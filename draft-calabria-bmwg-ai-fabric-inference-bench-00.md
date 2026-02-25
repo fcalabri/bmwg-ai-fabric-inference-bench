@@ -3,7 +3,7 @@ title: "Benchmarking Methodology for AI Inference Serving Network Fabrics"
 abbrev: "AI Inference Fabric Benchmarking"
 category: info
 
-docname: draft-calabria-bmwg-ai-fabric-inference-bench-00-latest
+docname: draft-calabria-bmwg-ai-fabric-inference-bench-latest
 submissiontype: IETF
 number:
 date: 2026-02-24
@@ -35,8 +35,6 @@ author:
    email: carlos@bluefern.consulting
 
 normative:
-  RFC2119:
-  RFC8174:
   RFC1242:
   RFC2544:
   RFC2889:
@@ -86,6 +84,16 @@ informative:
   K8S-INF:
     title: "llm-d: Kubernetes-Native Distributed LLM Inference"
     date: 2025
+
+venue:
+  group: "BMWG"
+  type: "Working Group"
+  mail: "bmwg@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/bmwg/"
+  github: "fcalabri/bmwg-ai-fabric-inference-bench"
+  latest: "https://fcalabri.github.io/bmwg-ai-fabric-inference-bench/draft-calabria-bmwg-ai-fabric-inference-bench.html"
+
+...
 
 --- abstract
 
@@ -147,9 +155,7 @@ reproducing inference serving traffic profiles.
 
 ## Requirements Language
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD",
-"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
-interpreted as described in {{RFC2119}} and {{RFC8174}}.
+{::boilerplate bcp14-tagged}
 
 ## Scope and Applicability
 
@@ -423,7 +429,7 @@ following components:
   KV cache to the appropriate decode workers. KV-aware routing and prefix-aware
   caching policies are under test.
 
-## Device Under Test (DUT) Identification
+## Device Under Test (DUT) Identification {#dut-id}
 
 The following table defines the DUT configurations tested in this document:
 
@@ -445,31 +451,35 @@ modes. The mode used MUST be documented in all test reports.
 
 The hardware traffic generator MUST satisfy all of the following:
 
-{:type="a"}
-1. RDMA traffic generation supporting RoCEv2 and, where tested, UET transport;
-   configurable RDMA verb types (one-sided PUT, PUT-with-signal, two-sided
-   SEND/RECV).
-2. Configurable message sizes from 4 KB (minimum KV cache page) to 256 MB
-   (large KV cache block).
-3. Configurable QP counts from 1 QP to a minimum of 256 QPs per
-   source-destination port pair.
+* RDMA traffic generation supporting RoCEv2 and, where tested, UET transport;
+  configurable RDMA verb types (one-sided PUT, PUT-with-signal, two-sided
+  SEND/RECV).
+
+* Configurable message sizes from 4 KB (minimum KV cache page) to 256 MB
+  (large KV cache block).
+
+* Configurable QP counts from 1 QP to a minimum of 256 QPs per
+  source-destination port pair.
 
 ### Software Workload Emulator (WE) - Minimum Requirements
 
 A software workload emulator runs on actual accelerators and generates realistic
 inference workloads. The WE MUST support all of the following:
 
-{:type="a"}
-1. Configurable prompt length distributions: uniform, Zipf, and trace-replay
-   modes.
-2. Configurable output length distributions and configurable request arrival
-   rates: Poisson, bursty, and trace-replay.
-3. Disaggregated prefill/decode execution with actual RDMA-based KV cache
-   transfer between prefill and decode worker pools.
-4. MoE expert parallelism with actual AllToAll dispatch where MoE-specific tests
-   ({{test-cat3}}) are performed.
-5. Measurement instrumentation providing per-request TTFT and ITL with timestamp
-   accuracy <= 1 millisecond.
+* Configurable prompt length distributions: uniform, Zipf, and trace-replay
+  modes.
+
+* Configurable output length distributions and configurable request arrival
+  rates: Poisson, bursty, and trace-replay.
+
+* Disaggregated prefill/decode execution with actual RDMA-based KV cache
+  transfer between prefill and decode worker pools.
+
+* MoE expert parallelism with actual AllToAll dispatch where MoE-specific tests
+  ({{test-cat3}}) are performed.
+
+* Measurement instrumentation providing per-request TTFT and ITL with timestamp
+  accuracy <= 1 millisecond.
 
 When a software workload emulator is used, the complete software configuration
 MUST be documented per {{dut-id}}, as framework version, RDMA library version,
@@ -688,7 +698,7 @@ capacity.
 xPyD ratios: 1P11D, 2P10D, 3P9D, 4P8D, 6P6D, 8P4D, 10P2D, 11P1D. For each
 ratio, submit a sustained request stream matching a target request rate with a
 specified prompt length distribution (e.g., Zipf with alpha=1.0 over
-[128, 8192] tokens). Measure TTFT P99, ITL P99, TPS_output, and Goodput for
+\[128, 8192\] tokens). Measure TTFT P99, ITL P99, TPS_output, and Goodput for
 each configuration.
 
 **Measurement:** Report all four metrics for each xPyD ratio and request rate.
@@ -707,10 +717,11 @@ strategies on prefill vs. decode pools in a disaggregated configuration.
 
 **Procedure:** Test the following parallelism configurations:
 
-{:type="a"}
-1. Prefill TP=8, Decode TP=8 (baseline, same parallelism)
-2. Prefill TP=8, Decode TP=4 with DP_Attention=2 (reduced TP, added DP)
-3. Prefill TP=4 with DP=2, Decode TP=2 with DP_Attention=4 (aggressive DP)
+* Prefill TP=8, Decode TP=8 (baseline, same parallelism)
+
+* Prefill TP=8, Decode TP=4 with DP_Attention=2 (reduced TP, added DP)
+
+* Prefill TP=4 with DP=2, Decode TP=2 with DP_Attention=4 (aggressive DP)
 
 **Measurement:** Report the number of concurrent RDMA flows, aggregate bandwidth
 (GB/s), TTFT (ms), and ITL (ms) at P50 and P99 for each configuration.
@@ -1154,13 +1165,13 @@ requirements apply:
 
 | Report Element | Format | Required? |
 |----------------|--------|-----------|
-| System Configuration | Structured table per above | MUST |
-| Workload Parameters | Structured table per above | MUST |
-| KPI Summary Table | Table with all measured KPIs | MUST |
-| Latency Distribution Plots | CDF or histogram per test section | SHOULD |
-| Throughput vs. Scale Graphs | Line chart per test section | SHOULD |
-| Fabric Health Indicators | Table per Section 4.4 | MUST |
-| Raw Data Appendix | Machine-readable format (CSV, JSON) | MAY |
+| System Configuration | Structured table per above | Yes (required) |
+| Workload Parameters | Structured table per above | Yes (required) |
+| KPI Summary Table | Table with all measured KPIs | Yes (required) |
+| Latency Distribution Plots | CDF or histogram per test section | Recommended |
+| Throughput vs. Scale Graphs | Line chart per test section | Recommended |
+| Fabric Health Indicators | Table per Section 4.4 | Yes (required) |
+| Raw Data Appendix | Machine-readable format (CSV, JSON) | Optional |
 {: #tab-reporting title="Reporting Format Requirements"}
 
 # Security Considerations
