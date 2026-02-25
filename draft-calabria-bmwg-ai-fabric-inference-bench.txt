@@ -6,6 +6,9 @@ Benchmarking Methodology Working Group                       F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
 Expires: 28 August 2026                             Blue Fern Consulting
+                                                                   Q. Wu
+                                                             G. Fioccola
+                                                                  Huawei
                                                         24 February 2026
 
 
@@ -1807,3 +1810,13 @@ Authors' Addresses
    Carlos Pignataro
    Blue Fern Consulting
    Email: carlos@bluefern.consulting
+
+
+   Qin Wu
+   Huawei
+   Email: bill.wu@huawei.com
+
+
+   Giuseppe Fioccola
+   Huawei
+   Email: giuseppe.fioccola@huawei.com
