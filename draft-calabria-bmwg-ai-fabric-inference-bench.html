@@ -26,8 +26,7 @@ congestion management under bursty inference traffic patterns, and scale/soak
 testing. The methodology enables apples-to-apples comparison across
 implementations, NIC transport stacks (RoCEv2, UET), and fabric architectures. 
        This document is a companion to  , which addresses training
-workloads, and the associated terminology document   that  SHOULD 
-be consulted before applying these methodologies. 
+workloads. 
     " name="description">
 <meta content="xml2rfc 3.31.0" name="generator">
 <meta content="benchmarking" name="keyword">
@@ -1136,8 +1135,7 @@ congestion management under bursty inference traffic patterns, and scale/soak
 testing. The methodology enables apples-to-apples comparison across
 implementations, NIC transport stacks (RoCEv2, UET), and fabric architectures.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
 <p id="section-abstract-3">This document is a companion to <span>[<a href="#TRAINING-BENCH" class="cite xref">TRAINING-BENCH</a>]</span>, which addresses training
-workloads, and the associated terminology document <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span> that <span class="bcp14">SHOULD</span>
-be consulted before applying these methodologies.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+workloads.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1481,7 +1479,7 @@ fabric-critical data movement: KV cache transfer. A single large prompt
 processed by a typical large-scale model generates multiple gigabytes of KV
 cache state that must be transferred from prefill workers to decode workers
 within a fraction of the target TTFT SLO.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">At cluster scale with thousands of concurrent requests, this creates sustained
+<p id="section-1-3">As clusters scale with thousands of concurrent requests, this creates sustained
 multi-terabyte-per-second aggregate transfer demands on the fabric.
 Simultaneously, Mixture-of-Experts (MoE) architectures introduce expert
 parallelism (EP), which distributes expert sub-networks across GPUs and requires
@@ -1550,8 +1548,7 @@ methodologies for AI training network fabrics. Both documents share common
 terminology (Section 2), test topology conventions (Section 3), and reporting
 formats (Section 14). Both documents <span class="bcp14">SHOULD</span> be used in conjunction with
 <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>, which defines the common terminology base for AI fabric
-benchmarking and <span class="bcp14">SHOULD</span> be consulted before applying the methodologies in either
-document.<a href="#section-1.4-1" class="pilcrow">¶</a></p>
+benchmarking which <span class="bcp14">SHOULD</span> be reused in both documents.<a href="#section-1.4-1" class="pilcrow">¶</a></p>
 <p id="section-1.4-2">Where training workloads are dominated by bulk synchronous collective
 communication (AllReduce, AllGather) with high bandwidth utilization and
 periodic synchronization barriers, inference workloads are dominated by bursty,
@@ -1567,7 +1564,7 @@ serve both training and inference workloads <span class="bcp14">SHOULD</span> ru
       <h2 id="name-terminology-and-definitions">
 <a href="#section-2" class="section-number selfRef">2. </a><a href="#name-terminology-and-definitions" class="section-name selfRef">Terminology and Definitions</a>
       </h2>
-<p id="section-2-1">The following terminology is used throughout this document. Terms defined in the
+<p id="section-2-1">The following terminologies are used throughout this document. Terms defined in the
 companion training document are referenced but not redefined unless the inference
 context introduces substantive differences.<a href="#section-2-1" class="pilcrow">¶</a></p>
 <span class="break"></span><dl class="dlParallel" id="section-2-2">
@@ -1848,14 +1845,14 @@ distinct pools connected by the fabric. The test topology <span class="bcp14">MU
 following components:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3.2-2.1">
-            <p id="section-3.2-2.1.1"><strong>Prefill Worker Pool:</strong> N_P nodes, each containing G accelerators with
+            <p id="section-3.2-2.1.1"><strong>Prefill Worker Pool:</strong> N Prefill nodes, each containing G accelerators with
 high-compute capability. These workers execute the prefill phase and generate
 KV cache state. Tensor Parallelism (TP) is applied within each node; Data
 Parallelism (DP) is applied across nodes. Each prefill worker communicates
 with one or more decode workers via RDMA-based KV cache transfer.<a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.2-2.2">
-            <p id="section-3.2-2.2.1"><strong>Decode Worker Pool:</strong> N_D nodes, each containing G accelerators with high
+            <p id="section-3.2-2.2.1"><strong>Decode Worker Pool:</strong> M Decode nodes, each containing G accelerators with high
 memory bandwidth. These workers receive KV cache state from prefill workers and
 execute the autoregressive decode phase. DP Attention may partition the KV
 cache across DP ranks within the decode pool, requiring AllToAll communication
@@ -1864,9 +1861,10 @@ during decode.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
           <li class="normal" id="section-3.2-2.3">
             <p id="section-3.2-2.3.1"><strong>KV Cache Transfer Network:</strong> The fabric segment connecting prefill and decode
 pools. This segment carries one-sided RDMA PUT operations (or PUT-with-signal)
-transferring KV cache blocks from prefill GPU memory to decode GPU memory. The
-transfer path may traverse NVLink (intra-node), PCIe/CXL (to NIC), and
-Ethernet/InfiniBand (inter-node).<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+transferring KV cache blocks from prefill GPU memory to decode GPU memory.
+The KV cache blocks transfer can be intra-node transfer,e.g.,NVLink transfer,
+or inter-node transfer,e.g., Ethernet/InfiniBand or NIC-Bound Transfer,e.g.,
+ PCIe/CXL transfer.<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.2-2.4">
             <p id="section-3.2-2.4.1"><strong>Request Router:</strong> A network-layer or application-layer load balancer that
@@ -1975,7 +1973,7 @@ rates: Poisson, bursty, and trace-replay.<a href="#section-3.4.2-2.2.1" class="p
 </li>
             <li class="normal" id="section-3.4.2-2.3">
               <p id="section-3.4.2-2.3.1">Disaggregated prefill/decode execution with actual RDMA-based KV cache
-transfer between prefill and decode worker pools.<a href="#section-3.4.2-2.3.1" class="pilcrow">¶</a></p>
+transfering between prefill and decode worker pools.<a href="#section-3.4.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
             <li class="normal" id="section-3.4.2-2.4">
               <p id="section-3.4.2-2.4.1">MoE expert parallelism with actual AllToAll dispatch where MoE-specific tests
