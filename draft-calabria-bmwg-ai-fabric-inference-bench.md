@@ -1,6 +1,7 @@
 ---
 title: "Benchmarking Methodology for AI Inference Serving Network Fabrics"
 abbrev: "AI Inference Fabric Benchmarking"
+update: 2544
 category: info
 
 docname: draft-calabria-bmwg-ai-fabric-inference-bench-latest
@@ -125,8 +126,7 @@ testing. The methodology enables apples-to-apples comparison across
 implementations, NIC transport stacks (RoCEv2, UET), and fabric architectures.
 
 This document is a companion to {{TRAINING-BENCH}}, which addresses training
-workloads, and the associated terminology document {{TERMINOLOGY}} that SHOULD
-be consulted before applying these methodologies.
+workloads.
 
 --- middle
 
@@ -148,7 +148,7 @@ processed by a typical large-scale model generates multiple gigabytes of KV
 cache state that must be transferred from prefill workers to decode workers
 within a fraction of the target TTFT SLO.
 
-At cluster scale with thousands of concurrent requests, this creates sustained
+As clusters scale with thousands of concurrent requests, this creates sustained
 multi-terabyte-per-second aggregate transfer demands on the fabric.
 Simultaneously, Mixture-of-Experts (MoE) architectures introduce expert
 parallelism (EP), which distributes expert sub-networks across GPUs and requires
@@ -205,8 +205,7 @@ methodologies for AI training network fabrics. Both documents share common
 terminology (Section 2), test topology conventions (Section 3), and reporting
 formats (Section 14). Both documents SHOULD be used in conjunction with
 {{TERMINOLOGY}}, which defines the common terminology base for AI fabric
-benchmarking and SHOULD be consulted before applying the methodologies in either
-document.
+benchmarking which SHOULD be reused in both documents.
 
 Where training workloads are dominated by bulk synchronous collective
 communication (AllReduce, AllGather) with high bandwidth utilization and
@@ -217,7 +216,7 @@ serve both training and inference workloads SHOULD run both test suites.
 
 # Terminology and Definitions
 
-The following terminology is used throughout this document. Terms defined in the
+The following terminologies are used throughout this document. Terms defined in the
 companion training document are referenced but not redefined unless the inference
 context introduces substantive differences.
 
@@ -416,13 +415,13 @@ The disaggregated topology separates the inference pipeline into physically
 distinct pools connected by the fabric. The test topology MUST include the
 following components:
 
-* **Prefill Worker Pool:** N_P nodes, each containing G accelerators with
+* **Prefill Worker Pool:** N Prefill nodes, each containing G accelerators with
   high-compute capability. These workers execute the prefill phase and generate
   KV cache state. Tensor Parallelism (TP) is applied within each node; Data
   Parallelism (DP) is applied across nodes. Each prefill worker communicates
   with one or more decode workers via RDMA-based KV cache transfer.
 
-* **Decode Worker Pool:** N_D nodes, each containing G accelerators with high
+* **Decode Worker Pool:** M Decode nodes, each containing G accelerators with high
   memory bandwidth. These workers receive KV cache state from prefill workers and
   execute the autoregressive decode phase. DP Attention may partition the KV
   cache across DP ranks within the decode pool, requiring AllToAll communication
@@ -430,9 +429,10 @@ following components:
 
 * **KV Cache Transfer Network:** The fabric segment connecting prefill and decode
   pools. This segment carries one-sided RDMA PUT operations (or PUT-with-signal)
-  transferring KV cache blocks from prefill GPU memory to decode GPU memory. The
-  transfer path may traverse NVLink (intra-node), PCIe/CXL (to NIC), and
-  Ethernet/InfiniBand (inter-node).
+  transferring KV cache blocks from prefill GPU memory to decode GPU memory.
+  The KV cache blocks transfer can be intra-node transfer,e.g.,NVLink transfer,
+  or inter-node transfer,e.g., Ethernet/InfiniBand or NIC-Bound Transfer,e.g.,
+   PCIe/CXL transfer.
 
 * **Request Router:** A network-layer or application-layer load balancer that
   assigns incoming inference requests to prefill workers and subsequently routes
@@ -483,7 +483,7 @@ inference workloads. The WE MUST support all of the following:
   rates: Poisson, bursty, and trace-replay.
 
 * Disaggregated prefill/decode execution with actual RDMA-based KV cache
-  transfer between prefill and decode worker pools.
+  transfering between prefill and decode worker pools.
 
 * MoE expert parallelism with actual AllToAll dispatch where MoE-specific tests
   ({{test-cat3}}) are performed.
