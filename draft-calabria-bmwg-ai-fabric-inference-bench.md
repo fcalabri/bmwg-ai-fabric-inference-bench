@@ -23,6 +23,14 @@ keyword:
  - MoE
  - disaggregated serving
 
+venue:
+  group: "BMWG"
+  type: "Working Group"
+  mail: "bmwg@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/bmwg/"
+  github: "fcalabri/bmwg-ai-fabric-inference-bench"
+  latest: "https://fcalabri.github.io/bmwg-ai-fabric-inference-bench/draft-calabria-bmwg-ai-fabric-inference-bench.html"
+
 author:
  - fullname: Fernando Calabria
    initials: F.
@@ -95,14 +103,6 @@ informative:
   K8S-INF:
     title: "llm-d: Kubernetes-Native Distributed LLM Inference"
     date: 2025
-
-venue:
-  group: "BMWG"
-  type: "Working Group"
-  mail: "bmwg@ietf.org"
-  arch: "https://mailarchive.ietf.org/arch/browse/bmwg/"
-  github: "fcalabri/bmwg-ai-fabric-inference-bench"
-  latest: "https://fcalabri.github.io/bmwg-ai-fabric-inference-bench/draft-calabria-bmwg-ai-fabric-inference-bench.html"
 
 ...
 
