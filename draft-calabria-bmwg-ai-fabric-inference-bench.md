@@ -1,6 +1,7 @@
 ---
 title: "Benchmarking Methodology for AI Inference Serving Network Fabrics"
 abbrev: "AI Inference Fabric Benchmarking"
+update: 2544
 category: info
 
 docname: draft-calabria-bmwg-ai-fabric-inference-bench-latest
