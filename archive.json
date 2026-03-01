@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-02-26T01:05:01.220565+00:00",
+  "timestamp": "2026-03-01T01:13:55.264416+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -50,5 +50,42 @@
     }
   ],
   "issues": [],
-  "pulls": []
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDORX8k_s7GaSnW",
+      "title": "Proposed Editorial changes to ai fabric inference benchmarking",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/1",
+      "state": "MERGED",
+      "author": "billwuqin",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-02-26T03:04:27Z",
+      "updatedAt": "2026-02-26T07:20:00Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "1eda30718d5712ef6cd157d199245b9a745769ee",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "billwuqin-patch-1",
+      "headRefOid": "9928d51196e75e22159386a79d14f3b3f3570106",
+      "closedAt": "2026-02-26T06:04:36Z",
+      "mergedAt": "2026-02-26T06:04:35Z",
+      "mergedBy": "billwuqin",
+      "mergeCommit": {
+        "oid": "b15a67ef4defb26dafb8ce60f80a93b699f4dd91"
+      },
+      "comments": [
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "Looks pretty good to me, thank you ! ",
+          "createdAt": "2026-02-26T07:19:58Z",
+          "updatedAt": "2026-02-26T07:19:58Z"
+        }
+      ],
+      "reviews": []
+    }
+  ]
 }
