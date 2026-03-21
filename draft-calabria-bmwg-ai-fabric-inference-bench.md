@@ -122,7 +122,7 @@ Coverage includes RDMA-based KV cache transfer between disaggregated prefill
 and decode workers, Mixture-of-Experts (MoE) expert parallelism AllToAll
 communication, request routing and load balancing for inference serving,
 congestion management under bursty inference traffic patterns, and scale/soak
-testing. The methodology enables apples-to-apples comparison across
+testing. The methodology enables direct, equivalent comparison across
 implementations, NIC transport stacks (RoCEv2, UET), and fabric architectures.
 
 This document is a companion to {{TRAINING-BENCH}}, which addresses training
@@ -203,9 +203,9 @@ dispatch, and disaggregated serving request routing.
 This document is a companion to {{TRAINING-BENCH}}, which defines benchmarking
 methodologies for AI training network fabrics. Both documents share common
 terminology (Section 2), test topology conventions (Section 3), and reporting
-formats (Section 14). Both documents SHOULD be used in conjunction with
-{{TERMINOLOGY}}, which defines the common terminology base for AI fabric
-benchmarking which SHOULD be reused in both documents.
+formats (Section 14). Both documents use the terminology defined in
+{{TERMINOLOGY}}, which provides the common terminology base for AI fabric
+benchmarking.
 
 Where training workloads are dominated by bulk synchronous collective
 communication (AllReduce, AllGather) with high bandwidth utilization and
@@ -216,7 +216,7 @@ serve both training and inference workloads SHOULD run both test suites.
 
 # Terminology and Definitions
 
-The following terminologies are used throughout this document. Terms defined in the
+The following terms are used throughout this document. Terms defined in the
 companion training document are referenced but not redefined unless the inference
 context introduces substantive differences.
 
@@ -430,9 +430,9 @@ following components:
 * **KV Cache Transfer Network:** The fabric segment connecting prefill and decode
   pools. This segment carries one-sided RDMA PUT operations (or PUT-with-signal)
   transferring KV cache blocks from prefill GPU memory to decode GPU memory.
-  The KV cache blocks transfer can be intra-node transfer,e.g.,NVLink transfer,
-  or inter-node transfer,e.g., Ethernet/InfiniBand or NIC-Bound Transfer,e.g.,
-   PCIe/CXL transfer.
+  The KV cache blocks transfer can be intra-node transfer, e.g., NVLink transfer,
+  or inter-node transfer, e.g., Ethernet/InfiniBand, or NIC-bound transfer, e.g.,
+  PCIe/CXL transfer.
 
 * **Request Router:** A network-layer or application-layer load balancer that
   assigns incoming inference requests to prefill workers and subsequently routes
@@ -483,7 +483,7 @@ inference workloads. The WE MUST support all of the following:
   rates: Poisson, bursty, and trace-replay.
 
 * Disaggregated prefill/decode execution with actual RDMA-based KV cache
-  transfering between prefill and decode worker pools.
+  transferring between prefill and decode worker pools.
 
 * MoE expert parallelism with actual AllToAll dispatch where MoE-specific tests
   ({{test-cat3}}) are performed.
@@ -505,23 +505,14 @@ Health Indicators (operational monitoring metrics).
 
 > NOTE: Where numerical reference values appear in the Target column of the KPI
 > tables below (including TTFT, ITL, and other latency targets), these values are
-> provided as informational reference points reflecting current industry
-> observations for interactive inference workloads. They do NOT constitute
-> benchmarking acceptance criteria or performance requirements. Per the BMWG
-> charter, the definition of acceptance criteria or performance requirements is
-> explicitly outside the scope of this Working Group. SLO values cited in this
-> document are illustrative examples from current industry practice. Implementers
-> MAY use these values as contextual references when interpreting results; they
-> MUST NOT be used as pass/fail thresholds in vendor evaluations.
-> Deployment-specific SLOs will vary by application, model architecture, and
-> operator requirements.
->
-> NOTE: Target values in this section are NON-NORMATIVE illustrative reference
-> points derived from current industry practice as of 2025-2026. They do NOT
-> constitute benchmarking acceptance criteria or performance requirements. Per
-> BMWG charter, defining acceptance criteria is explicitly out of scope.
-> Implementers MAY use these values as contextual references only; they MUST NOT
-> be used as pass/fail thresholds.
+> non-normative informational reference points reflecting current industry
+> observations for interactive inference workloads as of 2025-2026. They do NOT
+> constitute benchmarking acceptance criteria or performance requirements. Per the
+> BMWG charter, the definition of acceptance criteria or performance requirements
+> is explicitly outside the scope of this Working Group. Implementers MAY use
+> these values as contextual references when interpreting results; they MUST NOT
+> be used as pass/fail thresholds in vendor evaluations. Deployment-specific SLOs
+> will vary by application, model architecture, and operator requirements.
 
 ## Primary Latency KPIs
 
