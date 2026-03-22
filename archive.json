@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-19T01:10:48.361708+00:00",
+  "timestamp": "2026-03-22T01:10:37.766370+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -85,6 +85,34 @@
           "updatedAt": "2026-02-26T07:19:58Z"
         }
       ],
+      "reviews": []
+    },
+    {
+      "number": 2,
+      "id": "PR_kwDORX8k_s7MVyhq",
+      "title": "Editorial review: inclusive language, typos, and clarity",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/2",
+      "state": "MERGED",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "## Summary\n\n- Replace \"apples-to-apples\" colloquialism with \"direct, equivalent\" per NIST IR 8366 inclusive language guidance\n- Rewrite companion documents sentence (Section 1.4) to be factual, removing awkward double-SHOULD construction\n- Fix \"terminologies\" \u2192 \"terms\" (Section 2)\n- Fix \"transfering\" typo \u2192 \"transferring\"\n- Fix missing spaces and inconsistent capitalization in e.g. list (Section 3.2)\n- Consolidate duplicate NOTE blocks in KPI framework section (Section 4) into one\n\n## Test plan\n\n- [ ] Verify rendered HTML output looks correct\n- [ ] Confirm no unintended content changes (review diff)",
+      "createdAt": "2026-03-21T10:01:10Z",
+      "updatedAt": "2026-03-21T11:55:26Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "fdd42b1feb0a482f2f5473c8fbd68c85a7d725f2",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "carlos-review",
+      "headRefOid": "eef3df9506268215c41b493fdffa6d0cfdcbdaf1",
+      "closedAt": "2026-03-21T11:55:26Z",
+      "mergedAt": "2026-03-21T11:55:26Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "7e3169bf2f64f3682ab7d13e0ece2ec0c010fe52"
+      },
+      "comments": [],
       "reviews": []
     }
   ]
