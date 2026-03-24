@@ -433,26 +433,25 @@ following components:
   cache across DP ranks within the decode pool, requiring AllToAll communication
   during decode.
 
-* **KV Cache Transfer Network:**
+* **KV Cache Transfer Network:** KV Cache Transfer Network: The Ethernet fabric segment 
+  connecting prefill and decode worker pools.  This segment carries one-sided RDMA 
+  PUT operations (or PUT-with-signal)transferring KV cache blocks from prefill GPU memory
+   to  decode GPU memory viaRDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet 
+  Transport (UET).
   
-* KV Cache Transfer Network: The Ethernet fabric segment connecting prefill and decode
-   worker pools.  This segment carries one-sided RDMA PUT operations (or PUT-with-signal)
-   transferring KV cache blocks from prefill GPU memory to decode GPU memory via
-   RDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport (UET).
-
   NOTE ON TRANSFER PATH DECOMPOSITION: The end-to-end transfer from GPU memory
    to remote GPU memory traverses three segments:  (1) GPU-to-NIC:
-  PCIe/CXL (intra-node, out of scope as DUT); (2) NIC-to-NIC: Ethernet fabric (THE DUT — in scope); 
-  (3) NIC-to-GPU: PCIe/CXL at destination intra-node, out of scope as DUT).  Benchmarking 
-  procedures in Sections 5 and 6 measure fabric-segment latency and throughput exclusively.  
-  When end-to-end measurements are reported (e.g., TTFT decomposition), the intra-node 
-  segments MUST be labelled separately.  
-
+  PCIe/CXL (intra-node, out of scope as DUT); (2) NIC-to-NIC: Ethernet fabric (THE DUT 
+  — in scope); (3) NIC-to-GPU: PCIe/CXL at destination intra-node, out of scope as DUT). 
+   Benchmarking procedures in Sections 5 and 6 measure fabric-segment latency and
+   throughput exclusively.  When end-to-end measurements are reported (e.g., TTFT
+   decomposition), the intra-node segments MUST be labelled separately.  
+  
   The DUT boundary is illustrated as follows:
-
+  
   | GPU Memory -> [PCIe/CXL] ---> NIC ---> [ETHERNET FABRIC] ----> NIC ---> [PCIe/CXL] --> GPU Memory |
-  <----intra-node (out of scope)----->|<-----------DUT (in scope)------------>|<----intra-node (out of scope)----->|
-
+  <----intra-node (out of scope)----->|<----------DUT (in scope)------------>|<----intra-node (out of scope)----->|
+  
 * **Request Router:** A network-layer or application-layer load balancer that
   assigns incoming inference requests to prefill workers and subsequently routes
   KV cache to the appropriate decode workers. KV-aware routing and prefix-aware
