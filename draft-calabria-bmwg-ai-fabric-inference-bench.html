@@ -1087,6 +1087,9 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="workgroup">Benchmarking Methodology Working Group</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
 <dd class="internet-draft">draft-calabria-bmwg-ai-fabric-inference-bench-latest</dd>
+<dt class="label-updates">Updates:</dt>
+<dd class="updates">
+<a href="https://www.rfc-editor.org/rfc/rfc2544" class="eref">2544</a> (if approved)</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
 <time datetime="2026-02-24" class="published">24 February 2026</time>
@@ -1508,18 +1511,22 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
         <h3 id="name-scope-and-applicability">
 <a href="#section-1.2" class="section-number selfRef">1.2. </a><a href="#name-scope-and-applicability" class="section-name selfRef">Scope and Applicability</a>
         </h3>
-<p id="section-1.2-1">This document addresses the benchmarking of Ethernet-based network fabrics
-carrying AI inference serving traffic.<a href="#section-1.2-1" class="pilcrow">¶</a></p>
-<p id="section-1.2-2">The scope covers Layer 2/3 fabric performance (switch forwarding, link
-utilization, congestion management), RDMA transport performance (one-sided
-PUT/GET operations for KV cache transfer, two-sided SEND/RECV for expert
-parallelism dispatch), and the interaction between fabric behavior and
-application-level inference metrics (TTFT, ITL, TPS).<a href="#section-1.2-2" class="pilcrow">¶</a></p>
-<p id="section-1.2-3">The document does NOT address benchmarking of individual accelerator (GPU/XPU)
-compute performance, model accuracy or quality metrics, benchmarking of the
-inference serving software stack in isolation from the fabric, or live
-production network testing. All methodologies assume controlled laboratory
-conditions per BMWG convention.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
+<p id="section-1.2-1">The scope covers Layer 2/3 fabric performance (switch forwarding, link utilization,
+ congestion management), RDMA transport performance (one-sided PUT/GET operations
+ for KV cache transfer, two-sided SEND/RECV for expert parallelism dispatch), and
+the interaction between fabric behavior and application-level inference metrics
+ (TTFT, ITL, TPS).<a href="#section-1.2-1" class="pilcrow">¶</a></p>
+<p id="section-1.2-2">The DUT boundary for all measurements in this document is defined as the NIC-to-NIC
+Ethernet fabric segment — specifically, the path from the point of packet transmission
+ by the source NIC Ethernet port to the point of packet reception at the destination NIC
+ Ethernet port.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
+<p id="section-1.2-3">Intra-node transfer segments (NVLink GPU-to-GPU, PCIe/CXL GPU-to-NIC) are explicitly
+OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contributes
+ measurably to an end-to-end latency measurement (e.g., TTFT decomposition in Section 6.1), implementers <span class="bcp14">MUST</span> report intra-node transfer time as a separately labelled component
+ so that the fabric contribution can be isolated.  See Section 3.2 for DUT boundary diagram.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
+<p id="section-1.2-4">The document does NOT address benchmarking of individual accelerator (GPU/XPU) compute performance, model accuracy or quality metrics benchmarking of the inference serving
+ software stack in isolation from the fabric.<a href="#section-1.2-4" class="pilcrow">¶</a></p>
+<p id="section-1.2-5">All methodologies assume controlled laboratory conditions per BMWG convention.<a href="#section-1.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="relationship-to-existing-bmwg-work">
@@ -1859,18 +1866,39 @@ cache across DP ranks within the decode pool, requiring AllToAll communication
 during decode.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.2-2.3">
-            <p id="section-3.2-2.3.1"><strong>KV Cache Transfer Network:</strong> The fabric segment connecting prefill and decode
-pools. This segment carries one-sided RDMA PUT operations (or PUT-with-signal)
-transferring KV cache blocks from prefill GPU memory to decode GPU memory.
-The KV cache blocks transfer can be intra-node transfer, e.g., NVLink transfer,
-or inter-node transfer, e.g., Ethernet/InfiniBand, or NIC-bound transfer, e.g.,
-PCIe/CXL transfer.<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-3.2-2.3.1"><strong>KV Cache Transfer Network:</strong> The Ethernet fabric segment
+connecting prefill and decode worker pools.  This segment carries one-sided RDMA
+PUT operations (or PUT-with-signal) transferring KV cache blocks from prefill GPU memory
+to decode GPU memory via RDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet
+Transport (UET).<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-3.2-2.4">
-            <p id="section-3.2-2.4.1"><strong>Request Router:</strong> A network-layer or application-layer load balancer that
+        </ul>
+<p id="section-3.2-3">The end-to-end transfer from GPU memory to remote GPU memory traverses three segments:
+(1) GPU-to-NIC: PCIe/CXL (intra-node, out of scope as DUT);
+(2) NIC-to-NIC: Ethernet fabric (the DUT, in scope);
+(3) NIC-to-GPU: PCIe/CXL at destination (intra-node, out of scope as DUT).
+Benchmarking procedures in Sections 5 and 6 measure fabric-segment latency and
+throughput exclusively.  When end-to-end measurements are reported (e.g., TTFT
+decomposition), the intra-node segments <span class="bcp14">MUST</span> be labelled separately.<a href="#section-3.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.2-4">The DUT boundary is illustrated as follows:<a href="#section-3.2-4" class="pilcrow">¶</a></p>
+<span id="name-dut-boundary-nic-to-nic-eth"></span><div id="fig-dut-boundary">
+<figure id="figure-2">
+          <div class="alignLeft art-text artwork" id="section-3.2-5.1">
+<pre>
+  GPU Memory --&gt; [PCIe/CXL] --&gt; NIC --&gt; [ETHERNET FABRIC] --&gt; NIC --&gt; [PCIe/CXL] --&gt; GPU Memory
+  |&lt;-intra-node (out of scope--&gt;|&lt;--------DUT (in scope)-----&gt;|&lt;--intra-node (out of scope)--&gt;|
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-dut-boundary-nic-to-nic-eth" class="selfRef">DUT Boundary: NIC-to-NIC Ethernet Fabric Segment</a>
+          </figcaption></figure>
+</div>
+<ul class="normal">
+<li class="normal" id="section-3.2-6.1">
+            <p id="section-3.2-6.1.1"><strong>Request Router:</strong> A network-layer or application-layer load balancer that
 assigns incoming inference requests to prefill workers and subsequently routes
 KV cache to the appropriate decode workers. KV-aware routing and prefix-aware
-caching policies are under test.<a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
+caching policies are under test.<a href="#section-3.2-6.1.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
 </section>
@@ -3364,7 +3392,7 @@ parameter per <a href="#reporting" class="auto internal xref">Section 14</a>.<a 
 benchmarking over RoCEv2. The frame format follows the standard RoCEv2
 encapsulation with one-sided RDMA WRITE (PUT) operations.<a href="#appendix-C-1" class="pilcrow">¶</a></p>
 <span id="name-rocev2-kv-cache-transfer-fr"></span><div id="fig-roce-frame">
-<figure id="figure-2">
+<figure id="figure-3">
         <div class="alignLeft art-text artwork" id="appendix-C-2.1">
 <pre>
     0                   1                   2                   3
@@ -3407,7 +3435,7 @@ encapsulation with one-sided RDMA WRITE (PUT) operations.<a href="#appendix-C-1"
    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 </pre>
 </div>
-<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-rocev2-kv-cache-transfer-fr" class="selfRef">RoCEv2 KV Cache Transfer Frame (One-Sided RDMA WRITE)</a>
         </figcaption></figure>
 </div>
