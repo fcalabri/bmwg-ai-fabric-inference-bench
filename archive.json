@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-24T01:04:05.989001+00:00",
+  "timestamp": "2026-03-26T01:15:15.742248+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -114,6 +114,405 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDORX8k_s7ND4EJ",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/3",
+      "state": "CLOSED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "DUT Boundary and basic DUT scope diagram",
+      "createdAt": "2026-03-24T16:11:57Z",
+      "updatedAt": "2026-03-24T16:40:49Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "7e3169bf2f64f3682ab7d13e0ece2ec0c010fe52",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "DUT_Boundary",
+      "headRefOid": "710a08d86916eb15bc2a1639b4ae98ca6689ac24",
+      "closedAt": "2026-03-24T16:40:49Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7uct5N",
+          "commit": {
+            "abbreviatedOid": "710a08d"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-24T16:12:26Z",
+          "updatedAt": "2026-03-24T16:12:27Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "````suggestion\n The DUT boundary for all measurements in this document is defined as the NIC-to-NIC Ethernet fabric segment \u2014 specifically, the path from the point of packet transmission by the source NIC Ethernet port to the point of packet reception at the destination NIC Ethernet port.\n````",
+              "createdAt": "2026-03-24T16:12:26Z",
+              "updatedAt": "2026-03-24T16:12:27Z"
+            },
+            {
+              "originalPosition": 39,
+              "body": "````suggestion\n* **KV Cache Transfer Network:**\n\n````",
+              "createdAt": "2026-03-24T16:12:27Z",
+              "updatedAt": "2026-03-24T16:12:27Z"
+            },
+            {
+              "originalPosition": 42,
+              "body": "````suggestion\n  * NOTE ON TRANSFER PATH DECOMPOSITION: The end-to-end transfer from GPU memory to remote GPU memory traverses three segments: (1) GPU-to-NIC: PCIe/CXL (intra-node, out of scope as DUT); (2) NIC-to-NIC: Ethernet fabric (THE DUT \u2014 in scope); (3) NIC-to GPU: PCIe/CXL at destination (intra-node, out of scope as DUT).\n````",
+              "createdAt": "2026-03-24T16:12:27Z",
+              "updatedAt": "2026-03-24T16:12:27Z"
+            },
+            {
+              "originalPosition": 44,
+              "body": "````suggestion\n    Benchmarking procedures in Sections 5 and 6 measure fabric-segment latency and throughput exclusively.  When end-to-end measurements are reported (e.g., TTFT decomposition), the intra-node segments MUST be labelled separately.\n````",
+              "createdAt": "2026-03-24T16:12:27Z",
+              "updatedAt": "2026-03-24T16:12:27Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDORX8k_s7NFEEN",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/4",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "DUT Boundary Definitions",
+      "createdAt": "2026-03-24T17:22:41Z",
+      "updatedAt": "2026-03-24T17:56:05Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "7e3169bf2f64f3682ab7d13e0ece2ec0c010fe52",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "DUT_Boundary",
+      "headRefOid": "7f09ed4ca638c7dceb56ab5a47a85b170fcdba78",
+      "closedAt": "2026-03-24T17:29:06Z",
+      "mergedAt": "2026-03-24T17:29:06Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "c96f7ea66d0e5d230fb75a2fffa9de9a1792730d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7uecZf",
+          "commit": {
+            "abbreviatedOid": "752b038"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-24T17:23:10Z",
+          "updatedAt": "2026-03-24T17:23:11Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "````suggestion\nserving network fabrics. As Large Language Model (LLM) inference deployments\n````",
+              "createdAt": "2026-03-24T17:23:10Z",
+              "updatedAt": "2026-03-24T17:23:11Z"
+            },
+            {
+              "originalPosition": 25,
+              "body": "````suggestion\nThe DUT boundary for all measurements in this document is defined as the NIC-to-NIC Ethernet fabric segment \u2014 specifically, the path from the point of packet transmission by the source NIC Ethernet port to the point of packet reception at the destination NIC Ethernet port.\n````",
+              "createdAt": "2026-03-24T17:23:10Z",
+              "updatedAt": "2026-03-24T17:23:11Z"
+            },
+            {
+              "originalPosition": 49,
+              "body": "````suggestion\n\n  NOTE ON TRANSFER PATH DECOMPOSITION: The end-to-end transfer from GPU memory to remote GPU memory traverses three segments:  (1) GPU-to-NIC: PCIe/CXL (intra-node, out of scope as DUT); (2) NIC-to-NIC: Ethernet fabric (THE DUT \u2014 in scope); (3) NIC-to-GPU: PCIe/CXL at destination (intra-node, out of scope as DUT).  Benchmarking procedures in Sections 5 and 6 measure fabric-segment latency and throughput exclusively.  When end-to-end measurements are reported (e.g., TTFT decomposition), the intra-node segments MUST be labelled separately.\n\n````",
+              "createdAt": "2026-03-24T17:23:11Z",
+              "updatedAt": "2026-03-24T17:23:11Z"
+            },
+            {
+              "originalPosition": 51,
+              "body": "````suggestion\n\n````",
+              "createdAt": "2026-03-24T17:23:11Z",
+              "updatedAt": "2026-03-24T17:23:11Z"
+            },
+            {
+              "originalPosition": 54,
+              "body": "````suggestion\n\n````",
+              "createdAt": "2026-03-24T17:23:11Z",
+              "updatedAt": "2026-03-24T17:23:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7uejzM",
+          "commit": {
+            "abbreviatedOid": "7f09ed4"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-24T17:27:04Z",
+          "updatedAt": "2026-03-24T17:27:04Z",
+          "comments": [
+            {
+              "originalPosition": 46,
+              "body": "````suggestion\n* **KV Cache Transfer Network:**\n````",
+              "createdAt": "2026-03-24T17:27:04Z",
+              "updatedAt": "2026-03-24T17:27:04Z"
+            },
+            {
+              "originalPosition": 52,
+              "body": "````suggestion\n  (intra-node, out of scope as DUT).  Benchmarking procedures in Sections 5 and 6 measure fabric-segment latency and throughput exclusively.  When end-to-end measurements are reported (e.g., TTFT decomposition), the intra-node segments MUST be labelled separately.\n````",
+              "createdAt": "2026-03-24T17:27:04Z",
+              "updatedAt": "2026-03-24T17:27:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7uej4A",
+          "commit": {
+            "abbreviatedOid": "752b038"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-24T17:27:06Z",
+          "updatedAt": "2026-03-24T17:27:07Z",
+          "comments": [
+            {
+              "originalPosition": 25,
+              "body": "````suggestion\nThe DUT boundary for all measurements in this document is defined as the NIC-to-NIC Ethernet fabric segment \u2014 specifically, the path from the point of packet transmission by the source NIC Ethernet port to the point of packet reception at the destination NIC Ethernet port.\n````",
+              "createdAt": "2026-03-24T17:27:06Z",
+              "updatedAt": "2026-03-24T17:27:07Z"
+            },
+            {
+              "originalPosition": 49,
+              "body": "````suggestion\n\n  NOTE ON TRANSFER PATH DECOMPOSITION: The end-to-end transfer from GPU memory to remote GPU memory traverses three segments:  (1) GPU-to-NIC: PCIe/CXL (intra-node, out of scope as DUT); (2) NIC-to-NIC: Ethernet fabric (THE DUT \u2014 in scope); (3) NIC-to-GPU: PCIe/CXL at destination (intra-node, out of scope as DUT).  Benchmarking procedures in Sections 5 and 6 measure fabric-segment latency and throughput exclusively.  When end-to-end measurements are reported (e.g., TTFT decomposition), the intra-node segments MUST be labelled separately.\n\n````",
+              "createdAt": "2026-03-24T17:27:06Z",
+              "updatedAt": "2026-03-24T17:27:07Z"
+            },
+            {
+              "originalPosition": 51,
+              "body": "````suggestion\n\n````",
+              "createdAt": "2026-03-24T17:27:06Z",
+              "updatedAt": "2026-03-24T17:27:07Z"
+            },
+            {
+              "originalPosition": 54,
+              "body": "````suggestion\n\n````",
+              "createdAt": "2026-03-24T17:27:06Z",
+              "updatedAt": "2026-03-24T17:27:07Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "id": "PR_kwDORX8k_s7NGBaB",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/5",
+      "state": "CLOSED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-03-24T18:14:31Z",
+      "updatedAt": "2026-03-24T18:38:28Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "c96f7ea66d0e5d230fb75a2fffa9de9a1792730d",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "DUT_Boundary",
+      "headRefOid": "8c80222d9fdcaa20e996a7ff94727e6b6aa8fcca",
+      "closedAt": "2026-03-24T18:38:28Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7ugA5_",
+          "commit": {
+            "abbreviatedOid": "f48e2ca"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-24T18:21:14Z",
+          "updatedAt": "2026-03-24T18:21:14Z",
+          "comments": [
+            {
+              "originalPosition": 18,
+              "body": "````suggestion\n for KV cache transfer, two-sided SEND/RECV for expert parallelism dispatch), and\n````",
+              "createdAt": "2026-03-24T18:21:14Z",
+              "updatedAt": "2026-03-24T18:21:14Z"
+            },
+            {
+              "originalPosition": 23,
+              "body": "````suggestion\nThe DUT boundary for all measurements in this document is defined as the NIC-to-NIC\nEthernet fabric segment \u2014 specifically, the path from the point of packet\n````",
+              "createdAt": "2026-03-24T18:21:14Z",
+              "updatedAt": "2026-03-24T18:21:14Z"
+            },
+            {
+              "originalPosition": 25,
+              "body": "````suggestion\nat the destination NIC Ethernet port.\n````",
+              "createdAt": "2026-03-24T18:21:14Z",
+              "updatedAt": "2026-03-24T18:21:14Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "````suggestion\nIntra-node transfer segments (NVLink GPU-to-GPU, PCIe/CXL GPU-to-NIC) are explicitly\n````",
+              "createdAt": "2026-03-24T18:21:14Z",
+              "updatedAt": "2026-03-24T18:21:14Z"
+            },
+            {
+              "originalPosition": 34,
+              "body": "````suggestion\nThe document does NOT address benchmarking of individual accelerator (GPU/XPU) compute\n````",
+              "createdAt": "2026-03-24T18:21:14Z",
+              "updatedAt": "2026-03-24T18:21:14Z"
+            },
+            {
+              "originalPosition": 57,
+              "body": "````suggestion\n  PCIe/CXL (intra-node, out of scope as DUT); (2) NIC-to-NIC: Ethernet fabric\n````",
+              "createdAt": "2026-03-24T18:21:14Z",
+              "updatedAt": "2026-03-24T18:21:14Z"
+            },
+            {
+              "originalPosition": 62,
+              "body": "````suggestion\n  latency and throughput exclusively.\n  When end-to-end measurements are reported (e.g., TTFT decomposition), the intra-node\n  segments MUST be labelled separately.\n````",
+              "createdAt": "2026-03-24T18:21:14Z",
+              "updatedAt": "2026-03-24T18:21:14Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7ugZ6Q",
+          "commit": {
+            "abbreviatedOid": "8c80222"
+          },
+          "author": "github-actions",
+          "authorAssociation": "NONE",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-24T18:38:01Z",
+          "updatedAt": "2026-03-24T18:38:02Z",
+          "comments": [
+            {
+              "originalPosition": 24,
+              "body": "````suggestion\nThe DUT boundary for all measurements in this document is defined as the NIC-to-NIC\n````",
+              "createdAt": "2026-03-24T18:38:01Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "````suggestion\n Ethernet port.\n````",
+              "createdAt": "2026-03-24T18:38:01Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            },
+            {
+              "originalPosition": 56,
+              "body": "````suggestion\n* **KV Cache Transfer Network:** KV Cache Transfer Network: The Ethernet fabric segment\n  connecting prefill and decode worker pools.  This segment carries one-sided RDMA\n````",
+              "createdAt": "2026-03-24T18:38:01Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            },
+            {
+              "originalPosition": 58,
+              "body": "````suggestion\n   to  decode GPU memory viaRDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet\n````",
+              "createdAt": "2026-03-24T18:38:01Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            },
+            {
+              "originalPosition": 60,
+              "body": "````suggestion\n\n````",
+              "createdAt": "2026-03-24T18:38:01Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            },
+            {
+              "originalPosition": 64,
+              "body": "````suggestion\n  PCIe/CXL (intra-node, out of scope as DUT); (2) NIC-to-NIC: Ethernet fabric (THE DUT\n  \u2014 in scope); (3) NIC-to-GPU: PCIe/CXL at destination intra-node, out of scope as DUT).\n````",
+              "createdAt": "2026-03-24T18:38:01Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            },
+            {
+              "originalPosition": 68,
+              "body": "````suggestion\n   decomposition), the intra-node segments MUST be labelled separately.\n\n````",
+              "createdAt": "2026-03-24T18:38:01Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            },
+            {
+              "originalPosition": 75,
+              "body": "````suggestion\n\n````",
+              "createdAt": "2026-03-24T18:38:02Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            },
+            {
+              "originalPosition": 78,
+              "body": "````suggestion\n\n````",
+              "createdAt": "2026-03-24T18:38:02Z",
+              "updatedAt": "2026-03-24T18:38:02Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "id": "PR_kwDORX8k_s7NG88m",
+      "title": "DUT  BOUNDARY _new Section ",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/6",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "Updated Scope # 1.2 and DUT Boundaries plus Figure #1 ",
+      "createdAt": "2026-03-24T19:08:55Z",
+      "updatedAt": "2026-03-24T20:03:42Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "c96f7ea66d0e5d230fb75a2fffa9de9a1792730d",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "DUT_Boundary",
+      "headRefOid": "c20f83649d8158780e223216ee9a2c9930132b98",
+      "closedAt": "2026-03-24T20:03:31Z",
+      "mergedAt": "2026-03-24T20:03:31Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "d682e6c38c384c21d62e93ae0c965f40fcbeda0d"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7uiJ2d",
+          "commit": {
+            "abbreviatedOid": "c20f836"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-03-24T19:58:16Z",
+          "updatedAt": "2026-03-24T19:58:16Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
