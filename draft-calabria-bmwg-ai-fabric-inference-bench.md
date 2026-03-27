@@ -1,7 +1,7 @@
 ---
 title: "Benchmarking Methodology for AI Inference Serving Network Fabrics"
 abbrev: "AI Inference Fabric Benchmarking"
-update: 2544
+updates: 2544
 category: info
 
 docname: draft-calabria-bmwg-ai-fabric-inference-bench-latest
@@ -169,18 +169,24 @@ reproducing inference serving traffic profiles.
 
 ## Scope and Applicability
 
-This document addresses the benchmarking of Ethernet-based network fabrics
-carrying AI inference serving traffic.
+The scope covers Layer 2/3 fabric performance (switch forwarding, link utilization,
+ congestion management), RDMA transport performance (one-sided PUT/GET operations
+ for KV cache transfer, two-sided SEND/RECV for expert parallelism dispatch), and
+the interaction between fabric behavior and application-level inference metrics
+ (TTFT, ITL, TPS).
 
-The scope covers Layer 2/3 fabric performance (switch forwarding, link utilization, congestion management), RDMA transport performance (one-sided
-PUT/GET operations for KV cache transfer, two-sided SEND/RECV for expert parallelism dispatch), and the interaction between fabric behavior and
-application-level inference metrics (TTFT, ITL, TPS).
+The DUT boundary for all measurements in this document is defined as the NIC-to-NIC
+Ethernet fabric segment — specifically, the path from the point of packet transmission
+ by the source NIC Ethernet port to the point of packet reception at the destination NIC
+ Ethernet port.
 
-The DUT boundary for all measurements in this document is defined as the NIC-to-NIC Ethernet fabric segment — specifically, the path from the point of packet transmission by the source NIC Ethernet port to the point of packet reception at the destination NIC Ethernet port.
+Intra-node transfer segments (NVLink GPU-to-GPU, PCIe/CXL GPU-to-NIC) are explicitly
+OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contributes
+ measurably to an end-to-end latency measurement (e.g., TTFT decomposition in Section 6.1), implementers MUST report intra-node transfer time as a separately labelled component
+ so that the fabric contribution can be isolated.  See Section 3.2 for DUT boundary diagram.
 
-Intra-node transfer segments (NVLink GPU-to-GPU, PCIe/CXL GPU-to-NIC) are explicitly OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contributes measurably to an end-to-end latency measurement (e.g., TTFT decomposition in Section 6.1), implementers MUST report intra-node transfer time as a separately labelled component so that the fabric contribution can be isolated.  See Section 3.2 for DUT boundary diagram.
-
-The document does NOT address benchmarking of individual accelerator (GPU/XPU) compute performance, model accuracy or quality metrics benchmarking of the inference serving software stack in isolation from the fabric.
+The document does NOT address benchmarking of individual accelerator (GPU/XPU) compute performance, model accuracy or quality metrics benchmarking of the inference serving
+ software stack in isolation from the fabric.
 
 All methodologies assume controlled laboratory conditions per BMWG convention.
 
@@ -477,7 +483,13 @@ following components:
 
   NOTE ON TRANSFER PATH DECOMPOSITION: The end-to-end transfer from GPU memory to remote GPU memory traverses three segments: (1) GPU-to-NIC: PCIe/CXL (intra-node, out of scope as DUT); (2) NIC-to-NIC: Ethernet fabric (THE DUT — in scope); (3) NIC-to-GPU: PCIe/CXL at destination (intra-node, out of scope as DUT). Benchmarking procedures in Sections 5 and 6 measure fabric-segment latency and throughput exclusively. When end-to-end measurements are reported (e.g., TTFT decomposition), the intra-node segments MUST be labelled separately.
 
-  The DUT boundary is illustrated as follows:
+The end-to-end transfer from GPU memory to remote GPU memory traverses three segments:
+(1) GPU-to-NIC: PCIe/CXL (intra-node, out of scope as DUT);
+(2) NIC-to-NIC: Ethernet fabric (the DUT, in scope);
+(3) NIC-to-GPU: PCIe/CXL at destination (intra-node, out of scope as DUT).
+Benchmarking procedures in Sections 5 and 6 measure fabric-segment latency and
+throughput exclusively.  When end-to-end measurements are reported (e.g., TTFT
+decomposition), the intra-node segments MUST be labelled separately.
 
   ~~~~
   GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] --> GPU Memory
