@@ -386,12 +386,12 @@ S_KV:
 
         Attention variant mapping for  H_kv:
 
-    		MHA (Multi-Head Attention):    H_kv = H_total
-    		
-    		GQA (Grouped-Query Attention): H_kv = H_total / GQA_ratio
-                                   		 (e.g., H_total=64, GQA_ratio=8 -> H_kv=8)
-                                   		
-    		MQA (Multi-Query Attention):   H_kv = 1
+        MHA (Multi-Head Attention):    H_kv = H_total
+
+        GQA (Grouped-Query Attention): H_kv = H_total / GQA_ratio
+                                       (e.g., H_total=64, GQA_ratio=8 -> H_kv=8)
+
+        MQA (Multi-Query Attention):   H_kv = 1
 
   This formula yields the total KV cache bytes for one complete
   inference request.  The per-layer, per-token contribution is:
@@ -492,7 +492,7 @@ throughput exclusively.  When end-to-end measurements are reported (e.g., TTFT
 decomposition), the intra-node segments MUST be labelled separately.
 
   ~~~~
-  GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] --> GPU Memory
+  GPU Memory --> \[PCIe/CXL\] --> NIC --> \[ETHERNET FABRIC\] --> NIC --> \[PCIe/CXL\] --> GPU Memory
   <---intra-node (out of scope)--->|<------DUT (in scope)------->|<---intra-node (out of scope)--->
   ~~~~
 
@@ -1421,7 +1421,7 @@ bandwidth for the Low-Latency Dispatch path.
 This appendix provides a sample calculation for the S_KV formula already provided.
 It's based on a '70B parameter model at FP16 with 4K context' model
 
-```
+~~~
 Parameter                      Symbol   Value   Source
 Transformer layers             L        80      Published architecture
 KV attention heads (GQA-8)     H_kv     8       H_total=64 / GQA_ratio=8
@@ -1433,19 +1433,22 @@ Step-by-Step Calculation
 
 S_KV = 2  ×  L  ×  H_kv  ×   D   ×    C    × P_bytes
 
-     = 2  ×  80  ×   8   ×  128  ×  4,096  ×    2
+ = 2  ×  80  ×   8   ×  128  ×  4,096  ×    2
 
 Step 1:  2  × 80           =         160   (K + V tensors × layers)
+
 Step 2:  160 × 8           =       1,280   (× KV heads)
+
 Step 3:  1,280 × 128       =     163,840   (× head dimension)
+
 Step 4:  163,840 × 4,096   = 671,088,640   (× context tokens)
+
 Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
-```
+~~~
 
-
+{:numbered="false"}
 
 # Acknowledgements
-{:numbered="false"}
 
 Contributions and review are solicited from the BMWG mailing list
 (bmwg@ietf.org) and the broader AI networking community. The BMWG chairs and
