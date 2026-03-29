@@ -1787,12 +1787,12 @@ inference request across all transformer layers and all context tokens, computed
 
   Attention variant mapping for  H_kv:
 
-          MHA (Multi-Head Attention):    H_kv = H_total
+  MHA (Multi-Head Attention):    H_kv = H_total
 
-          GQA (Grouped-Query Attention): H_kv = H_total / GQA_ratio
-                                           (e.g., H_total=64, GQA_ratio=8 -&gt; H_kv=8)
+  GQA (Grouped-Query Attention): H_kv = H_total / GQA_ratio
+                                 (e.g., H_total=64, GQA_ratio=8 -&gt; H_kv=8)
 
-          MQA (Multi-Query Attention):   H_kv = 1
+  MQA (Multi-Query Attention):   H_kv = 1
 </pre><a href="#section-2-2.52.5" class="pilcrow">¶</a>
 </div>
 <p id="section-2-2.52.6">This formula yields the total KV cache bytes for one complete
@@ -3635,26 +3635,32 @@ bandwidth for the Low-Latency Dispatch path.<a href="#appendix-D-5" class="pilcr
       </h2>
 <p id="appendix-E-1">This appendix provides a sample calculation for the S_KV formula already provided.
 It's based on a '70B parameter model at FP16 with 4K context' model<a href="#appendix-E-1" class="pilcrow">¶</a></p>
-<p id="appendix-E-2">```
+<div class="alignLeft art-text artwork" id="appendix-E-2">
+<pre>
 Parameter                      Symbol   Value   Source
 Transformer layers             L        80      Published architecture
 KV attention heads (GQA-8)     H_kv     8       H_total=64 / GQA_ratio=8
 Per-head dimension             D        128     model_dim(8192) / H_total(64)
 Context length                 C        4,096   Given
-Precision                      P_bytes  2       FP16 = 2 bytes/element<a href="#appendix-E-2" class="pilcrow">¶</a></p>
-<p id="appendix-E-3">Step-by-Step Calculation<a href="#appendix-E-3" class="pilcrow">¶</a></p>
-<p id="appendix-E-4">S_KV = 2  ×  L  ×  H_kv  ×   D   ×    C    × P_bytes<a href="#appendix-E-4" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="appendix-E-5">
-<pre>
+Precision                      P_bytes  2       FP16 = 2 bytes/element
+
+Step-by-Step Calculation
+
+S_KV = 2  ×  L  ×  H_kv  ×   D   ×    C    × P_bytes
+
  = 2  ×  80  ×   8   ×  128  ×  4,096  ×    2
-</pre><a href="#appendix-E-5" class="pilcrow">¶</a>
-</div>
-<p id="appendix-E-6">Step 1:  2  × 80           =         160   (K + V tensors × layers)
+
+Step 1:  2  × 80           =         160   (K + V tensors × layers)
+
 Step 2:  160 × 8           =       1,280   (× KV heads)
+
 Step 3:  1,280 × 128       =     163,840   (× head dimension)
+
 Step 4:  163,840 × 4,096   = 671,088,640   (× context tokens)
+
 Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
-```<a href="#appendix-E-6" class="pilcrow">¶</a></p>
+</pre><a href="#appendix-E-2" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 <div id="acknowledgements">

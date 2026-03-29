@@ -437,12 +437,12 @@ Table of Contents
 
         Attention variant mapping for  H_kv:
 
-                MHA (Multi-Head Attention):    H_kv = H_total
+        MHA (Multi-Head Attention):    H_kv = H_total
 
-                GQA (Grouped-Query Attention): H_kv = H_total / GQA_ratio
-                                                 (e.g., H_total=64, GQA_ratio=8 -> H_kv=8)
+        GQA (Grouped-Query Attention): H_kv = H_total / GQA_ratio
+                                       (e.g., H_total=64, GQA_ratio=8 -> H_kv=8)
 
-                MQA (Multi-Query Attention):   H_kv = 1
+        MQA (Multi-Query Attention):   H_kv = 1
 
       This formula yields the total KV cache bytes for one complete
       inference request.  The per-layer, per-token contribution is:
@@ -1893,22 +1893,28 @@ Appendix E.  Model Architecture Parameters
    already provided.  It's based on a '70B parameter model at FP16 with
    4K context' model
 
-   ``` Parameter Symbol Value Source Transformer layers L 80 Published
-   architecture KV attention heads (GQA-8) H_kv 8 H_total=64 /
-   GQA_ratio=8 Per-head dimension D 128 model_dim(8192) / H_total(64)
-   Context length C 4,096 Given Precision P_bytes 2 FP16 = 2 bytes/
-   element
+Parameter                      Symbol   Value   Source
+Transformer layers             L        80      Published architecture
+KV attention heads (GQA-8)     H_kv     8       H_total=64 / GQA_ratio=8
+Per-head dimension             D        128     model_dim(8192) / H_total(64)
+Context length                 C        4,096   Given
+Precision                      P_bytes  2       FP16 = 2 bytes/element
 
-   Step-by-Step Calculation
+Step-by-Step Calculation
 
-   S_KV = 2 × L × H_kv × D × C × P_bytes
+S_KV = 2  ×  L  ×  H_kv  ×   D   ×    C    × P_bytes
 
-    = 2  ×  80  ×   8   ×  128  ×  4,096  ×    2
+ = 2  ×  80  ×   8   ×  128  ×  4,096  ×    2
 
-   Step 1: 2 × 80 = 160 (K + V tensors × layers) Step 2: 160 × 8 = 1,280
-   (× KV heads) Step 3: 1,280 × 128 = 163,840 (× head dimension) Step 4:
-   163,840 × 4,096 = 671,088,640 (× context tokens) Step 5: 671,088,640
-   × 2 = 1,342,177,280 bytes ```
+Step 1:  2  × 80           =         160   (K + V tensors × layers)
+
+Step 2:  160 × 8           =       1,280   (× KV heads)
+
+Step 3:  1,280 × 128       =     163,840   (× head dimension)
+
+Step 4:  163,840 × 4,096   = 671,088,640   (× context tokens)
+
+Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
 
 Acknowledgements
 
