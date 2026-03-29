@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-26T01:15:15.742248+00:00",
+  "timestamp": "2026-03-29T01:18:21.629994+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -510,6 +510,48 @@
           "body": "",
           "createdAt": "2026-03-24T19:58:16Z",
           "updatedAt": "2026-03-24T19:58:16Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "PR_kwDORX8k_s7OFHLu",
+      "title": "New formula (parameters) + sample on Appendix ",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/7",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "configurations can now be fully specified. no more fix reference  '70B at FP16' without parameterization",
+      "createdAt": "2026-03-27T15:07:28Z",
+      "updatedAt": "2026-03-28T12:35:00Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "d682e6c38c384c21d62e93ae0c965f40fcbeda0d",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "new_Formula",
+      "headRefOid": "6cd447d79b1e4e141ecb83c8709472ae56c20d27",
+      "closedAt": "2026-03-28T12:35:00Z",
+      "mergedAt": "2026-03-28T12:35:00Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "5a0ef6d725f49c1118163ebe777bf14db94bee4e"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7v7jEU",
+          "commit": {
+            "abbreviatedOid": "6cd447d"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-03-28T09:18:26Z",
+          "updatedAt": "2026-03-28T09:18:26Z",
           "comments": []
         }
       ]
