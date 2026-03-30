@@ -66,12 +66,12 @@ informative:
     title: "Benchmarking Methodology for AI Training Network Fabrics"
     date: 2026
     seriesinfo:
-      Internet-Draft: draft-calabria-bmwg-ai-fabric-training-bench-00
+      Internet-Draft: draft-calabria-bmwg-ai-fabric-training-bench
   TERMINOLOGY:
     title: "AI Fabric Benchmarking Terminology"
     date: 2026
     seriesinfo:
-      Internet-Draft: draft-calabria-bmwg-ai-fabric-terminology-00
+      Internet-Draft: draft-calabria-bmwg-ai-fabric-terminology
   UEC-SPEC:
     title: "UEC Specification 1.0"
     author:
