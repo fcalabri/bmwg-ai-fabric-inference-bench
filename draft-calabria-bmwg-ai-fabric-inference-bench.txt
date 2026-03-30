@@ -1636,16 +1636,16 @@ Table of Contents
 
    [TERMINOLOGY]
               "AI Fabric Benchmarking Terminology", Work in Progress,
-              Internet-Draft, draft-calabria-bmwg-ai-fabric-terminology-
-              00, 2026, <https://datatracker.ietf.org/doc/html/draft-
-              calabria-bmwg-ai-fabric-terminology-00>.
+              Internet-Draft, draft-calabria-bmwg-ai-fabric-terminology,
+              2026, <https://datatracker.ietf.org/doc/html/draft-
+              calabria-bmwg-ai-fabric-terminology>.
 
    [TRAINING-BENCH]
               "Benchmarking Methodology for AI Training Network
               Fabrics", Work in Progress, Internet-Draft, draft-
-              calabria-bmwg-ai-fabric-training-bench-00, 2026,
+              calabria-bmwg-ai-fabric-training-bench, 2026,
               <https://datatracker.ietf.org/doc/html/draft-calabria-
-              bmwg-ai-fabric-training-bench-00>.
+              bmwg-ai-fabric-training-bench>.
 
    [UEC-SPEC] Ultra Ethernet Consortium, "UEC Specification 1.0", 2024.
 
