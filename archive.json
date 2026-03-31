@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-29T01:18:21.629994+00:00",
+  "timestamp": "2026-03-31T01:16:44.774695+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -49,7 +49,159 @@
       "color": "ffffff"
     }
   ],
-  "issues": [],
+  "issues": [
+    {
+      "number": 8,
+      "id": "I_kwDORX8k_s74gEzM",
+      "title": "Scope clarification from Sowjanya",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/8",
+      "state": "CLOSED",
+      "author": "billwuqin",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "https://mailarchive.ietf.org/arch/msg/bmwg/0xCFN_7IyGEP33IlsNHTERFoCnY/",
+      "createdAt": "2026-03-30T09:32:06Z",
+      "updatedAt": "2026-03-30T13:03:09Z",
+      "closedAt": "2026-03-30T13:03:09Z",
+      "comments": [
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "Issues 1 and 2 addressed, not so sure about  if we need to address 3 (it\u2019s clear that the fabric is on scope so GPU stall does not / should not need to be addressed - also thinking about if we do this how we avoid getting into 'gaikwad's' draft territory and agree with 4, still needs to be addressed ",
+          "createdAt": "2026-03-30T11:37:06Z",
+          "updatedAt": "2026-03-30T11:37:06Z"
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "id": "I_kwDORX8k_s74gGJ-",
+      "title": "KV cache size assumptions from Sowjanya",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/9",
+      "state": "CLOSED",
+      "author": "billwuqin",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "https://mailarchive.ietf.org/arch/msg/bmwg/0xCFN_7IyGEP33IlsNHTERFoCnY/",
+      "createdAt": "2026-03-30T09:32:53Z",
+      "updatedAt": "2026-03-30T11:37:50Z",
+      "closedAt": "2026-03-30T11:37:50Z",
+      "comments": []
+    },
+    {
+      "number": 10,
+      "id": "I_kwDORX8k_s74gHn2",
+      "title": "GPU utilization metrics from Sowjanya",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/10",
+      "state": "CLOSED",
+      "author": "billwuqin",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "https://mailarchive.ietf.org/arch/msg/bmwg/0xCFN_7IyGEP33IlsNHTERFoCnY/",
+      "createdAt": "2026-03-30T09:33:39Z",
+      "updatedAt": "2026-03-30T19:58:22Z",
+      "closedAt": "2026-03-30T19:58:22Z",
+      "comments": [
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "DUT boundaries are well defined -  GPU / compute is not part of the DUT ,  do not want to get into application-level inference metrics  as it may conflict with <draft-gaikwad-llm-benchmarking-methodology-00>. and their specific definition for TTFT . This will require to specify new GPU Stall / Idle variables ",
+          "createdAt": "2026-03-30T13:11:35Z",
+          "updatedAt": "2026-03-30T13:11:35Z"
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "id": "I_kwDORX8k_s74gItE",
+      "title": "MoE configuration assumptions from Sowjanya",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/11",
+      "state": "CLOSED",
+      "author": "billwuqin",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "https://mailarchive.ietf.org/arch/msg/bmwg/0xCFN_7IyGEP33IlsNHTERFoCnY/",
+      "createdAt": "2026-03-30T09:34:14Z",
+      "updatedAt": "2026-03-30T20:02:17Z",
+      "closedAt": "2026-03-30T20:02:17Z",
+      "comments": [
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "working on a General MoE Traffic Formula  adding a Canonical MoE Test Matrix (7.1) and Routing Mode Generalization  update for 7.2 ",
+          "createdAt": "2026-03-30T13:05:36Z",
+          "updatedAt": "2026-03-30T13:05:36Z"
+        },
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "new definition ",
+          "createdAt": "2026-03-30T20:02:17Z",
+          "updatedAt": "2026-03-30T20:02:17Z"
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "id": "I_kwDORX8k_s74w4CJ",
+      "title": "MoE Configuration  Beyond Fixed (256, top-2)",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/12",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "expand on this  single hardcoded configuration ",
+      "createdAt": "2026-03-30T19:38:17Z",
+      "updatedAt": "2026-03-30T19:38:17Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 13,
+      "id": "I_kwDORX8k_s74xfzh",
+      "title": "Goodput",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/13",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "4.2 Primary Throughput KPIs \u2014 Goodput row, Definition cell from Terminology ",
+      "createdAt": "2026-03-30T20:04:14Z",
+      "updatedAt": "2026-03-30T20:04:14Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 14,
+      "id": "I_kwDORX8k_s74xiqb",
+      "title": "busBW",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/14",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Section 7 MoE EP AllToAll to reflect terminology",
+      "createdAt": "2026-03-30T20:06:08Z",
+      "updatedAt": "2026-03-30T20:06:08Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
   "pulls": [
     {
       "number": 1,
@@ -526,7 +678,7 @@
       "labels": [],
       "body": "configurations can now be fully specified. no more fix reference  '70B at FP16' without parameterization",
       "createdAt": "2026-03-27T15:07:28Z",
-      "updatedAt": "2026-03-28T12:35:00Z",
+      "updatedAt": "2026-03-29T14:20:19Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "d682e6c38c384c21d62e93ae0c965f40fcbeda0d",
