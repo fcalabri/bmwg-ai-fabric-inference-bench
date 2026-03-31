@@ -594,10 +594,10 @@ Health Indicators (operational monitoring metrics).
 | TPS_input | tokens/s | Aggregate input (prefill) tokens processed per second across all workers | SUT-E prefill completion events |
 | TPS_output | tokens/s | Aggregate output (decode) tokens generated per second across all workers | SUT-E token emission events |
 | TPS_per_GPU | tokens/s/GPU | Output tokens per second normalized by number of decode GPUs | SUT-E per-worker counters |
-| Goodput | tokens/s | Effective output token rate excluding tokens from preempted, evicted, or failed requests | SUT-E successful completion events |
+| Goodput | GB/s or tokens/s | See {{TERMINOLOGY}}, Section 10 (Goodput)<br />Reports MUST use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | KV_BW | GB/s | Aggregate KV cache transfer bandwidth between prefill and decode pools | DUT-PD RDMA counters |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
-{: #tab-throughput-kpis title="Primary Throughput KPIs"}
+|{: #tab-throughput-kpis title="Primary Throughput KPIs"}||||
 
 ## Fabric-Level KPIs
 
