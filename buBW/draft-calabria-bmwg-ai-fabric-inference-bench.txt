@@ -124,8 +124,9 @@ Table of Contents
      6.4.  Prefill Queue Depth Impact on Transfer Latency
    7.  Test Category 3: MoE Expert Parallelism Benchmarks
      7.1.  AllToAll Dispatch Throughput
-     7.2.  Wide Expert Parallelism Scaling
-     7.3.  Expert Parallelism and KV Cache Transfer Contention
+     7.2.  Normal vs. Low-Latency Dispatch Mode Comparison.
+     7.3.  Wide Expert Parallelism Scaling
+     7.4.  Expert Parallelism and KV Cache Transfer Contention
    8.  Test Category 4: Congestion Management Benchmarks
      8.1.  ECN Marking Under Inference Incast
      8.2.  PFC Behavior Under Bursty KV Cache Transfers
@@ -1075,7 +1076,9 @@ Table of Contents
    NOTE: If per-accelerator normalized throughput (BusBW) is reported
    alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is
    (n-1)/n where n is the number of EP ranks.  See the BusBW definition
-   in [TERMINOLOGY].  Normal vs. Low-Latency Dispatch Mode Comparison.
+   in [TERMINOLOGY].
+
+7.2.  Normal vs. Low-Latency Dispatch Mode Comparison.
 
    *Objective:* To compare fabric performance under Normal Dispatch
    (optimized for prefill, dynamic shapes, incompatible with CUDA Graph)
@@ -1091,7 +1094,7 @@ Table of Contents
    each mode.  Report the latency ratio LL/Normal for equivalent EP
    sizes.  Report the fabric bandwidth utilization (%) for each mode.
 
-7.2.  Wide Expert Parallelism Scaling
+7.3.  Wide Expert Parallelism Scaling
 
    *Objective:* To characterize AllToAll dispatch performance as EP
    group size scales beyond a single node (wide EP), requiring inter-
@@ -1107,7 +1110,7 @@ Table of Contents
    node fraction).  Report the scaling efficiency: (EP=8 latency) /
    (EP=N latency) * (N/8).
 
-7.3.  Expert Parallelism and KV Cache Transfer Contention
+7.4.  Expert Parallelism and KV Cache Transfer Contention
 
    *Objective:* To measure the mutual interference between EP AllToAll
    dispatch traffic and KV cache transfer traffic when both share the
