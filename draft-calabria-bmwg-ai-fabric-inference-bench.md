@@ -58,6 +58,7 @@ normative:
   RFC2544:
   RFC2889:
   RFC6349:
+  TERMINOLOGY: I-D.calabria-bmwg-ai-fabric-terminology
 
 informative:
   RFC7432:
@@ -67,11 +68,6 @@ informative:
     date: 2026
     seriesinfo:
       Internet-Draft: draft-calabria-bmwg-ai-fabric-training-bench
-  TERMINOLOGY:
-    title: "AI Fabric Benchmarking Terminology"
-    date: 2026
-    seriesinfo:
-      Internet-Draft: draft-calabria-bmwg-ai-fabric-terminology
   UEC-SPEC:
     title: "UEC Specification 1.0"
     author:
@@ -210,7 +206,7 @@ This document is a companion to {{TRAINING-BENCH}}, which defines benchmarking
 methodologies for AI training network fabrics. Both documents share common
 terminology (Section 2), test topology conventions (Section 3), and reporting
 formats (Section 14). Both documents use the terminology defined in
-{{TERMINOLOGY}}, which provides the common terminology base for AI fabric
+{{!TERMINOLOGY}}, which provides the common terminology base for AI fabric
 benchmarking.
 
 Where training workloads are dominated by bulk synchronous collective
@@ -594,7 +590,7 @@ Health Indicators (operational monitoring metrics).
 | TPS_input | tokens/s | Aggregate input (prefill) tokens processed per second across all workers | SUT-E prefill completion events |
 | TPS_output | tokens/s | Aggregate output (decode) tokens generated per second across all workers | SUT-E token emission events |
 | TPS_per_GPU | tokens/s/GPU | Output tokens per second normalized by number of decode GPUs | SUT-E per-worker counters |
-| Goodput | tokens/s | Effective output token rate excluding tokens from preempted, evicted, or failed requests | SUT-E successful completion events |
+| Goodput | GB/s or tokens/s | See the Goodput definition in {{!TERMINOLOGY}}<br />Reports MUST use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | KV_BW | GB/s | Aggregate KV cache transfer bandwidth between prefill and decode pools | DUT-PD RDMA counters |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
 {: #tab-throughput-kpis title="Primary Throughput KPIs"}
@@ -830,7 +826,9 @@ be repeated a minimum of 20 times per configuration.
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
 dimension. A companion latency table MUST be included.
 
-## Normal vs. Low-Latency Dispatch Mode Comparison
+NOTE: If per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is (n-1)/n where n is the number of EP ranks. See the BusBW definition in {{!TERMINOLOGY}}.
+
+## Normal vs. Low-Latency Dispatch Mode Comparison.
 
 **Objective:** To compare fabric performance under Normal Dispatch (optimized
 for prefill, dynamic shapes, incompatible with CUDA Graph) and Low-Latency
@@ -1018,8 +1016,7 @@ is provided.
 | CFG-C          | Large MHA: L=96, H_kv=64 (MHA), D=128, BF16               | 12.3 GB           | 98.6 GB            | >300 GB             |
 | CFG-D          | Mid INT8: L=80, H_kv=8 (GQA), D=128, INT8 (quantized)     | 0.67 GB           | 5.4 GB             | 21.5 GB             |
 | CFG-E (custom) | Implementer-defined:  L=___, H_kv=___, D=___, P=___       | Computed          | Computed           | Computed            |
-
-{: #tab-conf-matrix="Reference Configuration Matrix"}
+{: #tab-conf-matrix title="Reference Configuration Matrix"}
 
 **Measurement:** Report TTFT, T_transfer, and T_transfer/TTFT at P50, P95, P99
 for each prompt length. The test MUST be repeated a minimum of 100 times per
