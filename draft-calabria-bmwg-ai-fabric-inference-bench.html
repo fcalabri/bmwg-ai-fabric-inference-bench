@@ -1318,7 +1318,7 @@ workloads.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-alltoall-dispatch-throughpu" class="internal xref">AllToAll Dispatch Throughput</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-normal-vs-low-latency-dispa" class="internal xref">Normal vs. Low-Latency Dispatch Mode Comparison</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-normal-vs-low-latency-dispa" class="internal xref">Normal vs. Low-Latency Dispatch Mode Comparison.</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
                 <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-wide-expert-parallelism-sca" class="internal xref">Wide Expert Parallelism Scaling</a></p>
@@ -2180,8 +2180,8 @@ will vary by application, model architecture, and operator requirements.<a href=
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Goodput</td>
-              <td class="text-left" rowspan="1" colspan="1">tokens/s</td>
-              <td class="text-left" rowspan="1" colspan="1">Effective output token rate excluding tokens from preempted, evicted, or failed requests</td>
+              <td class="text-left" rowspan="1" colspan="1">GB/s or tokens/s</td>
+              <td class="text-left" rowspan="1" colspan="1">See the Goodput definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span><br>Reports <span class="bcp14">MUST</span> use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements</td>
               <td class="text-left" rowspan="1" colspan="1">SUT-E successful completion events</td>
             </tr>
             <tr>
@@ -2573,12 +2573,13 @@ be repeated a minimum of 20 times per configuration.<a href="#section-7.1-3" cla
 <p id="section-7.1-4"><strong>Reporting Format:</strong> Results <span class="bcp14">SHOULD</span> be reported as a heatmap with EP group size
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
 dimension. A companion latency table <span class="bcp14">MUST</span> be included.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<p id="section-7.1-5">NOTE: If per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is (n-1)/n where n is the number of EP ranks. See the BusBW definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>.<a href="#section-7.1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="normal-vs-low-latency-dispatch-mode-comparison">
 <section id="section-7.2">
         <h3 id="name-normal-vs-low-latency-dispa">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-normal-vs-low-latency-dispa" class="section-name selfRef">Normal vs. Low-Latency Dispatch Mode Comparison</a>
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-normal-vs-low-latency-dispa" class="section-name selfRef">Normal vs. Low-Latency Dispatch Mode Comparison.</a>
         </h3>
 <p id="section-7.2-1"><strong>Objective:</strong> To compare fabric performance under Normal Dispatch (optimized
 for prefill, dynamic shapes, incompatible with CUDA Graph) and Low-Latency
@@ -2791,8 +2792,12 @@ the fabric-dependent KV cache transfer component.<a href="#section-10.1-1" class
 of 128, 256, 512, 1024, 2048, 4096, 8192, and 16384 tokens. Measure TTFT and
 decompose into T_prefill, T_transfer, and T_decode_init. As a refernce the following table
 is provided.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
+<span id="name-reference-configuration-mat"></span><div id="tab-conf-matrix">
 <table class="center" id="table-6">
-          <caption><a href="#table-6" class="selfRef">Table 6</a></caption>
+          <caption>
+<a href="#table-6" class="selfRef">Table 6</a>:
+<a href="#name-reference-configuration-mat" class="selfRef">Reference Configuration Matrix</a>
+          </caption>
 <thead>
             <tr>
               <th class="text-left" rowspan="1" colspan="1">Config ID</th>
@@ -2841,6 +2846,7 @@ is provided.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
             </tr>
           </tbody>
         </table>
+</div>
 <p id="section-10.1-4"><strong>Measurement:</strong> Report TTFT, T_transfer, and T_transfer/TTFT at P50, P95, P99
 for each prompt length. The test <span class="bcp14">MUST</span> be repeated a minimum of 100 times per
 prompt length<a href="#section-10.1-4" class="pilcrow">¶</a></p>
@@ -3214,8 +3220,12 @@ applicable.<a href="#section-15-2" class="pilcrow">¶</a></p>
 <span class="refAuthor">Constantine, B.</span>, <span class="refAuthor">Forget, G.</span>, <span class="refAuthor">Geib, R.</span>, and <span class="refAuthor">R. Schrage</span>, <span class="refTitle">"Framework for TCP Throughput Testing"</span>, <span class="seriesInfo">RFC 6349</span>, <span class="seriesInfo">DOI 10.17487/RFC6349</span>, <time datetime="2011-08" class="refDate">August 2011</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6349">https://www.rfc-editor.org/rfc/rfc6349</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="TERMINOLOGY">[TERMINOLOGY]</dt>
+      <dd>
+<span class="refAuthor">Calabria, F.</span>, <span class="refAuthor">Pignataro, C.</span>, <span class="refAuthor">Wu, Q.</span>, and <span class="refAuthor">G. Fioccola</span>, <span class="refTitle">"Benchmarking Terminology for AI Network Fabrics"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-calabria-bmwg-ai-fabric-terminology-00</span>, <time datetime="2026-02-26" class="refDate">26 February 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-terminology-00">https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-terminology-00</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -3253,10 +3263,6 @@ applicable.<a href="#section-15-2" class="pilcrow">¶</a></p>
 <dt id="SGLANG">[SGLANG]</dt>
         <dd>
 <span class="refTitle">"SGLang: Efficient Execution of Structured Language Model Programs"</span>, <time datetime="2024" class="refDate">2024</time>. </dd>
-<dd class="break"></dd>
-<dt id="TERMINOLOGY">[TERMINOLOGY]</dt>
-        <dd>
-<span class="refTitle">"AI Fabric Benchmarking Terminology"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-calabria-bmwg-ai-fabric-terminology</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-terminology">https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-terminology</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TRAINING-BENCH">[TRAINING-BENCH]</dt>
         <dd>

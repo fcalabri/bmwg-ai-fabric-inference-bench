@@ -124,7 +124,7 @@ Table of Contents
      6.4.  Prefill Queue Depth Impact on Transfer Latency
    7.  Test Category 3: MoE Expert Parallelism Benchmarks
      7.1.  AllToAll Dispatch Throughput
-     7.2.  Normal vs. Low-Latency Dispatch Mode Comparison
+     7.2.  Normal vs. Low-Latency Dispatch Mode Comparison.
      7.3.  Wide Expert Parallelism Scaling
      7.4.  Expert Parallelism and KV Cache Transfer Contention
    8.  Test Category 4: Congestion Management Benchmarks
@@ -720,43 +720,46 @@ Table of Contents
 
 4.2.  Primary Throughput KPIs
 
-   +==============+===========+==========================+=============+
-   | KPI          | Unit      | Definition               | Measurement |
-   |              |           |                          | Point       |
-   +==============+===========+==========================+=============+
-   | TPS_input    | tokens/s  | Aggregate input          | SUT-E       |
-   |              |           | (prefill) tokens         | prefill     |
-   |              |           | processed per second     | completion  |
-   |              |           | across all workers       | events      |
-   +--------------+-----------+--------------------------+-------------+
-   | TPS_output   | tokens/s  | Aggregate output         | SUT-E token |
-   |              |           | (decode) tokens          | emission    |
-   |              |           | generated per second     | events      |
-   |              |           | across all workers       |             |
-   +--------------+-----------+--------------------------+-------------+
-   | TPS_per_GPU  | tokens/s/ | Output tokens per        | SUT-E per-  |
-   |              | GPU       | second normalized by     | worker      |
-   |              |           | number of decode         | counters    |
-   |              |           | GPUs                     |             |
-   +--------------+-----------+--------------------------+-------------+
-   | Goodput      | tokens/s  | Effective output         | SUT-E       |
-   |              |           | token rate excluding     | successful  |
-   |              |           | tokens from              | completion  |
-   |              |           | preempted, evicted,      | events      |
-   |              |           | or failed requests       |             |
-   +--------------+-----------+--------------------------+-------------+
-   | KV_BW        | GB/s      | Aggregate KV cache       | DUT-PD RDMA |
-   |              |           | transfer bandwidth       | counters    |
-   |              |           | between prefill and      |             |
-   |              |           | decode pools             |             |
-   +--------------+-----------+--------------------------+-------------+
-   | Request_Rate | req/s     | Maximum sustained        | SUT-E       |
-   |              |           | request arrival rate     | admission   |
-   |              |           | meeting all latency      | control     |
-   |              |           | SLOs                     | boundary    |
-   +--------------+-----------+--------------------------+-------------+
+   +==============+===========+=========================+=============+
+   | KPI          | Unit      | Definition              | Measurement |
+   |              |           |                         | Point       |
+   +==============+===========+=========================+=============+
+   | TPS_input    | tokens/s  | Aggregate input         | SUT-E       |
+   |              |           | (prefill) tokens        | prefill     |
+   |              |           | processed per second    | completion  |
+   |              |           | across all workers      | events      |
+   +--------------+-----------+-------------------------+-------------+
+   | TPS_output   | tokens/s  | Aggregate output        | SUT-E token |
+   |              |           | (decode) tokens         | emission    |
+   |              |           | generated per second    | events      |
+   |              |           | across all workers      |             |
+   +--------------+-----------+-------------------------+-------------+
+   | TPS_per_GPU  | tokens/s/ | Output tokens per       | SUT-E per-  |
+   |              | GPU       | second normalized by    | worker      |
+   |              |           | number of decode GPUs   | counters    |
+   +--------------+-----------+-------------------------+-------------+
+   | Goodput      | GB/s or   | See the Goodput         | SUT-E       |
+   |              | tokens/s  | definition in           | successful  |
+   |              |           | [TERMINOLOGY]           | completion  |
+   |              |           | Reports MUST use        | events      |
+   |              |           | Inference_Goodput for   |             |
+   |              |           | token-rate measurements |             |
+   |              |           | and Fabric_Goodput for  |             |
+   |              |           | byte-rate fabric        |             |
+   |              |           | measurements            |             |
+   +--------------+-----------+-------------------------+-------------+
+   | KV_BW        | GB/s      | Aggregate KV cache      | DUT-PD RDMA |
+   |              |           | transfer bandwidth      | counters    |
+   |              |           | between prefill and     |             |
+   |              |           | decode pools            |             |
+   +--------------+-----------+-------------------------+-------------+
+   | Request_Rate | req/s     | Maximum sustained       | SUT-E       |
+   |              |           | request arrival rate    | admission   |
+   |              |           | meeting all latency     | control     |
+   |              |           | SLOs                    | boundary    |
+   +--------------+-----------+-------------------------+-------------+
 
-                      Table 3: Primary Throughput KPIs
+                     Table 3: Primary Throughput KPIs
 
 4.3.  Fabric-Level KPIs
 
@@ -1070,7 +1073,12 @@ Table of Contents
    (GB/s) as the color dimension.  A companion latency table MUST be
    included.
 
-7.2.  Normal vs. Low-Latency Dispatch Mode Comparison
+   NOTE: If per-accelerator normalized throughput (BusBW) is reported
+   alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is
+   (n-1)/n where n is the number of EP ranks.  See the BusBW definition
+   in [TERMINOLOGY].
+
+7.2.  Normal vs. Low-Latency Dispatch Mode Comparison.
 
    *Objective:* To compare fabric performance under Normal Dispatch
    (optimized for prefill, dynamic shapes, incompatible with CUDA Graph)
@@ -1287,7 +1295,7 @@ Table of Contents
    |          | P=_*                 |          |          |          |
    +----------+----------------------+----------+----------+----------+
 
-                                 Table 6
+                 Table 6: Reference Configuration Matrix
 
    *Measurement:* Report TTFT, T_transfer, and T_transfer/TTFT at P50,
    P95, P99 for each prompt length.  The test MUST be repeated a minimum
@@ -1604,6 +1612,14 @@ Table of Contents
               2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
               May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
 
+   [TERMINOLOGY]
+              Calabria, F., Pignataro, C., Wu, Q., and G. Fioccola,
+              "Benchmarking Terminology for AI Network Fabrics", Work in
+              Progress, Internet-Draft, draft-calabria-bmwg-ai-fabric-
+              terminology-00, 26 February 2026,
+              <https://datatracker.ietf.org/doc/html/draft-calabria-
+              bmwg-ai-fabric-terminology-00>.
+
 17.2.  Informative References
 
    [DISTSERVE]
@@ -1633,12 +1649,6 @@ Table of Contents
 
    [SGLANG]   "SGLang: Efficient Execution of Structured Language Model
               Programs", 2024.
-
-   [TERMINOLOGY]
-              "AI Fabric Benchmarking Terminology", Work in Progress,
-              Internet-Draft, draft-calabria-bmwg-ai-fabric-terminology,
-              2026, <https://datatracker.ietf.org/doc/html/draft-
-              calabria-bmwg-ai-fabric-terminology>.
 
    [TRAINING-BENCH]
               "Benchmarking Methodology for AI Training Network
