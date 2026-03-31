@@ -361,39 +361,39 @@ S_KV:
   inference request across all transformer layers and all context tokens, computed as:
 
     S_KV = 2 x L x H_kv x D x C x P_bytes
-    
+
     Where:
-    
+
      L        = number of transformer layers
-    
+
         H_kv     = number of KV attention heads per layer
                      (H_kv <= H_total for GQA/MQA; see note below)
-    
+
         D        = per-head key/value dimension (head_dim)
                      Typically: head_dim = model_dim / H_total
-    
+
         C        = context length in tokens (prompt tokens + generated tokens)
-    
+
         P_bytes  = precision in bytes per element
                      (FP16 / BF16 = 2,  FP8 / INT8 = 1)
-    
+
         Factor 2 = accounts for both the K (key) and V (value) tensors,
                    each of shape \[H_kv, D\] per layer per token
-    
+
         Attention variant mapping for  H_kv:
-    
+
         MHA (Multi-Head Attention):    H_kv = H_total
-    
+
         GQA (Grouped-Query Attention): H_kv = H_total / GQA_ratio
                                        (e.g., H_total=64, GQA_ratio=8 -> H_kv=8)
-    
+
         MQA (Multi-Query Attention):   H_kv = 1
 
   This formula yields the total KV cache bytes for one complete
   inference request.  The per-layer, per-token contribution is:
 
     s_kv_unit = 2 x H_kv x D x P_bytes (bytes per layer per token)
-    
+
     and S_KV = s_kv_unit x L x C.
 
   Assumption: all layers share identical H_kv and D values.  Hybrid
@@ -826,7 +826,7 @@ be repeated a minimum of 20 times per configuration.
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
 dimension. A companion latency table MUST be included.
 
-NOTE: If per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is (n-1)/n where n is the number of EP ranks. See the BusBW definition in {{!TERMINOLOGY}}. 
+NOTE: If per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is (n-1)/n where n is the number of EP ranks. See the BusBW definition in {{!TERMINOLOGY}}.
 
 ## Normal vs. Low-Latency Dispatch Mode Comparison.
 
