@@ -597,7 +597,7 @@ Health Indicators (operational monitoring metrics).
 | Goodput | GB/s or tokens/s | See {{TERMINOLOGY}}, Section 10 (Goodput)<br />Reports MUST use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | KV_BW | GB/s | Aggregate KV cache transfer bandwidth between prefill and decode pools | DUT-PD RDMA counters |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
-|{: #tab-throughput-kpis title="Primary Throughput KPIs"}||||
+{: #tab-throughput-kpis title="Primary Throughput KPIs"}
 
 ## Fabric-Level KPIs
 
@@ -830,6 +830,8 @@ be repeated a minimum of 20 times per configuration.
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
 dimension. A companion latency table MUST be included.
 
+NOTE: If per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is (n-1)/n where n is the number of EP ranks. The full BusBW reporting requirements in {{TERMINOLOGY}}, Section 10 applies.
+
 ## Normal vs. Low-Latency Dispatch Mode Comparison
 
 **Objective:** To compare fabric performance under Normal Dispatch (optimized
@@ -1018,8 +1020,7 @@ is provided.
 | CFG-C          | Large MHA: L=96, H_kv=64 (MHA), D=128, BF16               | 12.3 GB           | 98.6 GB            | >300 GB             |
 | CFG-D          | Mid INT8: L=80, H_kv=8 (GQA), D=128, INT8 (quantized)     | 0.67 GB           | 5.4 GB             | 21.5 GB             |
 | CFG-E (custom) | Implementer-defined:  L=___, H_kv=___, D=___, P=___       | Computed          | Computed           | Computed            |
-
-{: #tab-conf-matrix="Reference Configuration Matrix"}
+{: #tab-conf-matrix title="Reference Configuration Matrix"}
 
 **Measurement:** Report TTFT, T_transfer, and T_transfer/TTFT at P50, P95, P99
 for each prompt length. The test MUST be repeated a minimum of 100 times per
