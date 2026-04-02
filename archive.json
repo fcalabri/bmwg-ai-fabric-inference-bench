@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-03-31T01:16:44.774695+00:00",
+  "timestamp": "2026-04-02T01:13:34.563202+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -174,32 +174,48 @@
       "id": "I_kwDORX8k_s74xfzh",
       "title": "Goodput",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/13",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "4.2 Primary Throughput KPIs \u2014 Goodput row, Definition cell from Terminology ",
       "createdAt": "2026-03-30T20:04:14Z",
-      "updatedAt": "2026-03-30T20:04:14Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-03-31T13:11:14Z",
+      "closedAt": "2026-03-31T13:11:14Z",
+      "comments": [
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "addressed by new Definition (Refer to PR) ",
+          "createdAt": "2026-03-31T13:11:14Z",
+          "updatedAt": "2026-03-31T13:11:14Z"
+        }
+      ]
     },
     {
       "number": 14,
       "id": "I_kwDORX8k_s74xiqb",
       "title": "busBW",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/14",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Section 7 MoE EP AllToAll to reflect terminology",
       "createdAt": "2026-03-30T20:06:08Z",
-      "updatedAt": "2026-03-30T20:06:08Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-03-31T14:58:12Z",
+      "closedAt": "2026-03-31T14:58:12Z",
+      "comments": [
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "Updated definition on TERMINOLOGY at the end Section 7. (Note) - see PR ",
+          "createdAt": "2026-03-31T14:58:12Z",
+          "updatedAt": "2026-03-31T14:58:12Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -705,6 +721,184 @@
           "createdAt": "2026-03-28T09:18:26Z",
           "updatedAt": "2026-03-28T09:18:26Z",
           "comments": []
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "id": "PR_kwDORX8k_s7O8qeX",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/15",
+      "state": "CLOSED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Link updated Goodput definition and Units from Terminology",
+      "createdAt": "2026-03-31T13:08:35Z",
+      "updatedAt": "2026-03-31T15:01:58Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "69c0ae6ef65311539d31ea460ecabad2eb068888",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "Goodput",
+      "headRefOid": "638c665a54203da1fc7ab5337a395a1f71fa3c89",
+      "closedAt": "2026-03-31T15:01:57Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "added these changes to BUBW (Cloned from this branch) ",
+          "createdAt": "2026-03-31T15:01:57Z",
+          "updatedAt": "2026-03-31T15:01:57Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 16,
+      "id": "PR_kwDORX8k_s7O-wQA",
+      "title": "Bu bw",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/16",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "Updated Note on 7.1 - link TERMINOLOGY on updated BUSBW definition ",
+      "createdAt": "2026-03-31T15:00:09Z",
+      "updatedAt": "2026-03-31T19:54:14Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "69c0ae6ef65311539d31ea460ecabad2eb068888",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "buBW",
+      "headRefOid": "15782ccbf3ff021e1746cc7fd927ce598f0d92ac",
+      "closedAt": "2026-03-31T19:54:14Z",
+      "mergedAt": "2026-03-31T19:54:14Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "435c2d831a706064c8520fbeb81f3c1448b3b166"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7wuaFk",
+          "commit": {
+            "abbreviatedOid": "157f667"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-03-31T16:46:03Z",
+          "updatedAt": "2026-03-31T16:46:11Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "What is Section 10? Can this be a citation instead of a hardcoded number?",
+              "createdAt": "2026-03-31T16:46:03Z",
+              "updatedAt": "2026-03-31T16:46:11Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7wuh7Y",
+          "commit": {
+            "abbreviatedOid": "157f667"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-31T16:52:08Z",
+          "updatedAt": "2026-03-31T16:52:09Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "its the entire  Table (Section 10) of the Terminology doc,  the definitions are long and some like BUSBW have several formulas and a set of  reporting requirements depending on the algo selected | ",
+              "createdAt": "2026-03-31T16:52:09Z",
+              "updatedAt": "2026-03-31T16:52:09Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7wwJP-",
+          "commit": {
+            "abbreviatedOid": "157f667"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-31T18:04:35Z",
+          "updatedAt": "2026-03-31T18:04:35Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "should I use instead See the BusBW definition in {{TERMINOLOGY}}.  ??",
+              "createdAt": "2026-03-31T18:04:35Z",
+              "updatedAt": "2026-03-31T18:07:01Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7wwP1N",
+          "commit": {
+            "abbreviatedOid": "157f667"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "\nshould I use instead See the BusBW definition in {{TERMINOLOGY}}. ??",
+          "createdAt": "2026-03-31T18:09:46Z",
+          "updatedAt": "2026-03-31T18:09:46Z",
+          "comments": []
+        },
+        {
+          "id": "PRR_kwDORX8k_s7ww-tH",
+          "commit": {
+            "abbreviatedOid": "157f667"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-31T18:44:30Z",
+          "updatedAt": "2026-03-31T18:44:30Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "Char, please see last commit to see if it acceptable - thank a lot man for all your help and guidance ",
+              "createdAt": "2026-03-31T18:44:30Z",
+              "updatedAt": "2026-03-31T18:44:30Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7wx9E2",
+          "commit": {
+            "abbreviatedOid": "15782cc"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-03-31T19:31:34Z",
+          "updatedAt": "2026-03-31T19:31:34Z",
+          "comments": [
+            {
+              "originalPosition": 13,
+              "body": "This is good -- or \"Section 10 of xyz\" too",
+              "createdAt": "2026-03-31T19:31:34Z",
+              "updatedAt": "2026-03-31T19:31:34Z"
+            }
+          ]
         }
       ]
     }
