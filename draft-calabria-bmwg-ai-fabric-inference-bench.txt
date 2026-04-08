@@ -124,7 +124,7 @@ Table of Contents
      6.4.  Prefill Queue Depth Impact on Transfer Latency
    7.  Test Category 3: MoE Expert Parallelism Benchmarks
      7.1.  AllToAll Dispatch Throughput
-     7.2.  Normal vs. Low-Latency Dispatch Mode Comparison.
+     7.2.  Routing Mode and Dispatch Mode Comparison.
      7.3.  Wide Expert Parallelism Scaling
      7.4.  Expert Parallelism and KV Cache Transfer Contention
    8.  Test Category 4: Congestion Management Benchmarks
@@ -1056,12 +1056,35 @@ Table of Contents
    *Objective:* To determine the maximum AllToAll dispatch throughput
    for MoE expert parallelism across the DUT fabric.
 
-   *Procedure:* Configure N GPUs in an EP group (e.g., N = 8, 16, 32,
-   64, 96).  Generate a synthetic MoE dispatch workload where each GPU
-   sends token embeddings to the experts selected by a top-k routing
-   function (k=2 typical).  Measure the aggregate AllToAll bandwidth and
-   per-dispatch latency for batch sizes of 1, 8, 32, 128, and 512
-   tokens, and EP group sizes of 8, 16, 32, 64, and 96.
+   *Procedure:* Generate a synthetic MoE dispatch workload where each
+   GPU sends token embeddings to the experts selected by a top-k routing
+   function.  The dispatch payload per GPU per MoE layer is:
+
+   T_dispatch = (B * k * H_model * P_bytes) / N. where B = batch size
+   (tokens), k = top-k routing count, H_model = hidden dimension,
+   P_bytes = precision bytes (BF16=2), N = EP group size
+
+   *Canonical MoE Test Matrix*
+
+    +========+======================+=========+=========+=============+
+    | Config | E (experts)          | k (top- | H_model | T_dispatch  |
+    |        |                      | k)      |         | (B=128,     |
+    |        |                      |         |         | BF16, N=96) |
+    +========+======================+=========+=========+=============+
+    | M1     | 8                    | 2       | 4096    | 2.1 MB/GPU  |
+    +--------+----------------------+---------+---------+-------------+
+    | M2     | 64                   | 4       | 7168    | 29 MB/GPU   |
+    +--------+----------------------+---------+---------+-------------+
+    | M3     | 256                  | 2       | 7168    | 14 MB/GPU   |
+    +--------+----------------------+---------+---------+-------------+
+    | M4     | 256                  | 8       | 7168    | 58 MB/GPU   |
+    +--------+----------------------+---------+---------+-------------+
+    | M5     | (implementer-defined |         |         |             |
+    |        | — report all         |         |         |             |
+    |        | parameters)          |         |         |             |
+    +--------+----------------------+---------+---------+-------------+
+
+                     Table 6: Canonical MoE Test Matrix
 
    *Measurement:* Report aggregate bandwidth (GB/s), per-dispatch
    latency (us) at P50 and P99, and GPU idle time waiting for dispatch
@@ -1071,28 +1094,47 @@ Table of Contents
    *Reporting Format:* Results SHOULD be reported as a heatmap with EP
    group size on the Y axis, batch size on the X axis, and throughput
    (GB/s) as the color dimension.  A companion latency table MUST be
-   included.
+   included.  Reports MUST state which config row(s) were used.  M5 MUST
+   include E, k, H_model, P_bytes, and N in the results table.
 
    NOTE: If per-accelerator normalized throughput (BusBW) is reported
    alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is
    (n-1)/n where n is the number of EP ranks.  See the BusBW definition
    in [TERMINOLOGY].
 
-7.2.  Normal vs. Low-Latency Dispatch Mode Comparison.
+7.2.  Routing Mode and Dispatch Mode Comparison.
 
-   *Objective:* To compare fabric performance under Normal Dispatch
-   (optimized for prefill, dynamic shapes, incompatible with CUDA Graph)
-   and Low-Latency Dispatch (optimized for decode, fixed shapes, CUDA
-   Graph compatible).
+   *Objective:* To compare fabric performance across dispatch modes and
+   routing policies.  Tests MUST cover Normal Dispatch and Low-Latency
+   Dispatch.  Tests SHOULD additionally cover at least one alternative
+   routing mode from Table 7.
 
-   *Procedure:* Execute identical MoE dispatch workloads in both modes
-   for EP group sizes of 8, 32, and 96 GPUs.  For Normal Dispatch, use
-   batch sizes of 128, 256, and 512 (typical prefill).  For Low-Latency
-   Dispatch, use batch sizes of 1, 4, 8, and 16 (typical decode).
+   *Routing Mode Taxonomy*
 
-   *Measurement:* Report per-dispatch latency (us) at P50, P95, P99 for
-   each mode.  Report the latency ratio LL/Normal for equivalent EP
-   sizes.  Report the fabric bandwidth utilization (%) for each mode.
+    +=============+=========================+=========================+
+    | Mode        | Description             | Traffic Impact          |
+    +=============+=========================+=========================+
+    | Standard    | Each token routed to k. | Fixed, uniform AllToAll |
+    | Top-k       | highest-scoring experts | dispatch volume         |
+    +-------------+-------------------------+-------------------------+
+    | Expert      | Experts select tokens;  | Non-uniform message     |
+    | Choice (EC) | ensures load balance    | sizes; tests HOL-       |
+    |             |                         | blocking resilience     |
+    +-------------+-------------------------+-------------------------+
+    | Top-k with  | Overloaded experts drop | Lower peak traffic;     |
+    | Token Drop  | excess tokens           | unpredictable under     |
+    |             |                         | load                    |
+    +-------------+-------------------------+-------------------------+
+    | Auxiliary   | Load-balanced top-k via | Near-uniform AllToAll;  |
+    | Loss Top-k  | training loss           | lower hot-spot risk     |
+    +-------------+-------------------------+-------------------------+
+
+                     Table 7: MoE Routing Mode Taxonomy
+
+   *Measurement:* Measure dispatch latency, fabric bandwidth, and
+   routing mode impact on AllToAll traffic distribution and fabric
+   congestion per Table 7 . Results from different routing modes MUST be
+   reported in separate result tables with the routing mode labelled.
 
 7.3.  Wide Expert Parallelism Scaling
 
@@ -1102,8 +1144,9 @@ Table of Contents
 
    *Procedure:* Scale the EP group from intra-node only (EP=8) to wide
    EP (EP=16, 32, 48, 64, 96 spanning 2, 4, 6, 8, 12 nodes).  Use a
-   fixed batch size of 128 tokens and a representative MoE model
-   configuration (256 experts, top-2 routing).
+   fixed batch size of 128 tokens and at least one configuration from
+   the canonical MoE test matrix Table 6.  The selected config row MUST
+   be identified in the results.
 
    *Measurement:* Report total dispatch latency (us), inter-node
    bandwidth (GB/s), and latency decomposition (intra-node vs. inter-
@@ -1295,7 +1338,7 @@ Table of Contents
    |          | P=_*                 |          |          |          |
    +----------+----------------------+----------+----------+----------+
 
-                 Table 6: Reference Configuration Matrix
+                 Table 8: Reference Configuration Matrix
 
    *Measurement:* Report TTFT, T_transfer, and T_transfer/TTFT at P50,
    P95, P99 for each prompt length.  The test MUST be repeated a minimum
@@ -1559,7 +1602,7 @@ Table of Contents
     |                      | (CSV, JSON)                |             |
     +----------------------+----------------------------+-------------+
 
-                   Table 7: Reporting Format Requirements
+                   Table 9: Reporting Format Requirements
 
 15.  Security Considerations
 
@@ -1709,7 +1752,7 @@ Appendix A.  KPI-to-Test Mapping Summary
      | JFI (Decode Worker)   | 9.4                   | SUT-E         |
      +-----------------------+-----------------------+---------------+
 
-                        Table 8: KPI-to-Test Mapping
+                       Table 10: KPI-to-Test Mapping
 
 Appendix B.  Inference Serving Framework Capability Categories
              (Informational)
@@ -1773,7 +1816,7 @@ Appendix B.  Inference Serving Framework Capability Categories
    | Scale         | been validated             | fabric scale tests  |
    +---------------+----------------------------+---------------------+
 
-                 Table 9: Framework Capability Categories
+                Table 11: Framework Capability Categories
 
    NOTE: Implementers MUST document the specific framework name,
    version, and configuration in all test reports.  Results obtained
@@ -1879,11 +1922,12 @@ Appendix D.  MoE AllToAll Communication Pattern
      | Target        |                     |                        |
      +---------------+---------------------+------------------------+
 
-          Table 10: MoE Dispatch Traffic Characteristics by Mode
+          Table 12: MoE Dispatch Traffic Characteristics by Mode
 
-   For a representative large-scale MoE model (256 experts, top-2
-   routing, hidden_dim=7168, EP=96 across 12 nodes), the inter-node
-   traffic per MoE layer dispatch is approximately:
+   For a representative dense MoE configuration (M3: E=256, k=2,
+   H_model=7168, EP=96 across 12 nodes, BF16), the inter-node traffic
+   per MoE layer dispatch using T_dispatch = (B * k * H_model * 2) / N
+   is approximately
 
    *  Normal Dispatch (prefill, batch=256): 256 * 2 * 7168 * 2 bytes /
       96 GPUs = ~76 KB per GPU pair, ~870 MB aggregate across all pairs.

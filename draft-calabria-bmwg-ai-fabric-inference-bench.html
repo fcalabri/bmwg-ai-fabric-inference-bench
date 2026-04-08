@@ -1318,7 +1318,7 @@ workloads.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-alltoall-dispatch-throughpu" class="internal xref">AllToAll Dispatch Throughput</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-normal-vs-low-latency-dispa" class="internal xref">Normal vs. Low-Latency Dispatch Mode Comparison.</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-routing-mode-and-dispatch-m" class="internal xref">Routing Mode and Dispatch Mode Comparison.</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
                 <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-wide-expert-parallelism-sca" class="internal xref">Wide Expert Parallelism Scaling</a></p>
@@ -2562,35 +2562,119 @@ latency-sensitive inter-GPU traffic patterns.<a href="#section-7-1" class="pilcr
         </h3>
 <p id="section-7.1-1"><strong>Objective:</strong> To determine the maximum AllToAll dispatch throughput for MoE
 expert parallelism across the DUT fabric.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2"><strong>Procedure:</strong> Configure N GPUs in an EP group (e.g., N = 8, 16, 32, 64, 96).
-Generate a synthetic MoE dispatch workload where each GPU sends token embeddings
-to the experts selected by a top-k routing function (k=2 typical). Measure the
-aggregate AllToAll bandwidth and per-dispatch latency for batch sizes of 1, 8,
-32, 128, and 512 tokens, and EP group sizes of 8, 16, 32, 64, and 96.<a href="#section-7.1-2" class="pilcrow">¶</a></p>
-<p id="section-7.1-3"><strong>Measurement:</strong> Report aggregate bandwidth (GB/s), per-dispatch latency (us)
+<p id="section-7.1-2"><strong>Procedure:</strong> Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
+The dispatch payload per GPU per MoE layer is:<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+<p id="section-7.1-3">T_dispatch = (B * k * H_model * P_bytes) / N. where B = batch size (tokens), k = top-k routing count,
+H_model = hidden dimension, P_bytes = precision bytes (BF16=2), N = EP group size<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.1-4"><strong>Canonical MoE Test Matrix</strong><a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<span id="name-canonical-moe-test-matrix"></span><div id="tbl-moe-matrix">
+<table class="center" id="table-6">
+          <caption>
+<a href="#table-6" class="selfRef">Table 6</a>:
+<a href="#name-canonical-moe-test-matrix" class="selfRef">Canonical MoE Test Matrix</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Config</th>
+              <th class="text-left" rowspan="1" colspan="1">E (experts)</th>
+              <th class="text-left" rowspan="1" colspan="1">k (top-k)</th>
+              <th class="text-left" rowspan="1" colspan="1">H_model</th>
+              <th class="text-left" rowspan="1" colspan="1">T_dispatch (B=128, BF16, N=96)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">M1</td>
+              <td class="text-left" rowspan="1" colspan="1">8</td>
+              <td class="text-left" rowspan="1" colspan="1">2</td>
+              <td class="text-left" rowspan="1" colspan="1">4096</td>
+              <td class="text-left" rowspan="1" colspan="1">2.1 MB/GPU</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">M2</td>
+              <td class="text-left" rowspan="1" colspan="1">64</td>
+              <td class="text-left" rowspan="1" colspan="1">4</td>
+              <td class="text-left" rowspan="1" colspan="1">7168</td>
+              <td class="text-left" rowspan="1" colspan="1">29  MB/GPU</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">M3</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">2</td>
+              <td class="text-left" rowspan="1" colspan="1">7168</td>
+              <td class="text-left" rowspan="1" colspan="1">14  MB/GPU</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">M4</td>
+              <td class="text-left" rowspan="1" colspan="1">256</td>
+              <td class="text-left" rowspan="1" colspan="1">8</td>
+              <td class="text-left" rowspan="1" colspan="1">7168</td>
+              <td class="text-left" rowspan="1" colspan="1">58  MB/GPU</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">M5</td>
+              <td class="text-left" rowspan="1" colspan="1">(implementer-defined — report all parameters)</td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+              <td class="text-left" rowspan="1" colspan="1"> </td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<p id="section-7.1-6"><strong>Measurement:</strong> Report aggregate bandwidth (GB/s), per-dispatch latency (us)
 at P50 and P99, and GPU idle time waiting for dispatch completion. The test <span class="bcp14">MUST</span>
-be repeated a minimum of 20 times per configuration.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
-<p id="section-7.1-4"><strong>Reporting Format:</strong> Results <span class="bcp14">SHOULD</span> be reported as a heatmap with EP group size
+be repeated a minimum of 20 times per configuration.<a href="#section-7.1-6" class="pilcrow">¶</a></p>
+<p id="section-7.1-7"><strong>Reporting Format:</strong> Results <span class="bcp14">SHOULD</span> be reported as a heatmap with EP group size
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
-dimension. A companion latency table <span class="bcp14">MUST</span> be included.<a href="#section-7.1-4" class="pilcrow">¶</a></p>
-<p id="section-7.1-5">NOTE: If per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is (n-1)/n where n is the number of EP ranks. See the BusBW definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>.<a href="#section-7.1-5" class="pilcrow">¶</a></p>
+dimension. A companion latency table <span class="bcp14">MUST</span> be included. Reports <span class="bcp14">MUST</span> state which config row(s) were used. M5 <span class="bcp14">MUST</span> include E, k, H_model, P_bytes, and N in the results table.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
+<p id="section-7.1-8">NOTE: If per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, the algo_factor for AllToAll is (n-1)/n where n is the number of EP ranks. See the BusBW definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="normal-vs-low-latency-dispatch-mode-comparison">
+<div id="routing-mode-and-dispatch-mode-comparison">
 <section id="section-7.2">
-        <h3 id="name-normal-vs-low-latency-dispa">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-normal-vs-low-latency-dispa" class="section-name selfRef">Normal vs. Low-Latency Dispatch Mode Comparison.</a>
+        <h3 id="name-routing-mode-and-dispatch-m">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-routing-mode-and-dispatch-m" class="section-name selfRef">Routing Mode and Dispatch Mode Comparison.</a>
         </h3>
-<p id="section-7.2-1"><strong>Objective:</strong> To compare fabric performance under Normal Dispatch (optimized
-for prefill, dynamic shapes, incompatible with CUDA Graph) and Low-Latency
-Dispatch (optimized for decode, fixed shapes, CUDA Graph compatible).<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<p id="section-7.2-2"><strong>Procedure:</strong> Execute identical MoE dispatch workloads in both modes for EP
-group sizes of 8, 32, and 96 GPUs. For Normal Dispatch, use batch sizes of 128,
-256, and 512 (typical prefill). For Low-Latency Dispatch, use batch sizes of 1,
-4, 8, and 16 (typical decode).<a href="#section-7.2-2" class="pilcrow">¶</a></p>
-<p id="section-7.2-3"><strong>Measurement:</strong> Report per-dispatch latency (us) at P50, P95, P99 for each
-mode. Report the latency ratio LL/Normal for equivalent EP sizes. Report the
-fabric bandwidth utilization (%) for each mode.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-1"><strong>Objective:</strong> To compare fabric performance across dispatch modes and routing policies. Tests <span class="bcp14">MUST</span> cover Normal Dispatch and Low-Latency Dispatch.  Tests <span class="bcp14">SHOULD</span> additionally cover at least one alternative routing mode from <a href="#tbl-routing-modes" class="auto internal xref">Table 7</a>.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-2"><strong>Routing Mode Taxonomy</strong><a href="#section-7.2-2" class="pilcrow">¶</a></p>
+<span id="name-moe-routing-mode-taxonomy"></span><div id="tbl-routing-modes">
+<table class="center" id="table-7">
+          <caption>
+<a href="#table-7" class="selfRef">Table 7</a>:
+<a href="#name-moe-routing-mode-taxonomy" class="selfRef">MoE Routing Mode Taxonomy</a>
+          </caption>
+<thead>
+            <tr>
+              <th class="text-left" rowspan="1" colspan="1">Mode</th>
+              <th class="text-left" rowspan="1" colspan="1">Description</th>
+              <th class="text-left" rowspan="1" colspan="1">Traffic Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Standard Top-k</td>
+              <td class="text-left" rowspan="1" colspan="1">Each token routed to k. highest-scoring experts</td>
+              <td class="text-left" rowspan="1" colspan="1">Fixed, uniform AllToAll dispatch volume</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Expert Choice (EC)</td>
+              <td class="text-left" rowspan="1" colspan="1">Experts select tokens; ensures load balance</td>
+              <td class="text-left" rowspan="1" colspan="1">Non-uniform message sizes; tests HOL-blocking resilience</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Top-k with Token Drop</td>
+              <td class="text-left" rowspan="1" colspan="1">Overloaded experts drop excess tokens</td>
+              <td class="text-left" rowspan="1" colspan="1">Lower peak traffic; unpredictable under load</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Auxiliary Loss Top-k</td>
+              <td class="text-left" rowspan="1" colspan="1">Load-balanced top-k via training loss</td>
+              <td class="text-left" rowspan="1" colspan="1">Near-uniform AllToAll; lower hot-spot risk</td>
+            </tr>
+          </tbody>
+        </table>
+</div>
+<p id="section-7.2-4"><strong>Measurement:</strong> Measure dispatch latency, fabric bandwidth, and routing mode impact on AllToAll traffic distribution and fabric congestion per <a href="#tbl-routing-modes" class="auto internal xref">Table 7</a> . Results from different routing modes <span class="bcp14">MUST</span> be reported in separate result tables with the routing mode labelled.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="wide-expert-parallelism-scaling">
@@ -2600,10 +2684,8 @@ fabric bandwidth utilization (%) for each mode.<a href="#section-7.2-3" class="p
         </h3>
 <p id="section-7.3-1"><strong>Objective:</strong> To characterize AllToAll dispatch performance as EP group size
 scales beyond a single node (wide EP), requiring inter-node fabric communication.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<p id="section-7.3-2"><strong>Procedure:</strong> Scale the EP group from intra-node only (EP=8) to wide EP
-(EP=16, 32, 48, 64, 96 spanning 2, 4, 6, 8, 12 nodes). Use a fixed batch size
-of 128 tokens and a representative MoE model configuration (256 experts, top-2
-routing).<a href="#section-7.3-2" class="pilcrow">¶</a></p>
+<p id="section-7.3-2"><strong>Procedure:</strong> Scale the EP group from intra-node only (EP=8) to wide EP (EP=16, 32, 48, 64, 96 spanning 2, 4, 6, 8, 12 nodes). Use a fixed batch size of 128 tokens and at least one configuration from the canonical MoE test matrix <a href="#tbl-moe-matrix" class="auto internal xref">Table 6</a>.
+The selected config row <span class="bcp14">MUST</span> be identified in the results.<a href="#section-7.3-2" class="pilcrow">¶</a></p>
 <p id="section-7.3-3"><strong>Measurement:</strong> Report total dispatch latency (us), inter-node bandwidth
 (GB/s), and latency decomposition (intra-node vs. inter-node fraction). Report
 the scaling efficiency: (EP=8 latency) / (EP=N latency) * (N/8).<a href="#section-7.3-3" class="pilcrow">¶</a></p>
@@ -2793,9 +2875,9 @@ of 128, 256, 512, 1024, 2048, 4096, 8192, and 16384 tokens. Measure TTFT and
 decompose into T_prefill, T_transfer, and T_decode_init. As a refernce the following table
 is provided.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
 <span id="name-reference-configuration-mat"></span><div id="tab-conf-matrix">
-<table class="center" id="table-6">
+<table class="center" id="table-8">
           <caption>
-<a href="#table-6" class="selfRef">Table 6</a>:
+<a href="#table-8" class="selfRef">Table 8</a>:
 <a href="#name-reference-configuration-mat" class="selfRef">Reference Configuration Matrix</a>
           </caption>
 <thead>
@@ -3110,9 +3192,9 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <span id="name-reporting-format-requiremen"></span><div id="tab-reporting">
-<table class="center" id="table-7">
+<table class="center" id="table-9">
         <caption>
-<a href="#table-7" class="selfRef">Table 7</a>:
+<a href="#table-9" class="selfRef">Table 9</a>:
 <a href="#name-reporting-format-requiremen" class="selfRef">Reporting Format Requirements</a>
         </caption>
 <thead>
@@ -3289,9 +3371,9 @@ applicable.<a href="#section-15-2" class="pilcrow">¶</a></p>
 <p id="appendix-A-1">The following table provides a cross-reference from each KPI defined in
 <a href="#kpi-framework" class="auto internal xref">Section 4</a> to the test(s) in which it is measured.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 <span id="name-kpi-to-test-mapping"></span><div id="tab-kpi-mapping">
-<table class="center" id="table-8">
+<table class="center" id="table-10">
         <caption>
-<a href="#table-8" class="selfRef">Table 8</a>:
+<a href="#table-10" class="selfRef">Table 10</a>:
 <a href="#name-kpi-to-test-mapping" class="selfRef">KPI-to-Test Mapping</a>
         </caption>
 <thead>
@@ -3408,9 +3490,9 @@ documentation of SUT-E configurations and is NOT normative. Implementers using
 a Software Workload Emulator (SUT-E tests) <span class="bcp14">SHOULD</span> document which of the
 following capabilities their serving framework supports.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 <span id="name-framework-capability-catego"></span><div id="tab-framework-caps">
-<table class="center" id="table-9">
+<table class="center" id="table-11">
         <caption>
-<a href="#table-9" class="selfRef">Table 9</a>:
+<a href="#table-11" class="selfRef">Table 11</a>:
 <a href="#name-framework-capability-catego" class="selfRef">Framework Capability Categories</a>
         </caption>
 <thead>
@@ -3554,9 +3636,9 @@ GPU holds M/N experts), a single MoE layer forward pass generates an AllToAll
 communication pattern where each GPU sends a variable-size payload to every
 other GPU.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
 <span id="name-moe-dispatch-traffic-charac"></span><div id="tab-moe-dispatch">
-<table class="center" id="table-10">
+<table class="center" id="table-12">
         <caption>
-<a href="#table-10" class="selfRef">Table 10</a>:
+<a href="#table-12" class="selfRef">Table 12</a>:
 <a href="#name-moe-dispatch-traffic-charac" class="selfRef">MoE Dispatch Traffic Characteristics by Mode</a>
         </caption>
 <thead>
@@ -3615,9 +3697,7 @@ other GPU.<a href="#appendix-D-1" class="pilcrow">¶</a></p>
         </tbody>
       </table>
 </div>
-<p id="appendix-D-3">For a representative large-scale MoE model (256 experts, top-2 routing,
-hidden_dim=7168, EP=96 across 12 nodes), the inter-node traffic per MoE layer
-dispatch is approximately:<a href="#appendix-D-3" class="pilcrow">¶</a></p>
+<p id="appendix-D-3">For a representative dense MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes, BF16), the inter-node traffic per MoE layer dispatch using T_dispatch = (B * k * H_model * 2) / N is approximately<a href="#appendix-D-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-D-4.1">
           <p id="appendix-D-4.1.1">Normal Dispatch (prefill, batch=256): 256 * 2 * 7168 * 2 bytes / 96 GPUs
