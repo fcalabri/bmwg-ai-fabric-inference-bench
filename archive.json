@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-02T01:13:34.563202+00:00",
+  "timestamp": "2026-04-09T01:08:03.935070+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -156,7 +156,7 @@
       "id": "I_kwDORX8k_s74w4CJ",
       "title": "MoE Configuration  Beyond Fixed (256, top-2)",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/12",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -165,9 +165,17 @@
       "labels": [],
       "body": "expand on this  single hardcoded configuration ",
       "createdAt": "2026-03-30T19:38:17Z",
-      "updatedAt": "2026-03-30T19:38:17Z",
-      "closedAt": null,
-      "comments": []
+      "updatedAt": "2026-04-07T21:38:30Z",
+      "closedAt": "2026-04-07T21:38:30Z",
+      "comments": [
+        {
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "body": "addressed on MoE Branch - see PR ",
+          "createdAt": "2026-04-07T21:38:30Z",
+          "updatedAt": "2026-04-07T21:38:30Z"
+        }
+      ]
     },
     {
       "number": 13,
@@ -736,7 +744,7 @@
       "labels": [],
       "body": "Link updated Goodput definition and Units from Terminology",
       "createdAt": "2026-03-31T13:08:35Z",
-      "updatedAt": "2026-03-31T15:01:58Z",
+      "updatedAt": "2026-04-07T21:37:06Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "69c0ae6ef65311539d31ea460ecabad2eb068888",
@@ -772,7 +780,7 @@
       "labels": [],
       "body": "Updated Note on 7.1 - link TERMINOLOGY on updated BUSBW definition ",
       "createdAt": "2026-03-31T15:00:09Z",
-      "updatedAt": "2026-03-31T19:54:14Z",
+      "updatedAt": "2026-04-07T21:37:09Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "69c0ae6ef65311539d31ea460ecabad2eb068888",
@@ -897,6 +905,77 @@
               "body": "This is good -- or \"Section 10 of xyz\" too",
               "createdAt": "2026-03-31T19:31:34Z",
               "updatedAt": "2026-03-31T19:31:34Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 17,
+      "id": "PR_kwDORX8k_s7QhHv6",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/17",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "Removed MoE fix definition - added tables for parameters and new procedures and reporting references",
+      "createdAt": "2026-04-07T14:13:26Z",
+      "updatedAt": "2026-04-08T14:34:34Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "435c2d831a706064c8520fbeb81f3c1448b3b166",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "MoE",
+      "headRefOid": "48761a63027f16ff104a0370e16024486499b587",
+      "closedAt": "2026-04-08T14:34:33Z",
+      "mergedAt": "2026-04-08T14:34:33Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "a72194cd4f58f5933ba94c9705719cae0e030854"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7y57A3",
+          "commit": {
+            "abbreviatedOid": "48761a6"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-04-08T13:03:50Z",
+          "updatedAt": "2026-04-08T13:04:15Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "Leave this normative, since it's necessary to understand the doc",
+              "createdAt": "2026-04-08T13:03:50Z",
+              "updatedAt": "2026-04-08T13:04:15Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7y8Vqc",
+          "commit": {
+            "abbreviatedOid": "48761a6"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-04-08T14:34:05Z",
+          "updatedAt": "2026-04-08T14:34:05Z",
+          "comments": [
+            {
+              "originalPosition": 5,
+              "body": "10-4 ",
+              "createdAt": "2026-04-08T14:34:05Z",
+              "updatedAt": "2026-04-08T14:34:05Z"
             }
           ]
         }
