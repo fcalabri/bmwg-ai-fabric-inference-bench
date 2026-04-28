@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-04-09T01:08:03.935070+00:00",
+  "timestamp": "2026-04-28T01:49:16.383849+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -744,7 +744,7 @@
       "labels": [],
       "body": "Link updated Goodput definition and Units from Terminology",
       "createdAt": "2026-03-31T13:08:35Z",
-      "updatedAt": "2026-04-07T21:37:06Z",
+      "updatedAt": "2026-04-26T19:27:46Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "69c0ae6ef65311539d31ea460ecabad2eb068888",
@@ -764,7 +764,21 @@
           "updatedAt": "2026-03-31T15:01:57Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s74_Wge",
+          "commit": {
+            "abbreviatedOid": "638c665"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "Comment",
+          "createdAt": "2026-04-26T19:27:46Z",
+          "updatedAt": "2026-04-26T19:27:46Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 16,
