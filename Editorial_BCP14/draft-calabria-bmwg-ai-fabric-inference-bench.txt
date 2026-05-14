@@ -576,46 +576,46 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
 4.2.  Primary Throughput KPIs
 
-   +==============+===========+=========================+=============+
-   | KPI          | Unit      | Definition              | Measurement |
-   |              |           |                         | Point       |
-   +==============+===========+=========================+=============+
-   | TPS_input    | tokens/s  | Aggregate input         | SUT-E       |
-   |              |           | (prefill) tokens        | prefill     |
-   |              |           | processed per second    | completion  |
-   |              |           | across all workers      | events      |
-   +--------------+-----------+-------------------------+-------------+
-   | TPS_output   | tokens/s  | Aggregate output        | SUT-E token |
-   |              |           | (decode) tokens         | emission    |
-   |              |           | generated per second    | events      |
-   |              |           | across all workers      |             |
-   +--------------+-----------+-------------------------+-------------+
-   | TPS_per_GPU  | tokens/s/ | Output tokens per       | SUT-E per-  |
-   |              | GPU       | second normalized by    | worker      |
-   |              |           | number of decode GPUs   | counters    |
-   +--------------+-----------+-------------------------+-------------+
-   | Goodput      | GB/s or   | See the Goodput         | SUT-E       |
-   |              | tokens/s  | definition in           | successful  |
-   |              |           | [TERMINOLOGY]           | completion  |
-   |              |           | Reports use             | events      |
-   |              |           | Inference_Goodput for   |             |
-   |              |           | token-rate measurements |             |
-   |              |           | and Fabric_Goodput for  |             |
-   |              |           | byte-rate fabric        |             |
-   |              |           | measurements            |             |
-   +--------------+-----------+-------------------------+-------------+
-   | KV_BW        | GB/s      | Aggregate KV cache      | DUT-PD RDMA |
-   |              |           | transfer bandwidth      | counters    |
-   |              |           | between prefill and     |             |
-   |              |           | decode pools            |             |
-   +--------------+-----------+-------------------------+-------------+
-   | Request_Rate | req/s     | Maximum sustained       | SUT-E       |
-   |              |           | request arrival rate    | admission   |
-   |              |           | meeting all latency     | control     |
-   |              |           | SLOs                    | boundary    |
-   +--------------+-----------+-------------------------+-------------+
+   +==============+===========+==========================+=============+
+   | KPI          | Unit      | Definition               | Measurement |
+   |              |           |                          | Point       |
+   +==============+===========+==========================+=============+
+   | TPS_input    | tokens/s  | Aggregate input          | SUT-E       |
+   |              |           | (prefill) tokens         | prefill     |
+   |              |           | processed per second     | completion  |
+   |              |           | across all workers       | events      |
+   +--------------+-----------+--------------------------+-------------+
+   | TPS_output   | tokens/s  | Aggregate output         | SUT-E token |
+   |              |           | (decode) tokens          | emission    |
+   |              |           | generated per second     | events      |
+   |              |           | across all workers       |             |
+   +--------------+-----------+--------------------------+-------------+
+   | TPS_per_GPU  | tokens/s/ | Output tokens per        | SUT-E per-  |
+   |              | GPU       | second normalized by     | worker      |
+   |              |           | number of decode GPUs    | counters    |
+   +--------------+-----------+--------------------------+-------------+
+   | Goodput      | GB/s or   | See the Goodput          | SUT-E       |
+   |              | tokens/s  | definition in            | successful  |
+   |              |           | [TERMINOLOGY] Reports    | completion  |
+   |              |           | use Inference_Goodput    | events      |
+   |              |           | for token-rate           |             |
+   |              |           | measurements and         |             |
+   |              |           | Fabric_Goodput for       |             |
+   |              |           | byte-rate fabric         |             |
+   |              |           | measurements             |             |
+   +--------------+-----------+--------------------------+-------------+
+   | KV_BW        | GB/s      | Aggregate KV cache       | DUT-PD RDMA |
+   |              |           | transfer bandwidth       | counters    |
+   |              |           | between prefill and      |             |
+   |              |           | decode pools             |             |
+   +--------------+-----------+--------------------------+-------------+
+   | Request_Rate | req/s     | Maximum sustained        | SUT-E       |
+   |              |           | request arrival rate     | admission   |
+   |              |           | meeting all latency      | control     |
+   |              |           | SLOs                     | boundary    |
+   +--------------+-----------+--------------------------+-------------+
 
-                     Table 4: Primary Throughput KPIs
+                      Table 4: Primary Throughput KPIs
 
 4.3.  Fabric-Level KPIs
 
