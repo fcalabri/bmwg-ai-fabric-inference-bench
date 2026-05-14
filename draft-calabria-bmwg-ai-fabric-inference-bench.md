@@ -5,12 +5,12 @@ category: info
 
 docname: draft-calabria-bmwg-ai-fabric-inference-bench-latest
 submissiontype: IETF
+ipr: trust200902
 number:
-date: 2026-02-24
 consensus: true
 v: 3
 area: "Operations and Management"
-workgroup: "Benchmarking Methodology Working Group"
+workgroup: "BMWG"
 keyword:
  - benchmarking
  - AI
@@ -31,30 +31,26 @@ venue:
   latest: "https://fcalabri.github.io/bmwg-ai-fabric-inference-bench/draft-calabria-bmwg-ai-fabric-inference-bench.html"
 
 author:
- - fullname: Fernando Calabria
-   initials: F.
-   surname: Calabria
-   organization: Cisco
-   country: United States
-   email: fcalabri@cisco.com
- - fullname: Carlos Pignataro
-   initials: C.
-   surname: Pignataro
-   organization: Blue Fern Consulting
-   country: United States
-   email: carlos@bluefern.consulting
- - fullname: Qin Wu
-   initials: Q.
-   surname: Wu
-   organization: Huawei
-   country: China
-   email: bill.wu@huawei.com
- - fullname: Giuseppe Fioccola
-   initials: G.
-   surname: Fioccola
-   organization: Huawei
-   country: Italy
-   email: giuseppe.fioccola@huawei.com
+  - name: Fernando Calabria
+    ins: F. Calabria
+    org: Cisco
+    country: United States
+    email: fcalabri@cisco.com
+  - name: Carlos Pignataro
+    ins: C. Pignataro
+    org: Blue Fern Consulting
+    country: United States
+    email: carlos@bluefern.consulting
+  - name: Qin Wu
+    ins: Q. Wu
+    org: Huawei
+    country: China
+    email: bill.wu@huawei.com
+  - name: Giuseppe Fioccola
+    ins: G. Fioccola
+    org: Huawei
+    country: Italy
+    email: giuseppe.fioccola@huawei.com
 
 normative:
   RFC1242:
@@ -66,11 +62,12 @@ normative:
   RFC8239:
   TERMINOLOGY: I-D.calabria-bmwg-ai-fabric-terminology
   TRAINING-BENCH: I-D.calabria-bmwg-ai-fabric-training-bench
-  UEC-SPEC:
-    title: "UEC Specification 1.0"
+  UEC-1.0:
+    title: "Ultra Ethernet Transport (UET) Specification 1.0"
     author:
-      org: "Ultra Ethernet Consortium"
-    date: 2024
+      - org: Ultra Ethernet Consortium
+    date: 2025-06
+    target: "https://ultraethernet.org"
 
 informative:
   RFC7432:
@@ -155,7 +152,7 @@ Ethernet fabric segment — specifically, the path from the point of packet tran
 Intra-node transfer segments (proprietary accelerator interconnects GPU-to-GPU, and PCIe / Compute Express Link (CXL) GPU-to-NIC) are explicitly
 OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contributes
  measurably to an end-to-end latency measurement (e.g., TTFT decomposition in {{end-to-end-disaggregated-ttft}}), implementers report intra-node transfer time as a separately labelled component
- so that the fabric contribution can be isolated.  See Section 3.2 for DUT boundary diagram.
+ so that the fabric contribution can be isolated.  See {{dut-id}} for DUT boundary diagram.
 
 The document does NOT address benchmarking of individual accelerator (GPU/XPU) compute performance, model accuracy or quality metrics benchmarking of the inference serving
  software stack in isolation from the fabric.
@@ -180,8 +177,8 @@ dispatch, and disaggregated serving request routing.
 
 This document is a companion to {{TRAINING-BENCH}}, which defines benchmarking
 methodologies for AI training network fabrics. Both documents share common
-terminology (Section 2), test topology conventions (Section 3), and reporting
-formats ({{reporting}}). Both documents use the terminology defined in
+terminology, test topology conventions, and reporting formats
+({{reporting}}). Both documents use the terminology defined in
 {{TERMINOLOGY}}, which provides the common terminology base for AI fabric
 benchmarking.
 
@@ -1053,7 +1050,7 @@ elements apply:
 | KPI Summary Table | Table with all measured KPIs | Yes (required) |
 | Latency Distribution Plots | CDF or histogram per test section | Recommended |
 | Throughput vs. Scale Graphs | Line chart per test section | Recommended |
-| Fabric Health Indicators | Table per Section 4.4 | Yes (required) |
+| Fabric Health Indicators | Table per {{tab-health}} | Yes (required) |
 | Raw Data Appendix | Machine-readable format (CSV, JSON) | Optional |
 {: #tab-reporting title="Reporting Format Requirements"}
 
@@ -1135,13 +1132,13 @@ following capabilities their serving framework supports.
 
 | Capability Category | Description | Relevance to Fabric Benchmarking |
 |--------------------|-------------|----------------------------------|
-| Disaggregated Prefill/Decode (PD) | Physical separation of prefill and decode execution across different accelerator pools | Determines whether DUT-PD topology tests apply (Section 6) |
+| Disaggregated Prefill/Decode (PD) | Physical separation of prefill and decode execution across different accelerator pools | Determines whether DUT-PD topology tests apply ({{test-cat2}}) |
 | KV Cache Transfer Protocol | Protocol and library used for prefill-to-decode KV state transfer (one-sided PUT, two-sided SEND/RECV, GPU-initiated) | Determines RDMA verb types under test and applicable frame formats (Appendix C) |
-| MoE Expert Parallelism (EP) Support | Distribution of MoE expert sub-networks across GPUs and AllToAll dispatch mode support | Determines whether MoE EP tests apply (Section 7) |
+| MoE Expert Parallelism (EP) Support | Distribution of MoE expert sub-networks across GPUs and AllToAll dispatch mode support | Determines whether MoE EP tests apply ({{test-cat3}}) |
 | Continuous Batching | Dynamic request admission to active inference batches | Affects request arrival rate distributions and load balancing tests in {{test-cat5}} |
 | Prefix / KV Cache Sharing | Reuse of KV cache segments for requests with common prefixes | Determines applicability of the prefix cache hit rate test in {{test-cat5}} |
 | RDMA Transport Support | Underlying transport(s) supported: RoCEv2, UET, or other | Documented in the test report; affects congestion management test interpretation in {{test-cat4}} |
-| GPU-Initiated Networking (GIN) Support | Ability for GPU threads to directly initiate RDMA operations without CPU involvement | Affects RDMA primitive choice in MoE dispatch tests (Section 7) |
+| GPU-Initiated Networking (GIN) Support | Ability for GPU threads to directly initiate RDMA operations without CPU involvement | Affects RDMA primitive choice in MoE dispatch tests ({{test-cat3}}) |
 | Container Orchestration Integration | Native support for container-based deployment and horizontal scaling | Relevant for autoscaling tests in {{test-cat8}} |
 | Maximum Reported Scale | Maximum cluster scale at which the framework has been validated | Documents applicability of fabric scale tests |
 {: #tab-framework-caps title="Framework Capability Categories"}
