@@ -165,7 +165,7 @@ All methodologies assume controlled laboratory conditions per BMWG convention.
 ## Relationship to Existing BMWG Work
 
 This document builds upon the foundational BMWG benchmarking framework
-established by {{RFC1242}}, {{RFC2544}}, {{RFC2889}}, and {{RFC6349}}.
+established by {{!RFC1242}}, {{!RFC2544}}, {{!RFC2889}}, and {{!RFC6349}}.
 
 The test structure follows RFC 2544 conventions for trial duration (minimum 60
 seconds), statistical repetition (minimum 20 trials for latency, 50 for burst),
