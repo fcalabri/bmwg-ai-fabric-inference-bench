@@ -527,7 +527,7 @@ hardware pools to enable independent optimization and scaling. This section
 benchmarks the fabric's ability to support the resulting KV cache transfer
 traffic patterns and their impact on end-to-end inference metrics.
 
-## End-to-End Disaggregated TTFT
+## End-to-End Disaggregated TTFT {#end-to-end-disaggregated-ttft}
 
 **Objective:** To measure TTFT as a function of prompt length in a disaggregated
 serving configuration, isolating the fabric contribution.
