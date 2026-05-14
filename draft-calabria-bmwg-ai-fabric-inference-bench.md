@@ -213,7 +213,9 @@ The scope of the DUT for the tests defined in this document is the Ethernet fabr
 
 Worked examples of the S_KV formula and KV cache size computation for representative model architectures are provided in the appendix.
 
+## Acronyms
 
+Acronyms used in this document are expanded in the Acronyms appendix of {{TERMINOLOGY}}. Acronyms unique to the methodology defined herein are expanded on first use in the body of this document.
 
 # Test Topology and Architecture
 
