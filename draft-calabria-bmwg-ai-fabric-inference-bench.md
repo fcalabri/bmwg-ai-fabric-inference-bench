@@ -97,7 +97,7 @@ congestion management under bursty inference traffic patterns, and scale/soak
 testing. The methodology enables direct, equivalent comparison across
 implementations, NIC transport stacks (RoCEv2, UET), and fabric architectures.
 
-This document is a companion to {{!TRAINING-BENCH}}, which addresses training
+This document is a companion to {{TRAINING-BENCH}}, which addresses training
 workloads.
 
 --- middle
@@ -165,7 +165,7 @@ All methodologies assume controlled laboratory conditions per BMWG convention.
 ## Relationship to Existing BMWG Work
 
 This document builds upon the foundational BMWG benchmarking framework
-established by {{!RFC1242}}, {{!RFC2544}}, {{!RFC2889}}, and {{!RFC6349}}.
+established by {{RFC1242}}, {{RFC2544}}, {{RFC2889}}, and {{RFC6349}}.
 
 The test structure follows RFC 2544 conventions for trial duration (minimum 60
 seconds), statistical repetition (minimum 20 trials for latency, 50 for burst),
@@ -178,11 +178,11 @@ dispatch, and disaggregated serving request routing.
 
 ## Relationship to Companion Documents
 
-This document is a companion to {{!TRAINING-BENCH}}, which defines benchmarking
+This document is a companion to {{TRAINING-BENCH}}, which defines benchmarking
 methodologies for AI training network fabrics. Both documents share common
 terminology (Section 2), test topology conventions (Section 3), and reporting
 formats ({{reporting}}). Both documents use the terminology defined in
-{{!TERMINOLOGY}}, which provides the common terminology base for AI fabric
+{{TERMINOLOGY}}, which provides the common terminology base for AI fabric
 benchmarking.
 
 Where training workloads are dominated by bulk synchronous collective
@@ -194,9 +194,9 @@ serve both training and inference workloads should run both test suites.
 
 # Terminology
 
-Terminology used in this document is defined in {{!TERMINOLOGY}}. Readers should consult that document before applying the methodology defined here. Where a term overlaps with {{!RFC1242}} or {{!RFC8238}}, the terminology document provides AI fabric context extensions; the foundational definitions in those RFCs remain authoritative for general network benchmarking.
+Terminology used in this document is defined in {{TERMINOLOGY}}. Readers should consult that document before applying the methodology defined here. Where a term overlaps with {{RFC1242}} or {{RFC8238}}, the terminology document provides AI fabric context extensions; the foundational definitions in those RFCs remain authoritative for general network benchmarking.
 
-The following terms are bench-specific extensions used only in this document and are not redefined in {{!TERMINOLOGY}}:
+The following terms are bench-specific extensions used only in this document and are not redefined in {{TERMINOLOGY}}:
 
 | Term | Definition |
 |---|---|
@@ -209,7 +209,7 @@ The following terms are bench-specific extensions used only in this document and
 | **SUT-E** | End-to-end inference SUT configuration; see {{dut-id}}. |
 {: #tab-terminology title="Bench-Specific Terminology Extensions"}
 
-The scope of the DUT for the tests defined in this document is the Ethernet fabric segment connecting prefill and decode workers (and, where applicable, expert-parallel groups), consistent with the Fabric DUT Boundary defined in {{!TERMINOLOGY}}.
+The scope of the DUT for the tests defined in this document is the Ethernet fabric segment connecting prefill and decode workers (and, where applicable, expert-parallel groups), consistent with the Fabric DUT Boundary defined in {{TERMINOLOGY}}.
 
 Worked examples of the S_KV formula and KV cache size computation for representative model architectures are provided in the appendix.
 
@@ -392,7 +392,7 @@ Health Indicators (operational monitoring metrics).
 | TPS_input | tokens/s | Aggregate input (prefill) tokens processed per second across all workers | SUT-E prefill completion events |
 | TPS_output | tokens/s | Aggregate output (decode) tokens generated per second across all workers | SUT-E token emission events |
 | TPS_per_GPU | tokens/s/GPU | Output tokens per second normalized by number of decode GPUs | SUT-E per-worker counters |
-| Goodput | GB/s or tokens/s | See the Goodput definition in {{!TERMINOLOGY}} Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
+| Goodput | GB/s or tokens/s | See the Goodput definition in {{TERMINOLOGY}} Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | KV_BW | GB/s | Aggregate KV cache transfer bandwidth between prefill and decode pools | DUT-PD RDMA counters |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
 {: #tab-throughput-kpis title="Primary Throughput KPIs"}
@@ -637,7 +637,7 @@ at P50 and P99, and GPU idle time waiting for dispatch completion. The test is r
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
 dimension. A companion latency table is included. Reports state which config row(s) were used. For M5, the values of E, k, H_model, P_bytes, and N are included in the results table.
 
-NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, BusBW is computed per the BusBW definition in {{!TERMINOLOGY}}; algo_factor is fixed per collective type and does not depend on the algorithm the library selects at runtime. The runtime algorithm in use is verified via library tracing and documented as part of the test conditions.
+NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, BusBW is computed per the BusBW definition in {{TERMINOLOGY}}; algo_factor is fixed per collective type and does not depend on the algorithm the library selects at runtime. The runtime algorithm in use is verified via library tracing and documented as part of the test conditions.
 
 ## Routing Mode and Dispatch Mode Comparison
 
@@ -1024,7 +1024,7 @@ perturbation.
 # Reporting Format {#reporting}
 
 All test results are reported following the conventions established in
-{{!RFC2544}} Section 26. In addition, the following inference-specific reporting
+{{RFC2544}} Section 26. In addition, the following inference-specific reporting
 elements apply:
 
 * **System Configuration Report:** the report includes: model name and
@@ -1057,17 +1057,17 @@ elements apply:
 
 # Security Considerations
 
-This document defines benchmarking methodology for controlled laboratory environments and does not specify any protocol mechanism. It therefore introduces no new protocol-level security considerations beyond those of the underlying technologies it references. The considerations below follow the BMWG convention established in {{!RFC8238}} and align with the companion terminology document {{!TERMINOLOGY}}.
+This document defines benchmarking methodology for controlled laboratory environments and does not specify any protocol mechanism. It therefore introduces no new protocol-level security considerations beyond those of the underlying technologies it references. The considerations below follow the BMWG convention established in {{RFC8238}} and align with the companion terminology document {{TERMINOLOGY}}.
 
 Benchmarking activities as described in this document are limited to technology characterization of AI inference serving fabrics using controlled stimuli in a laboratory environment, with dedicated address space and the constraints specified herein.
 
 The benchmarking network topology will be an independent test setup and MUST NOT be connected to devices that may forward the test traffic into a production network or misroute traffic to the test management network. This isolation requirement is particularly important for AI fabric benchmarking because the lossless transport modes referenced in this document (PFC, DCQCN, CBFC) propagate congestion hop-by-hop and can extend the blast radius of a misconfigured test beyond the immediate DUT.
 
-Benchmarking is performed on a "black-box" basis, relying solely on measurements observable external to the DUT as defined in {{!TERMINOLOGY}}.
+Benchmarking is performed on a "black-box" basis, relying solely on measurements observable external to the DUT as defined in {{TERMINOLOGY}}.
 
 Special capabilities SHOULD NOT exist in the DUT specifically for benchmarking purposes. Any implications for network security arising from the DUT SHOULD be identical in the lab and in production networks. In particular, RDMA memory-region permissions and KV cache telemetry exposure are properties of the deployed configuration, not of the benchmarking methodology, and SHOULD reflect production posture during testing.
 
-Per {{!RFC6815}}, the tests defined herein MUST NOT be performed on production networks. The use of dedicated test IP address ranges per {{!RFC2544}} Appendix C (198.18.0.0/15 for IPv4; 2001:db8::/32 per {{?RFC3849}} for IPv6) is RECOMMENDED to prevent accidental interaction with production infrastructure.
+Per {{RFC6815}}, the tests defined herein MUST NOT be performed on production networks. The use of dedicated test IP address ranges per {{RFC2544}} Appendix C (198.18.0.0/15 for IPv4; 2001:db8::/32 per {{RFC3849}} for IPv6) is RECOMMENDED to prevent accidental interaction with production infrastructure.
 
 The following considerations are specific to inference-serving benchmarking:
 
@@ -1170,7 +1170,7 @@ Notes:
 - The UDP Source Port uses entropy-based values for ECMP load distribution across fabric paths.
 - The RETH carries the remote virtual address, remote key, and DMA length for the one-sided WRITE operation. For KV cache transfers, the DMA Length field indicates the size of the KV cache block being transferred.
 - Typical MTU for RoCEv2 deployments is 4096 bytes; larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling.
-- For UET-based KV cache transfers, the frame format defined in {{!TRAINING-BENCH}} Appendix D ("UET Frame Format") applies; the DUT IP port is 4793 and the transport service indicator selects between ROD and RUD per test.
+- For UET-based KV cache transfers, the frame format defined in {{TRAINING-BENCH}} Appendix D ("UET Frame Format") applies; the DUT IP port is 4793 and the transport service indicator selects between ROD and RUD per test.
 
 # MoE AllToAll Communication Pattern
 
