@@ -152,7 +152,7 @@ Ethernet fabric segment — specifically, the path from the point of packet tran
  by the source NIC Ethernet port to the point of packet reception at the destination NIC
  Ethernet port.
 
-Intra-node transfer segments (proprietary accelerator interconnects GPU-to-GPU, and PCIe/CXL GPU-to-NIC) are explicitly
+Intra-node transfer segments (proprietary accelerator interconnects GPU-to-GPU, and PCIe / Compute Express Link (CXL) GPU-to-NIC) are explicitly
 OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contributes
  measurably to an end-to-end latency measurement (e.g., TTFT decomposition in {{end-to-end-disaggregated-ttft}}), implementers report intra-node transfer time as a separately labelled component
  so that the fabric contribution can be isolated.  See Section 3.2 for DUT boundary diagram.
@@ -419,7 +419,7 @@ Health Indicators (operational monitoring metrics).
 |-----------|-----------|-------------|
 | CPU Utilization (switch) | < 30% | Control plane CPU usage on switches under inference traffic load |
 | Memory Usage (switch) | < 70% | TCAM, buffer, and control plane memory usage |
-| FEC Error Rate | < 1e-12 post-FEC BER | Forward Error Correction effectiveness on fabric links |
+| FEC Error Rate | < 1e-12 post-FEC Bit Error Rate (BER) | Forward Error Correction effectiveness on fabric links |
 | CRC Error Count | 0 | Layer 2 CRC errors on any fabric link |
 | BGP/OSPF Stability | 0 flaps | Routing protocol adjacency stability under inference load |
 | NIC QP State | 100% active | All RDMA Queue Pairs in active state (no error/reset) |
@@ -617,7 +617,7 @@ expert parallelism across the DUT fabric.
 The dispatch payload per GPU per MoE layer is:
 
 T_dispatch = (B * k * H_model * P_bytes) / N. where B = batch size (tokens), k = top-k routing count,
-H_model = hidden dimension, P_bytes = precision bytes (BF16=2), N = EP group size
+H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size
 
 **Canonical MoE Test Matrix**
 
@@ -820,9 +820,9 @@ is provided.
 
 | Config ID      | Model Profile                                             | S_KV @ 4K ctx     | S_KV @ 32K ctx     | S_KV @ 128K ctx     |
 | -------------- | --------------------------------------------------------- | ----------------- | ------------------ | ------------------- |
-| CFG-A          | Small: L=32, H_kv=8 (GQA), D=128, BF16                    | 0.25 GB           | 2.0 GB             | 8.0 GB              |
+| CFG-A          | Small: L=32, H_kv=8 (Grouped-Query Attention, GQA), D=128, BF16 | 0.25 GB     | 2.0 GB             | 8.0 GB              |
 | CFG-B          | Mid: L=80, H_kv=8 (GQA), D=128, BF16 (~70B-parameter dense class)         | 1.3 GB            | 10.5 GB            | 42.0 GB             |
-| CFG-C          | Large MHA: L=96, H_kv=64 (MHA), D=128, BF16               | 12.3 GB           | 98.6 GB            | >300 GB             |
+| CFG-C          | Large: L=96, H_kv=64 (Multi-Head Attention, MHA), D=128, BF16 | 12.3 GB       | 98.6 GB            | >300 GB             |
 | CFG-D          | Mid INT8: L=80, H_kv=8 (GQA), D=128, INT8 (quantized)     | 0.67 GB           | 5.4 GB             | 21.5 GB             |
 | CFG-E (custom) | Implementer-defined:  L=___, H_kv=___, D=___, P=___       | Computed          | Computed           | Computed            |
 {: #tab-conf-matrix title="Reference Configuration Matrix"}
@@ -1154,7 +1154,7 @@ This appendix defines the reference frame format for KV cache transfer benchmark
 |---|---|---|---|
 | 00 | Ethernet Dst MAC | 6B | DUT next-hop MAC |
 | 06 | Ethernet Src MAC | 6B | Test equipment MAC |
-| 12 | EtherType / TPID | 2B | 0x0800 (IPv4) or 0x86DD (IPv6) when untagged; 0x8100 (TPID) when 802.1Q-tagged |
+| 12 | EtherType / Tag Protocol Identifier (TPID) | 2B | 0x0800 (IPv4) or 0x86DD (IPv6) when untagged; 0x8100 (TPID) when 802.1Q-tagged |
 | 14 | 802.1Q Tag (optional) | 4B | When tagged: TCI (PCP for RDMA priority class, VID) followed by inner EtherType 0x0800 or 0x86DD. Omit this row when untagged and shift subsequent offsets back by 4B |
 | 18 | IPv4 / IPv6 Header | 20B (IPv4) or 40B (IPv6) | DSCP=26 (AF31), ECN=ECT(0), Proto=17 (UDP) |
 | 38 / 58 | UDP Header | 8B | DstPort=4791 (RoCEv2), SrcPort=entropy for ECMP, UDP Length, UDP Checksum |
