@@ -1220,6 +1220,11 @@ workloads.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
             <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-terminology" class="internal xref">Terminology</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-acronyms" class="internal xref">Acronyms</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-test-topology-and-architect" class="internal xref">Test Topology and Architecture</a></p>
@@ -1523,7 +1528,7 @@ the interaction between fabric behavior and application-level inference metrics
 Ethernet fabric segment — specifically, the path from the point of packet transmission
  by the source NIC Ethernet port to the point of packet reception at the destination NIC
  Ethernet port.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
-<p id="section-1.2-3">Intra-node transfer segments (proprietary accelerator interconnects GPU-to-GPU, and PCIe/CXL GPU-to-NIC) are explicitly
+<p id="section-1.2-3">Intra-node transfer segments (proprietary accelerator interconnects GPU-to-GPU, and PCIe / Compute Express Link (CXL) GPU-to-NIC) are explicitly
 OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contributes
  measurably to an end-to-end latency measurement (e.g., TTFT decomposition in <a href="#end-to-end-disaggregated-ttft" class="auto internal xref">Section 6.1</a>), implementers report intra-node transfer time as a separately labelled component
  so that the fabric contribution can be isolated.  See Section 3.2 for DUT boundary diagram.<a href="#section-1.2-3" class="pilcrow">¶</a></p>
@@ -1636,6 +1641,14 @@ serve both training and inference workloads should run both test suites.<a href=
 </div>
 <p id="section-2-4">The scope of the DUT for the tests defined in this document is the Ethernet fabric segment connecting prefill and decode workers (and, where applicable, expert-parallel groups), consistent with the Fabric DUT Boundary defined in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>.<a href="#section-2-4" class="pilcrow">¶</a></p>
 <p id="section-2-5">Worked examples of the S_KV formula and KV cache size computation for representative model architectures are provided in the appendix.<a href="#section-2-5" class="pilcrow">¶</a></p>
+<div id="acronyms">
+<section id="section-2.1">
+        <h3 id="name-acronyms">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-acronyms" class="section-name selfRef">Acronyms</a>
+        </h3>
+<p id="section-2.1-1">Acronyms used in this document are expanded in the Acronyms appendix of <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>. Acronyms unique to the methodology defined herein are expanded on first use in the body of this document.<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 <div id="test-topology-and-architecture">
@@ -2139,7 +2152,7 @@ Health Indicators (operational monitoring metrics).<a href="#section-4-1" class=
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">FEC Error Rate</td>
-              <td class="text-left" rowspan="1" colspan="1">&lt; 1e-12 post-FEC BER</td>
+              <td class="text-left" rowspan="1" colspan="1">&lt; 1e-12 post-FEC Bit Error Rate (BER)</td>
               <td class="text-left" rowspan="1" colspan="1">Forward Error Correction effectiveness on fabric links</td>
             </tr>
             <tr>
@@ -2386,7 +2399,7 @@ expert parallelism across the DUT fabric.<a href="#section-7.1-1" class="pilcrow
 <p id="section-7.1-2"><strong>Procedure:</strong> Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
 The dispatch payload per GPU per MoE layer is:<a href="#section-7.1-2" class="pilcrow">¶</a></p>
 <p id="section-7.1-3">T_dispatch = (B * k * H_model * P_bytes) / N. where B = batch size (tokens), k = top-k routing count,
-H_model = hidden dimension, P_bytes = precision bytes (BF16=2), N = EP group size<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size<a href="#section-7.1-3" class="pilcrow">¶</a></p>
 <p id="section-7.1-4"><strong>Canonical MoE Test Matrix</strong><a href="#section-7.1-4" class="pilcrow">¶</a></p>
 <span id="name-canonical-moe-test-matrix"></span><div id="tbl-moe-matrix">
 <table class="center" id="table-7">
@@ -2711,7 +2724,7 @@ is provided.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
           <tbody>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">CFG-A</td>
-              <td class="text-left" rowspan="1" colspan="1">Small: L=32, H_kv=8 (GQA), D=128, BF16</td>
+              <td class="text-left" rowspan="1" colspan="1">Small: L=32, H_kv=8 (Grouped-Query Attention, GQA), D=128, BF16</td>
               <td class="text-left" rowspan="1" colspan="1">0.25 GB</td>
               <td class="text-left" rowspan="1" colspan="1">2.0 GB</td>
               <td class="text-left" rowspan="1" colspan="1">8.0 GB</td>
@@ -2725,7 +2738,7 @@ is provided.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">CFG-C</td>
-              <td class="text-left" rowspan="1" colspan="1">Large MHA: L=96, H_kv=64 (MHA), D=128, BF16</td>
+              <td class="text-left" rowspan="1" colspan="1">Large: L=96, H_kv=64 (Multi-Head Attention, MHA), D=128, BF16</td>
               <td class="text-left" rowspan="1" colspan="1">12.3 GB</td>
               <td class="text-left" rowspan="1" colspan="1">98.6 GB</td>
               <td class="text-left" rowspan="1" colspan="1">&gt;300 GB</td>
@@ -3458,7 +3471,7 @@ following capabilities their serving framework supports.<a href="#appendix-C-1" 
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">12</td>
-            <td class="text-left" rowspan="1" colspan="1">EtherType / TPID</td>
+            <td class="text-left" rowspan="1" colspan="1">EtherType / Tag Protocol Identifier (TPID)</td>
             <td class="text-left" rowspan="1" colspan="1">2B</td>
             <td class="text-left" rowspan="1" colspan="1">0x0800 (IPv4) or 0x86DD (IPv6) when untagged; 0x8100 (TPID) when 802.1Q-tagged</td>
           </tr>
