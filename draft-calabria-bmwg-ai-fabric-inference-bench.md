@@ -97,7 +97,7 @@ congestion management under bursty inference traffic patterns, and scale/soak
 testing. The methodology enables direct, equivalent comparison across
 implementations, NIC transport stacks (RoCEv2, UET), and fabric architectures.
 
-This document is a companion to {{!TRAINING-BENCH}}, which addresses training
+This document is a companion to {{TRAINING-BENCH}}, which addresses training
 workloads.
 
 --- middle
@@ -152,7 +152,7 @@ Ethernet fabric segment — specifically, the path from the point of packet tran
  by the source NIC Ethernet port to the point of packet reception at the destination NIC
  Ethernet port.
 
-Intra-node transfer segments (proprietary accelerator interconnects GPU-to-GPU, and PCIe/CXL GPU-to-NIC) are explicitly
+Intra-node transfer segments (proprietary accelerator interconnects GPU-to-GPU, and PCIe / Compute Express Link (CXL) GPU-to-NIC) are explicitly
 OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contributes
  measurably to an end-to-end latency measurement (e.g., TTFT decomposition in {{end-to-end-disaggregated-ttft}}), implementers report intra-node transfer time as a separately labelled component
  so that the fabric contribution can be isolated.  See Section 3.2 for DUT boundary diagram.
@@ -165,7 +165,7 @@ All methodologies assume controlled laboratory conditions per BMWG convention.
 ## Relationship to Existing BMWG Work
 
 This document builds upon the foundational BMWG benchmarking framework
-established by {{!RFC1242}}, {{!RFC2544}}, {{!RFC2889}}, and {{!RFC6349}}.
+established by {{RFC1242}}, {{RFC2544}}, {{RFC2889}}, and {{RFC6349}}.
 
 The test structure follows RFC 2544 conventions for trial duration (minimum 60
 seconds), statistical repetition (minimum 20 trials for latency, 50 for burst),
@@ -178,11 +178,11 @@ dispatch, and disaggregated serving request routing.
 
 ## Relationship to Companion Documents
 
-This document is a companion to {{!TRAINING-BENCH}}, which defines benchmarking
+This document is a companion to {{TRAINING-BENCH}}, which defines benchmarking
 methodologies for AI training network fabrics. Both documents share common
 terminology (Section 2), test topology conventions (Section 3), and reporting
 formats ({{reporting}}). Both documents use the terminology defined in
-{{!TERMINOLOGY}}, which provides the common terminology base for AI fabric
+{{TERMINOLOGY}}, which provides the common terminology base for AI fabric
 benchmarking.
 
 Where training workloads are dominated by bulk synchronous collective
@@ -194,9 +194,9 @@ serve both training and inference workloads should run both test suites.
 
 # Terminology
 
-Terminology used in this document is defined in {{!TERMINOLOGY}}. Readers should consult that document before applying the methodology defined here. Where a term overlaps with {{!RFC1242}} or {{!RFC8238}}, the terminology document provides AI fabric context extensions; the foundational definitions in those RFCs remain authoritative for general network benchmarking.
+Terminology used in this document is defined in {{TERMINOLOGY}}. Readers should consult that document before applying the methodology defined here. Where a term overlaps with {{RFC1242}} or {{RFC8238}}, the terminology document provides AI fabric context extensions; the foundational definitions in those RFCs remain authoritative for general network benchmarking.
 
-The following terms are bench-specific extensions used only in this document and are not redefined in {{!TERMINOLOGY}}:
+The following terms are bench-specific extensions used only in this document and are not redefined in {{TERMINOLOGY}}:
 
 | Term | Definition |
 |---|---|
@@ -209,11 +209,13 @@ The following terms are bench-specific extensions used only in this document and
 | **SUT-E** | End-to-end inference SUT configuration; see {{dut-id}}. |
 {: #tab-terminology title="Bench-Specific Terminology Extensions"}
 
-The scope of the DUT for the tests defined in this document is the Ethernet fabric segment connecting prefill and decode workers (and, where applicable, expert-parallel groups), consistent with the Fabric DUT Boundary defined in {{!TERMINOLOGY}}.
+The scope of the DUT for the tests defined in this document is the Ethernet fabric segment connecting prefill and decode workers (and, where applicable, expert-parallel groups), consistent with the Fabric DUT Boundary defined in {{TERMINOLOGY}}.
 
 Worked examples of the S_KV formula and KV cache size computation for representative model architectures are provided in the appendix.
 
+## Acronyms
 
+Acronyms used in this document are expanded in the Acronyms appendix of {{TERMINOLOGY}}. Acronyms unique to the methodology defined herein are expanded on first use in the body of this document.
 
 # Test Topology and Architecture
 
@@ -392,7 +394,7 @@ Health Indicators (operational monitoring metrics).
 | TPS_input | tokens/s | Aggregate input (prefill) tokens processed per second across all workers | SUT-E prefill completion events |
 | TPS_output | tokens/s | Aggregate output (decode) tokens generated per second across all workers | SUT-E token emission events |
 | TPS_per_GPU | tokens/s/GPU | Output tokens per second normalized by number of decode GPUs | SUT-E per-worker counters |
-| Goodput | GB/s or tokens/s | See the Goodput definition in {{!TERMINOLOGY}} Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
+| Goodput | GB/s or tokens/s | See the Goodput definition in {{TERMINOLOGY}} Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | KV_BW | GB/s | Aggregate KV cache transfer bandwidth between prefill and decode pools | DUT-PD RDMA counters |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
 {: #tab-throughput-kpis title="Primary Throughput KPIs"}
@@ -419,7 +421,7 @@ Health Indicators (operational monitoring metrics).
 |-----------|-----------|-------------|
 | CPU Utilization (switch) | < 30% | Control plane CPU usage on switches under inference traffic load |
 | Memory Usage (switch) | < 70% | TCAM, buffer, and control plane memory usage |
-| FEC Error Rate | < 1e-12 post-FEC BER | Forward Error Correction effectiveness on fabric links |
+| FEC Error Rate | < 1e-12 post-FEC Bit Error Rate (BER) | Forward Error Correction effectiveness on fabric links |
 | CRC Error Count | 0 | Layer 2 CRC errors on any fabric link |
 | BGP/OSPF Stability | 0 flaps | Routing protocol adjacency stability under inference load |
 | NIC QP State | 100% active | All RDMA Queue Pairs in active state (no error/reset) |
@@ -617,7 +619,7 @@ expert parallelism across the DUT fabric.
 The dispatch payload per GPU per MoE layer is:
 
 T_dispatch = (B * k * H_model * P_bytes) / N. where B = batch size (tokens), k = top-k routing count,
-H_model = hidden dimension, P_bytes = precision bytes (BF16=2), N = EP group size
+H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size
 
 **Canonical MoE Test Matrix**
 
@@ -637,7 +639,7 @@ at P50 and P99, and GPU idle time waiting for dispatch completion. The test is r
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
 dimension. A companion latency table is included. Reports state which config row(s) were used. For M5, the values of E, k, H_model, P_bytes, and N are included in the results table.
 
-NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, BusBW is computed per the BusBW definition in {{!TERMINOLOGY}}; algo_factor is fixed per collective type and does not depend on the algorithm the library selects at runtime. The runtime algorithm in use is verified via library tracing and documented as part of the test conditions.
+NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, BusBW is computed per the BusBW definition in {{TERMINOLOGY}}; algo_factor is fixed per collective type and does not depend on the algorithm the library selects at runtime. The runtime algorithm in use is verified via library tracing and documented as part of the test conditions.
 
 ## Routing Mode and Dispatch Mode Comparison
 
@@ -820,9 +822,9 @@ is provided.
 
 | Config ID      | Model Profile                                             | S_KV @ 4K ctx     | S_KV @ 32K ctx     | S_KV @ 128K ctx     |
 | -------------- | --------------------------------------------------------- | ----------------- | ------------------ | ------------------- |
-| CFG-A          | Small: L=32, H_kv=8 (GQA), D=128, BF16                    | 0.25 GB           | 2.0 GB             | 8.0 GB              |
+| CFG-A          | Small: L=32, H_kv=8 (Grouped-Query Attention, GQA), D=128, BF16 | 0.25 GB     | 2.0 GB             | 8.0 GB              |
 | CFG-B          | Mid: L=80, H_kv=8 (GQA), D=128, BF16 (~70B-parameter dense class)         | 1.3 GB            | 10.5 GB            | 42.0 GB             |
-| CFG-C          | Large MHA: L=96, H_kv=64 (MHA), D=128, BF16               | 12.3 GB           | 98.6 GB            | >300 GB             |
+| CFG-C          | Large: L=96, H_kv=64 (Multi-Head Attention, MHA), D=128, BF16 | 12.3 GB       | 98.6 GB            | >300 GB             |
 | CFG-D          | Mid INT8: L=80, H_kv=8 (GQA), D=128, INT8 (quantized)     | 0.67 GB           | 5.4 GB             | 21.5 GB             |
 | CFG-E (custom) | Implementer-defined:  L=___, H_kv=___, D=___, P=___       | Computed          | Computed           | Computed            |
 {: #tab-conf-matrix title="Reference Configuration Matrix"}
@@ -1024,7 +1026,7 @@ perturbation.
 # Reporting Format {#reporting}
 
 All test results are reported following the conventions established in
-{{!RFC2544}} Section 26. In addition, the following inference-specific reporting
+{{RFC2544}} Section 26. In addition, the following inference-specific reporting
 elements apply:
 
 * **System Configuration Report:** the report includes: model name and
@@ -1057,17 +1059,17 @@ elements apply:
 
 # Security Considerations
 
-This document defines benchmarking methodology for controlled laboratory environments and does not specify any protocol mechanism. It therefore introduces no new protocol-level security considerations beyond those of the underlying technologies it references. The considerations below follow the BMWG convention established in {{!RFC8238}} and align with the companion terminology document {{!TERMINOLOGY}}.
+This document defines benchmarking methodology for controlled laboratory environments and does not specify any protocol mechanism. It therefore introduces no new protocol-level security considerations beyond those of the underlying technologies it references. The considerations below follow the BMWG convention established in {{RFC8238}} and align with the companion terminology document {{TERMINOLOGY}}.
 
 Benchmarking activities as described in this document are limited to technology characterization of AI inference serving fabrics using controlled stimuli in a laboratory environment, with dedicated address space and the constraints specified herein.
 
 The benchmarking network topology will be an independent test setup and MUST NOT be connected to devices that may forward the test traffic into a production network or misroute traffic to the test management network. This isolation requirement is particularly important for AI fabric benchmarking because the lossless transport modes referenced in this document (PFC, DCQCN, CBFC) propagate congestion hop-by-hop and can extend the blast radius of a misconfigured test beyond the immediate DUT.
 
-Benchmarking is performed on a "black-box" basis, relying solely on measurements observable external to the DUT as defined in {{!TERMINOLOGY}}.
+Benchmarking is performed on a "black-box" basis, relying solely on measurements observable external to the DUT as defined in {{TERMINOLOGY}}.
 
 Special capabilities SHOULD NOT exist in the DUT specifically for benchmarking purposes. Any implications for network security arising from the DUT SHOULD be identical in the lab and in production networks. In particular, RDMA memory-region permissions and KV cache telemetry exposure are properties of the deployed configuration, not of the benchmarking methodology, and SHOULD reflect production posture during testing.
 
-Per {{!RFC6815}}, the tests defined herein MUST NOT be performed on production networks. The use of dedicated test IP address ranges per {{!RFC2544}} Appendix C (198.18.0.0/15 for IPv4; 2001:db8::/32 per {{?RFC3849}} for IPv6) is RECOMMENDED to prevent accidental interaction with production infrastructure.
+Per {{RFC6815}}, the tests defined herein MUST NOT be performed on production networks. The use of dedicated test IP address ranges per {{RFC2544}} Appendix C (198.18.0.0/15 for IPv4; 2001:db8::/32 per {{RFC3849}} for IPv6) is RECOMMENDED to prevent accidental interaction with production infrastructure.
 
 The following considerations are specific to inference-serving benchmarking:
 
@@ -1154,7 +1156,7 @@ This appendix defines the reference frame format for KV cache transfer benchmark
 |---|---|---|---|
 | 00 | Ethernet Dst MAC | 6B | DUT next-hop MAC |
 | 06 | Ethernet Src MAC | 6B | Test equipment MAC |
-| 12 | EtherType / TPID | 2B | 0x0800 (IPv4) or 0x86DD (IPv6) when untagged; 0x8100 (TPID) when 802.1Q-tagged |
+| 12 | EtherType / Tag Protocol Identifier (TPID) | 2B | 0x0800 (IPv4) or 0x86DD (IPv6) when untagged; 0x8100 (TPID) when 802.1Q-tagged |
 | 14 | 802.1Q Tag (optional) | 4B | When tagged: TCI (PCP for RDMA priority class, VID) followed by inner EtherType 0x0800 or 0x86DD. Omit this row when untagged and shift subsequent offsets back by 4B |
 | 18 | IPv4 / IPv6 Header | 20B (IPv4) or 40B (IPv6) | DSCP=26 (AF31), ECN=ECT(0), Proto=17 (UDP) |
 | 38 / 58 | UDP Header | 8B | DstPort=4791 (RoCEv2), SrcPort=entropy for ECMP, UDP Length, UDP Checksum |
@@ -1170,7 +1172,7 @@ Notes:
 - The UDP Source Port uses entropy-based values for ECMP load distribution across fabric paths.
 - The RETH carries the remote virtual address, remote key, and DMA length for the one-sided WRITE operation. For KV cache transfers, the DMA Length field indicates the size of the KV cache block being transferred.
 - Typical MTU for RoCEv2 deployments is 4096 bytes; larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling.
-- For UET-based KV cache transfers, the frame format defined in {{!TRAINING-BENCH}} Appendix D ("UET Frame Format") applies; the DUT IP port is 4793 and the transport service indicator selects between ROD and RUD per test.
+- For UET-based KV cache transfers, the frame format defined in {{TRAINING-BENCH}} Appendix D ("UET Frame Format") applies; the DUT IP port is 4793 and the transport service indicator selects between ROD and RUD per test.
 
 # MoE AllToAll Communication Pattern
 
