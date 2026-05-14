@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-12T01:54:20.958945+00:00",
+  "timestamp": "2026-05-14T02:01:03.039032+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -254,6 +254,22 @@
       "body": "Editoria a nd BCP-14 to align with latest terminology and training ",
       "createdAt": "2026-05-11T15:30:04Z",
       "updatedAt": "2026-05-11T15:30:04Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 22,
+      "id": "I_kwDORX8k_s8AAAABCAJOMA",
+      "title": "Acronyms",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/22",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Acronym before 1st apperance - avoid drift with terminology ",
+      "createdAt": "2026-05-12T13:04:00Z",
+      "updatedAt": "2026-05-12T13:04:00Z",
       "closedAt": null,
       "comments": []
     }
@@ -1041,7 +1057,7 @@
       "labels": [],
       "body": "BusBW normative references to Terminology for Goodput ",
       "createdAt": "2026-05-11T15:28:09Z",
-      "updatedAt": "2026-05-11T15:28:35Z",
+      "updatedAt": "2026-05-13T03:52:39Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "a72194cd4f58f5933ba94c9705719cae0e030854",
@@ -1053,7 +1069,28 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7-_qtE",
+          "commit": {
+            "abbreviatedOid": "bbca2b2"
+          },
+          "author": "billwuqin",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-05-13T03:51:49Z",
+          "updatedAt": "2026-05-13T03:52:39Z",
+          "comments": [
+            {
+              "originalPosition": 14,
+              "body": "```suggestion\n| Goodput | GB/s or tokens/s | See the Goodput definition in {{!TERMINOLOGY}} Reports MUST use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |\n```",
+              "createdAt": "2026-05-13T03:51:49Z",
+              "updatedAt": "2026-05-13T03:52:39Z"
+            }
+          ]
+        }
+      ]
     },
     {
       "number": 21,
@@ -1069,7 +1106,7 @@
       "labels": [],
       "body": "Editorial - BCP-14 ,  removed duplicatd terms\r\n\r\nAlignment with terminology definitions and terms (removed redundant definitions and formulas) \r\n\r\nRemoved all vendor references (NCCL  and model names etc.) ",
       "createdAt": "2026-05-11T17:47:41Z",
-      "updatedAt": "2026-05-11T17:47:41Z",
+      "updatedAt": "2026-05-13T04:05:35Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "a72194cd4f58f5933ba94c9705719cae0e030854",
@@ -1081,7 +1118,74 @@
       "mergedBy": null,
       "mergeCommit": null,
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7-_0Dc",
+          "commit": {
+            "abbreviatedOid": "4c843fc"
+          },
+          "author": "billwuqin",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T04:00:29Z",
+          "updatedAt": "2026-05-13T04:00:29Z",
+          "comments": [
+            {
+              "originalPosition": 107,
+              "body": "Where end-to-end-disaggregated-ttft is defined? a external reference document? No?",
+              "createdAt": "2026-05-13T04:00:29Z",
+              "updatedAt": "2026-05-13T04:00:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7-_3Fm",
+          "commit": {
+            "abbreviatedOid": "4c843fc"
+          },
+          "author": "billwuqin",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-13T04:03:29Z",
+          "updatedAt": "2026-05-13T04:03:29Z",
+          "comments": [
+            {
+              "originalPosition": 447,
+              "body": "No objection to this section, I think if we know how to set threshold, we can document them in separate I-D and publish it as BCP.",
+              "createdAt": "2026-05-13T04:03:29Z",
+              "updatedAt": "2026-05-13T04:03:29Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7-_3s4",
+          "commit": {
+            "abbreviatedOid": "4c843fc"
+          },
+          "author": "billwuqin",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-05-13T04:04:06Z",
+          "updatedAt": "2026-05-13T04:05:35Z",
+          "comments": [
+            {
+              "originalPosition": 473,
+              "body": "```suggestion\n| Goodput | GB/s or tokens/s | See the Goodput definition in {{!TERMINOLOGY}} Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |\n```",
+              "createdAt": "2026-05-13T04:04:06Z",
+              "updatedAt": "2026-05-13T04:05:35Z"
+            },
+            {
+              "originalPosition": 473,
+              "body": "It is not clear the purpose of <br />, maybe I miss something.",
+              "createdAt": "2026-05-13T04:04:31Z",
+              "updatedAt": "2026-05-13T04:05:35Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
