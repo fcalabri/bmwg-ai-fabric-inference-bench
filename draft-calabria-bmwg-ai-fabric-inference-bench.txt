@@ -2,14 +2,14 @@
 
 
 
-Benchmarking Methodology Working Group                       F. Calabria
+BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 28 August 2026                             Blue Fern Consulting
+Expires: 16 November 2026                           Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
-                                                        24 February 2026
+                                                             15 May 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -73,7 +73,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 August 2026.
+   This Internet-Draft will expire on 16 November 2026.
 
 Copyright Notice
 
@@ -236,7 +236,7 @@ Table of Contents
    intra-node transfer contributes measurably to an end-to-end latency
    measurement (e.g., TTFT decomposition in Section 6.1), implementers
    report intra-node transfer time as a separately labelled component so
-   that the fabric contribution can be isolated.  See Section 3.2 for
+   that the fabric contribution can be isolated.  See Section 3.3 for
    DUT boundary diagram.
 
    The document does NOT address benchmarking of individual accelerator
@@ -267,10 +267,10 @@ Table of Contents
 
    This document is a companion to [TRAINING-BENCH], which defines
    benchmarking methodologies for AI training network fabrics.  Both
-   documents share common terminology (Section 2), test topology
-   conventions (Section 3), and reporting formats (Section 14).  Both
-   documents use the terminology defined in [TERMINOLOGY], which
-   provides the common terminology base for AI fabric benchmarking.
+   documents share common terminology, test topology conventions, and
+   reporting formats (Section 14).  Both documents use the terminology
+   defined in [TERMINOLOGY], which provides the common terminology base
+   for AI fabric benchmarking.
 
    Where training workloads are dominated by bulk synchronous collective
    communication (AllReduce, AllGather) with high bandwidth utilization
@@ -1467,7 +1467,7 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
     | Throughput vs. Scale | Line chart per test        | Recommended |
     | Graphs               | section                    |             |
     +----------------------+----------------------------+-------------+
-    | Fabric Health        | Table per Section 4.4      | Yes         |
+    | Fabric Health        | Table per Table 6          | Yes         |
     | Indicators           |                            | (required)  |
     +----------------------+----------------------------+-------------+
     | Raw Data Appendix    | Machine-readable format    | Optional    |
@@ -1618,7 +1618,9 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
               <https://datatracker.ietf.org/doc/html/draft-calabria-
               bmwg-ai-fabric-training-bench-01>.
 
-   [UEC-SPEC] Ultra Ethernet Consortium, "UEC Specification 1.0", 2024.
+   [UEC-1.0]  Ultra Ethernet Consortium, "Ultra Ethernet Transport (UET)
+              Specification 1.0", June 2025,
+              <https://ultraethernet.org>.
 
 17.2.  Informative References
 
