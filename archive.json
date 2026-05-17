@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-14T02:01:03.039032+00:00",
+  "timestamp": "2026-05-17T01:55:17.567092+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -230,15 +230,15 @@
       "id": "I_kwDORX8k_s8AAAABB5I6Ig",
       "title": "BusBW updated definition",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/18",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "reflect new terminology BusBW definition (invariant) ",
       "createdAt": "2026-05-11T15:16:15Z",
-      "updatedAt": "2026-05-11T15:16:15Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-14T13:22:38Z",
+      "closedAt": "2026-05-14T13:22:38Z",
       "comments": []
     },
     {
@@ -246,15 +246,15 @@
       "id": "I_kwDORX8k_s8AAAABB5O4fQ",
       "title": "Editorial changes BCP-14",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/20",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Editoria a nd BCP-14 to align with latest terminology and training ",
       "createdAt": "2026-05-11T15:30:04Z",
-      "updatedAt": "2026-05-11T15:30:04Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-14T13:22:39Z",
+      "closedAt": "2026-05-14T13:22:39Z",
       "comments": []
     },
     {
@@ -262,15 +262,15 @@
       "id": "I_kwDORX8k_s8AAAABCAJOMA",
       "title": "Acronyms",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/22",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "Acronym before 1st apperance - avoid drift with terminology ",
       "createdAt": "2026-05-12T13:04:00Z",
-      "updatedAt": "2026-05-12T13:04:00Z",
-      "closedAt": null,
+      "updatedAt": "2026-05-14T16:12:30Z",
+      "closedAt": "2026-05-14T16:12:30Z",
       "comments": []
     }
   ],
@@ -323,7 +323,7 @@
       "labels": [],
       "body": "## Summary\n\n- Replace \"apples-to-apples\" colloquialism with \"direct, equivalent\" per NIST IR 8366 inclusive language guidance\n- Rewrite companion documents sentence (Section 1.4) to be factual, removing awkward double-SHOULD construction\n- Fix \"terminologies\" \u2192 \"terms\" (Section 2)\n- Fix \"transfering\" typo \u2192 \"transferring\"\n- Fix missing spaces and inconsistent capitalization in e.g. list (Section 3.2)\n- Consolidate duplicate NOTE blocks in KPI framework section (Section 4) into one\n\n## Test plan\n\n- [ ] Verify rendered HTML output looks correct\n- [ ] Confirm no unintended content changes (review diff)",
       "createdAt": "2026-03-21T10:01:10Z",
-      "updatedAt": "2026-03-21T11:55:26Z",
+      "updatedAt": "2026-05-14T16:24:44Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "fdd42b1feb0a482f2f5473c8fbd68c85a7d725f2",
@@ -986,7 +986,7 @@
       "labels": [],
       "body": "Removed MoE fix definition - added tables for parameters and new procedures and reporting references",
       "createdAt": "2026-04-07T14:13:26Z",
-      "updatedAt": "2026-04-08T14:34:34Z",
+      "updatedAt": "2026-05-14T16:24:51Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "435c2d831a706064c8520fbeb81f3c1448b3b166",
@@ -1048,7 +1048,7 @@
       "id": "PR_kwDORX8k_s7aT96f",
       "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/19",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1057,17 +1057,19 @@
       "labels": [],
       "body": "BusBW normative references to Terminology for Goodput ",
       "createdAt": "2026-05-11T15:28:09Z",
-      "updatedAt": "2026-05-13T03:52:39Z",
+      "updatedAt": "2026-05-14T13:22:01Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
-      "baseRefOid": "a72194cd4f58f5933ba94c9705719cae0e030854",
+      "baseRefOid": "ed0a6633844ceaf8858a1b8a32b6ecb175755159",
       "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "headRefName": "BusBW_invariant",
-      "headRefOid": "bbca2b27d4e7f5b877221d818be1455b838db3cb",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "eeae7f3d2efd2a3410b9e9a27d981d111d91d378",
+      "closedAt": "2026-05-14T13:22:01Z",
+      "mergedAt": "2026-05-14T13:22:01Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "12650d99ac16447ac3852e6016b8d83c31e94b46"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1097,7 +1099,7 @@
       "id": "PR_kwDORX8k_s7aXFDP",
       "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/21",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1106,17 +1108,19 @@
       "labels": [],
       "body": "Editorial - BCP-14 ,  removed duplicatd terms\r\n\r\nAlignment with terminology definitions and terms (removed redundant definitions and formulas) \r\n\r\nRemoved all vendor references (NCCL  and model names etc.) ",
       "createdAt": "2026-05-11T17:47:41Z",
-      "updatedAt": "2026-05-13T04:05:35Z",
+      "updatedAt": "2026-05-14T13:19:36Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "a72194cd4f58f5933ba94c9705719cae0e030854",
       "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "headRefName": "Editorial_BCP14",
-      "headRefOid": "4c843fca10083286868d1f979e91312d8d900789",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "35defce45283586d30dd1f3f33b9c9fa770f6a83",
+      "closedAt": "2026-05-14T13:19:36Z",
+      "mergedAt": "2026-05-14T13:19:36Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "ed0a6633844ceaf8858a1b8a32b6ecb175755159"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1182,6 +1186,123 @@
               "body": "It is not clear the purpose of <br />, maybe I miss something.",
               "createdAt": "2026-05-13T04:04:31Z",
               "updatedAt": "2026-05-13T04:05:35Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7_tsak",
+          "commit": {
+            "abbreviatedOid": "4c843fc"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-14T13:10:11Z",
+          "updatedAt": "2026-05-14T13:10:11Z",
+          "comments": [
+            {
+              "originalPosition": 107,
+              "body": "{{end-to-end-disaggregated-ttft}} is an internal section xref to ## End-to-End Disaggregated TTFT in Section 6.x of this document , \r\n\r\n Just pushed a fix to make the anchor explicit on the target heading so the xref is accuratte:\r\n\r\nThanks for catching this \u2014 same pattern (explicit {#anchor} on any heading that is the target of a {{...}} xref)\r\n \r\nwe should probably be applied to the other internal cross-references in the draft as a cleanup pass.\r\n\r\n## End-to-End Disaggregated TTFT\r\n## End-to-End Disaggregated TTFT {#end-to-end-disaggregated-ttft}\r\n\r\n**Objective:** To measure TTFT as a function of prompt length in a disaggregated\r\nserving configuration, isolating the fabric contribution.",
+              "createdAt": "2026-05-14T13:10:11Z",
+              "updatedAt": "2026-05-14T13:10:12Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDORX8k_s7_t6BI",
+          "commit": {
+            "abbreviatedOid": "4c843fc"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-05-14T13:19:01Z",
+          "updatedAt": "2026-05-14T13:19:02Z",
+          "comments": [
+            {
+              "originalPosition": 447,
+              "body": "Agreed \u2014 and I believe that  any future threshold-setting work may  need a home outside BMWG (charter constraint) and would more naturally take the form of an Applicability Statement or Informational profile rather than BCP.  as this  draft stays methodology-only.\"\r\n",
+              "createdAt": "2026-05-14T13:19:01Z",
+              "updatedAt": "2026-05-14T13:19:02Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 23,
+      "id": "PR_kwDORX8k_s7bi3xq",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/23",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "defined at first use -  no drift from terminology",
+      "createdAt": "2026-05-14T13:57:51Z",
+      "updatedAt": "2026-05-14T16:16:31Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "12650d99ac16447ac3852e6016b8d83c31e94b46",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "Acronyms",
+      "headRefOid": "69c0f25ee8f36409ee6043d0840ffc6826b73416",
+      "closedAt": "2026-05-14T16:11:51Z",
+      "mergedAt": "2026-05-14T16:11:51Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "c4afc4ea67e429b099c41da979bb450f2bdbdbd0"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 24,
+      "id": "PR_kwDORX8k_s7bowB1",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/24",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "02_Edits and consistency between docs",
+      "createdAt": "2026-05-14T18:39:03Z",
+      "updatedAt": "2026-05-15T12:59:03Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "c4afc4ea67e429b099c41da979bb450f2bdbdbd0",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "02_Edits",
+      "headRefOid": "43345c31793e26ff22f085cbdb612ce7e69e25e7",
+      "closedAt": "2026-05-15T12:58:58Z",
+      "mergedAt": "2026-05-15T12:58:58Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "70754a729129bc5445268a04205ac8b3beabcfb0"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s7_9ghi",
+          "commit": {
+            "abbreviatedOid": "43345c3"
+          },
+          "author": "billwuqin",
+          "authorAssociation": "COLLABORATOR",
+          "state": "CHANGES_REQUESTED",
+          "body": "",
+          "createdAt": "2026-05-15T00:02:29Z",
+          "updatedAt": "2026-05-15T00:02:42Z",
+          "comments": [
+            {
+              "originalPosition": 72,
+              "body": "Where is it referenced in the document?",
+              "createdAt": "2026-05-15T00:02:30Z",
+              "updatedAt": "2026-05-15T00:02:42Z"
             }
           ]
         }
