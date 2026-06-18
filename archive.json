@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-05-17T01:55:17.567092+00:00",
+  "timestamp": "2026-06-18T02:32:58.393777+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -271,6 +271,22 @@
       "createdAt": "2026-05-12T13:04:00Z",
       "updatedAt": "2026-05-14T16:12:30Z",
       "closedAt": "2026-05-14T16:12:30Z",
+      "comments": []
+    },
+    {
+      "number": 25,
+      "id": "I_kwDORX8k_s8AAAABFzHGBA",
+      "title": "Issues 6 and 7",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/25",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "6 Improve wording  on TTFT / ITL target values \n7 Goodput metric clarity \nadditional pass/fail criteria (instead of threshold) ",
+      "createdAt": "2026-06-17T14:15:56Z",
+      "updatedAt": "2026-06-17T14:15:56Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -1305,6 +1321,48 @@
               "updatedAt": "2026-05-15T00:02:42Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 26,
+      "id": "PR_kwDORX8k_s7nhki7",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/26",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "issues 6 and 7 plus criteria instead  of thresholds (consistency among all 3 documents)",
+      "createdAt": "2026-06-17T14:35:58Z",
+      "updatedAt": "2026-06-17T23:36:05Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "65d0a8902c3c14a69fe59592b1b2a9009e1347dd",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "issues-6-and-7",
+      "headRefOid": "c8ca544fc406cc6379eb7ccf9a93f80b28925152",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s8AAAABDW9N-A",
+          "commit": {
+            "abbreviatedOid": "c8ca544"
+          },
+          "author": "billwuqin",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-06-17T23:36:05Z",
+          "updatedAt": "2026-06-17T23:36:05Z",
+          "comments": []
         }
       ]
     }
