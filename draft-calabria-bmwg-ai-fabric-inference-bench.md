@@ -376,7 +376,7 @@ categories. KPIs are organized into four tiers: Primary Latency KPIs
 capacity metrics), Fabric-Level KPIs (network-specific measurements), and Fabric
 Health Indicators (operational monitoring metrics).
 
-> NOTE: Per BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. The KPI tables in this section define what is measured; they do not set thresholds. Indicative non-normative reference values reflecting current industry observations are provided in {{indicative-reference-values}}; those values MUST NOT be used as pass/fail thresholds in vendor evaluations.
+> NOTE: Per BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. The KPI tables in this section define what is measured; they do not set pass/fail criteria. Indicative non-normative reference values reflecting current industry observations are provided in {{indicative-reference-values}}; those values MUST NOT be used as pass/fail criteria in vendor evaluations.
 
 ## Primary Latency KPIs
 
@@ -396,7 +396,7 @@ Health Indicators (operational monitoring metrics).
 | TPS_input | tokens/s | Aggregate input (prefill) tokens processed per second across all workers | SUT-E prefill completion events |
 | TPS_output | tokens/s | Aggregate output (decode) tokens generated per second across all workers | SUT-E token emission events |
 | TPS_per_GPU | tokens/s/GPU | Output tokens per second normalized by number of decode GPUs | SUT-E per-worker counters |
-| Goodput | GB/s or tokens/s | See the Goodput definition in {{TERMINOLOGY}} Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
+| Goodput | GB/s or tokens/s | See the Goodput definition in {{TERMINOLOGY}}. Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | KV_BW | GB/s | Aggregate KV cache transfer bandwidth between prefill and decode pools | DUT-PD RDMA counters |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
 {: #tab-throughput-kpis title="Primary Throughput KPIs"}
@@ -562,12 +562,15 @@ capacity.
 xPyD ratios: 1P11D, 2P10D, 3P9D, 4P8D, 6P6D, 8P4D, 10P2D, 11P1D. For each
 ratio, submit a sustained request stream matching a target request rate with a
 specified prompt length distribution (e.g., Zipf with alpha=1.0 over
-\[128, 8192\] tokens). Measure TTFT P99, ITL P99, TPS_output, and Goodput for
+\[128, 8192\] tokens). Measure TTFT P99, ITL P99, TPS_output, and Inference_Goodput for
 each configuration.
 
 **Measurement:** Report all four metrics for each xPyD ratio and request rate.
-Identify the Pareto-optimal ratio(s) that maximize TPS_output while meeting
-TTFT P99 < 500 ms and ITL P99 < 50 ms.
+Identify the Pareto-optimal ratio(s) across the TPS_output, TTFT, and ITL
+trade-off, that is, the ratios for which no other ratio improves one metric
+without worsening another. For reference, an illustrative interactive-serving
+objective is TTFT P99 < 500 ms and ITL P99 < 50 ms; these values are provided
+for context only and are not benchmark requirements or acceptance criteria.
 
 **Reporting Format:** Results are reported as a multi-panel figure with
 one panel per request rate, each showing xPyD ratio on the X axis and metrics
@@ -764,7 +767,7 @@ a sustained request stream at rates of 10, 50, 100, and 200 req/s. Compare
 against round-robin routing (baseline).
 
 **Measurement:** Report the coefficient of variation (CV) of decode worker
-memory utilization, P99 TTFT, P99 ITL, KV cache eviction rate, and Goodput for
+memory utilization, P99 TTFT, P99 ITL, KV cache eviction rate, and Inference_Goodput for
 both KV-aware and round-robin routing.
 
 ## Prefix-Aware Cache Hit Rate
@@ -893,9 +896,9 @@ meeting latency SLOs.
 
 **Procedure:** Increase the request arrival rate from 1 req/s to the point where
 either TTFT P99 exceeds 500 ms or ITL P99 exceeds 50 ms. At each rate, measure
-TPS_output, TPS_input, Goodput, and all latency KPIs.
+TPS_output, TPS_input, Inference_Goodput, and all latency KPIs.
 
-**Measurement:** Report TPS_output, TPS_input, Goodput, TTFT P99, ITL P99, and
+**Measurement:** Report TPS_output, TPS_input, Inference_Goodput, TTFT P99, ITL P99, and
 fabric utilization at the SLO-bounded throughput. Report the fabric utilization
 at the SLO boundary as a key efficiency metric.
 
@@ -914,15 +917,15 @@ concurrent transfers for each batch size, with and without continuous batching.
 
 ## Goodput Under Preemption and Eviction
 
-**Objective:** To measure the Goodput loss when fabric congestion forces KV
+**Objective:** To measure the Inference_Goodput loss when fabric congestion forces KV
 cache eviction or request preemption.
 
 **Procedure:** Oversubscribe the system beyond the SLO-bounded throughput (at
 110%, 125%, 150%, and 200% of the rate found in Test 11.1). Measure the rate of
-KV cache evictions, request preemptions, and the resulting Goodput reduction.
+KV cache evictions, request preemptions, and the resulting Inference_Goodput reduction.
 
-**Measurement:** Report Goodput, eviction rate (evictions/s), preemption rate
-(preemptions/s), wasted fabric bandwidth (GB/s), and the Goodput/TPS_output
+**Measurement:** Report Inference_Goodput, eviction rate (evictions/s), preemption rate
+(preemptions/s), wasted fabric bandwidth (GB/s), and the Inference_Goodput/TPS_output
 ratio (efficiency).
 
 # Test Category 8: Scale and Autoscaling {#test-cat8}
@@ -1098,7 +1101,7 @@ The following table provides a cross-reference from each KPI defined in
 | ITL | 10.2, 10.3, 10.4 | SUT-E |
 | TPS_output | 6.2, 11.1, 11.2, 11.3 | SUT-E |
 | TPS_input | 11.1 | SUT-E |
-| Goodput | 11.1, 11.3 | SUT-E |
+| Inference_Goodput | 11.1, 11.3 | SUT-E |
 | KV_xfer_latency | 5.2, 5.3, 6.1, 6.4 | DUT-N, DUT-PD |
 | KV_xfer_bandwidth | 5.1, 5.3, 5.4 | DUT-N, DUT-PD |
 | EP_alltoall_latency | 7.1, 7.2, 7.3, 7.4 | DUT-F |
@@ -1116,7 +1119,7 @@ The following table provides a cross-reference from each KPI defined in
 
 # Indicative Reference Values (Non-Normative) {#indicative-reference-values}
 
-This appendix provides indicative reference values for the KPIs defined in {{kpi-framework}}, reflecting current industry observations for interactive inference workloads as of 2025-2026. These values are NON-NORMATIVE and do not constitute benchmarking acceptance criteria or performance requirements. Per the BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. Implementers may use these values as contextual references when interpreting results; they MUST NOT be used as pass/fail thresholds in vendor evaluations. Deployment-specific SLOs will vary by application, model architecture, and operator requirements.
+This appendix provides indicative reference values for the KPIs defined in {{kpi-framework}}, reflecting current industry observations for interactive inference workloads as of 2025-2026. These values are NON-NORMATIVE and do not constitute benchmarking acceptance criteria or performance requirements. Per the BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. Implementers may use these values as contextual references when interpreting results; they MUST NOT be used as pass/fail criteria in vendor evaluations. Deployment-specific SLOs will vary by application, model architecture, and operator requirements.
 
 | KPI | Indicative Reference (Interactive) |
 |---|---|
