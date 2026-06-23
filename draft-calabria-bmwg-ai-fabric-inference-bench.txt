@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 5 December 2026                            Blue Fern Consulting
+Expires: 25 December 2026                           Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                             3 June 2026
+                                                            23 June 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -75,7 +75,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 December 2026.
+   This Internet-Draft will expire on 25 December 2026.
 
 Copyright Notice
 
@@ -549,10 +549,10 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
       NOTE: Per BMWG charter, the definition of acceptance criteria or
       performance requirements is explicitly outside the scope of this
       Working Group.  The KPI tables in this section define what is
-      measured; they do not set thresholds.  Indicative non-normative
-      reference values reflecting current industry observations are
-      provided in Appendix B; those values MUST NOT be used as pass/fail
-      thresholds in vendor evaluations.
+      measured; they do not set pass/fail criteria.  Indicative non-
+      normative reference values reflecting current industry
+      observations are provided in Appendix B; those values MUST NOT be
+      used as pass/fail criteria in vendor evaluations.
 
 4.1.  Primary Latency KPIs
 
@@ -605,7 +605,7 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
    +--------------+-----------+--------------------------+-------------+
    | Goodput      | GB/s or   | See the Goodput          | SUT-E       |
    |              | tokens/s  | definition in            | successful  |
-   |              |           | [TERMINOLOGY] Reports    | completion  |
+   |              |           | [TERMINOLOGY].  Reports  | completion  |
    |              |           | use Inference_Goodput    | events      |
    |              |           | for token-rate           |             |
    |              |           | measurements and         |             |
@@ -861,11 +861,15 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
    For each ratio, submit a sustained request stream matching a target
    request rate with a specified prompt length distribution (e.g., Zipf
    with alpha=1.0 over [128, 8192] tokens).  Measure TTFT P99, ITL P99,
-   TPS_output, and Goodput for each configuration.
+   TPS_output, and Inference_Goodput for each configuration.
 
    *Measurement:* Report all four metrics for each xPyD ratio and
-   request rate.  Identify the Pareto-optimal ratio(s) that maximize
-   TPS_output while meeting TTFT P99 < 500 ms and ITL P99 < 50 ms.
+   request rate.  Identify the Pareto-optimal ratio(s) across the
+   TPS_output, TTFT, and ITL trade-off, that is, the ratios for which no
+   other ratio improves one metric without worsening another.  For
+   reference, an illustrative interactive-serving objective is TTFT P99
+   < 500 ms and ITL P99 < 50 ms; these values are provided for context
+   only and are not benchmark requirements or acceptance criteria.
 
    *Reporting Format:* Results are reported as a multi-panel figure with
    one panel per request rate, each showing xPyD ratio on the X axis and
@@ -1125,7 +1129,7 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
    *Measurement:* Report the coefficient of variation (CV) of decode
    worker memory utilization, P99 TTFT, P99 ITL, KV cache eviction rate,
-   and Goodput for both KV-aware and round-robin routing.
+   and Inference_Goodput for both KV-aware and round-robin routing.
 
 9.2.  Prefix-Aware Cache Hit Rate
 
@@ -1279,12 +1283,12 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
    *Procedure:* Increase the request arrival rate from 1 req/s to the
    point where either TTFT P99 exceeds 500 ms or ITL P99 exceeds 50 ms.
-   At each rate, measure TPS_output, TPS_input, Goodput, and all latency
-   KPIs.
+   At each rate, measure TPS_output, TPS_input, Inference_Goodput, and
+   all latency KPIs.
 
-   *Measurement:* Report TPS_output, TPS_input, Goodput, TTFT P99, ITL
-   P99, and fabric utilization at the SLO-bounded throughput.  Report
-   the fabric utilization at the SLO boundary as a key efficiency
+   *Measurement:* Report TPS_output, TPS_input, Inference_Goodput, TTFT
+   P99, ITL P99, and fabric utilization at the SLO-bounded throughput.
+   Report the fabric utilization at the SLO boundary as a key efficiency
    metric.
 
 11.2.  Batch Size Scaling and Continuous Batching Impact
@@ -1304,17 +1308,17 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
 11.3.  Goodput Under Preemption and Eviction
 
-   *Objective:* To measure the Goodput loss when fabric congestion
-   forces KV cache eviction or request preemption.
+   *Objective:* To measure the Inference_Goodput loss when fabric
+   congestion forces KV cache eviction or request preemption.
 
    *Procedure:* Oversubscribe the system beyond the SLO-bounded
    throughput (at 110%, 125%, 150%, and 200% of the rate found in Test
    11.1).  Measure the rate of KV cache evictions, request preemptions,
-   and the resulting Goodput reduction.
+   and the resulting Inference_Goodput reduction.
 
-   *Measurement:* Report Goodput, eviction rate (evictions/s),
+   *Measurement:* Report Inference_Goodput, eviction rate (evictions/s),
    preemption rate (preemptions/s), wasted fabric bandwidth (GB/s), and
-   the Goodput/TPS_output ratio (efficiency).
+   the Inference_Goodput/TPS_output ratio (efficiency).
 
 12.  Test Category 8: Scale and Autoscaling
 
@@ -1605,20 +1609,20 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
               <https://www.rfc-editor.org/rfc/rfc8239>.
 
    [TERMINOLOGY]
-              Calabria, F., Pignataro, C., Wu, Q., and G. Fioccola,
-              "Benchmarking Terminology for AI Network Fabrics", Work in
-              Progress, Internet-Draft, draft-calabria-bmwg-ai-fabric-
-              terminology-01, 21 April 2026,
+              Calabria, F., Pignataro, C., Wu, Q., Fioccola, G., and S.
+              Reddy, "Benchmarking Terminology for AI Network Fabrics",
+              Work in Progress, Internet-Draft, draft-calabria-bmwg-ai-
+              fabric-terminology-02, 4 June 2026,
               <https://datatracker.ietf.org/doc/html/draft-calabria-
-              bmwg-ai-fabric-terminology-01>.
+              bmwg-ai-fabric-terminology-02>.
 
    [TRAINING-BENCH]
-              Calabria, F., Pignataro, C., Wu, Q., and G. Fioccola,
-              "Benchmarking Methodology for AI Training Network
+              Calabria, F., Pignataro, C., Wu, Q., Fioccola, G., and S.
+              Reddy, "Benchmarking Methodology for AI Training Network
               Fabrics", Work in Progress, Internet-Draft, draft-
-              calabria-bmwg-ai-fabric-training-bench-01, 21 April 2026,
+              calabria-bmwg-ai-fabric-training-bench-02, 4 June 2026,
               <https://datatracker.ietf.org/doc/html/draft-calabria-
-              bmwg-ai-fabric-training-bench-01>.
+              bmwg-ai-fabric-training-bench-02>.
 
    [UEC-1.0]  Ultra Ethernet Consortium, "Ultra Ethernet Transport (UET)
               Specification 1.0", June 2025,
@@ -1652,7 +1656,7 @@ Appendix A.  KPI-to-Test Mapping Summary
      +-----------------------+-----------------------+---------------+
      | TPS_input             | 11.1                  | SUT-E         |
      +-----------------------+-----------------------+---------------+
-     | Goodput               | 11.1, 11.3            | SUT-E         |
+     | Inference_Goodput     | 11.1, 11.3            | SUT-E         |
      +-----------------------+-----------------------+---------------+
      | KV_xfer_latency       | 5.2, 5.3, 6.1, 6.4    | DUT-N, DUT-PD |
      +-----------------------+-----------------------+---------------+
@@ -1693,7 +1697,7 @@ Appendix B.  Indicative Reference Values (Non-Normative)
    acceptance criteria or performance requirements is explicitly outside
    the scope of this Working Group.  Implementers may use these values
    as contextual references when interpreting results; they MUST NOT be
-   used as pass/fail thresholds in vendor evaluations.  Deployment-
+   used as pass/fail criteria in vendor evaluations.  Deployment-
    specific SLOs will vary by application, model architecture, and
    operator requirements.
 
