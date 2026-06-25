@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 25 December 2026                           Blue Fern Consulting
+Expires: 27 December 2026                           Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                            23 June 2026
+                                                            25 June 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -75,7 +75,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 25 December 2026.
+   This Internet-Draft will expire on 27 December 2026.
 
 Copyright Notice
 
@@ -1974,8 +1974,8 @@ Acknowledgments
 
    This work has benefited from the discussions that occurred during the
    joint IPPM and BMWG meeting and on the BMWG mailing list.  Thanks to
-   Carsten Rossenhoevel, Mohamed Boucadair, and Sowjanya Reddy for
-   valuable review and comments.
+   Carsten Rossenhoevel, and Mohamed Boucadair for valuable review and
+   comments.
 
 Authors' Addresses
 
