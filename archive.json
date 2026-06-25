@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-18T02:32:58.393777+00:00",
+  "timestamp": "2026-06-25T02:06:06.448867+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -278,15 +278,15 @@
       "id": "I_kwDORX8k_s8AAAABFzHGBA",
       "title": "Issues 6 and 7",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/25",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "6 Improve wording  on TTFT / ITL target values \n7 Goodput metric clarity \nadditional pass/fail criteria (instead of threshold) ",
       "createdAt": "2026-06-17T14:15:56Z",
-      "updatedAt": "2026-06-17T14:15:56Z",
-      "closedAt": null,
+      "updatedAt": "2026-06-23T10:16:46Z",
+      "closedAt": "2026-06-23T10:16:46Z",
       "comments": []
     }
   ],
@@ -1329,7 +1329,7 @@
       "id": "PR_kwDORX8k_s7nhki7",
       "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/26",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [
@@ -1338,17 +1338,19 @@
       "labels": [],
       "body": "issues 6 and 7 plus criteria instead  of thresholds (consistency among all 3 documents)",
       "createdAt": "2026-06-17T14:35:58Z",
-      "updatedAt": "2026-06-17T23:36:05Z",
+      "updatedAt": "2026-06-23T10:11:34Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "65d0a8902c3c14a69fe59592b1b2a9009e1347dd",
       "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "headRefName": "issues-6-and-7",
       "headRefOid": "c8ca544fc406cc6379eb7ccf9a93f80b28925152",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-06-23T10:11:06Z",
+      "mergedAt": "2026-06-23T10:11:05Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "9eaf53ab8dcbf2b6d6adec07d572a32247e24baa"
+      },
       "comments": [],
       "reviews": [
         {
@@ -1363,6 +1365,26 @@
           "createdAt": "2026-06-17T23:36:05Z",
           "updatedAt": "2026-06-17T23:36:05Z",
           "comments": []
+        },
+        {
+          "id": "PRR_kwDORX8k_s8AAAABDy_OMQ",
+          "commit": {
+            "abbreviatedOid": "c8ca544"
+          },
+          "author": "sowjanyadreddy",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2026-06-23T03:26:57Z",
+          "updatedAt": "2026-06-23T03:26:58Z",
+          "comments": [
+            {
+              "originalPosition": 1,
+              "body": "Remove my name from this section as I was added in the author section. ",
+              "createdAt": "2026-06-23T03:26:58Z",
+              "updatedAt": "2026-06-23T03:26:58Z"
+            }
+          ]
         }
       ]
     }
