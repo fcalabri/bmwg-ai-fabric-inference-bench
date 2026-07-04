@@ -15,21 +15,21 @@
 Performance Indicators (KPIs) for evaluating Ethernet-based AI inference
 serving network fabrics. As Large Language Model (LLM) inference deployments
 scale to disaggregated prefill/decode architectures spanning hundreds or
-thousands of accelerators (GPUs/XPUs), the interconnect fabric becomes the
-critical bottleneck determining Time to First Token (TTFT), Inter-Token
-Latency (ITL), and aggregate throughput in tokens per second (TPS). This
+thousands of accelerators (GPUs/XPUs), the interconnect fabric determines
+Time to First Token (TTFT), Inter-Token Latency (ITL), and aggregate
+throughput in tokens per second (TPS). This
 document establishes vendor-independent, reproducible test procedures for
 benchmarking fabric-level performance under realistic AI inference workloads. 
        Coverage includes RDMA-based KV cache transfer between disaggregated prefill
 and decode workers, Mixture-of-Experts (MoE) expert parallelism AllToAll
 communication, request routing and load balancing for inference serving,
 congestion management under bursty inference traffic patterns, and scale/soak
-testing. The methodology enables direct, equivalent comparison across
-implementations, NIC transport stacks (RoCEv2, UET), and fabric architectures. 
-       This document is a companion to  , which addresses training
-workloads. 
+testing. The methodology enables direct comparison across NIC transport
+stacks (RoCEv2 and UET) and fabric architectures. 
+       This document is a companion to the AI training fabric benchmarking
+methodology, which addresses training workloads. 
     " name="description">
-<meta content="xml2rfc 3.33.0" name="generator">
+<meta content="xml2rfc 3.34.0" name="generator">
 <meta content="benchmarking" name="keyword">
 <meta content="AI" name="keyword">
 <meta content="inference" name="keyword">
@@ -41,18 +41,19 @@ workloads.
 <meta content="disaggregated serving" name="keyword">
 <meta content="draft-calabria-bmwg-ai-fabric-inference-bench-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.33.0
-    Python 3.12.13
-    ConfigArgParse 1.7
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
-    lxml 6.0.2
-    platformdirs 4.9.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.10.0
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.7.0
+    wcwidth 0.8.2
 -->
 <link href="draft-calabria-bmwg-ai-fabric-inference-bench.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1071,11 +1072,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">AI Inference Fabric Benchmarking</td>
-<td class="right">June 2026</td>
+<td class="right">July 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Calabria, et al.</td>
-<td class="center">Expires 6 December 2026</td>
+<td class="center">Expires 5 January 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1088,12 +1089,12 @@ svg {
 <dd class="internet-draft">draft-calabria-bmwg-ai-fabric-inference-bench-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-06-04" class="published">4 June 2026</time>
+<time datetime="2026-07-04" class="published">4 July 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-12-06">6 December 2026</time></dd>
+<dd class="expires"><time datetime="2027-01-05">5 January 2027</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1126,19 +1127,19 @@ svg {
 Performance Indicators (KPIs) for evaluating Ethernet-based AI inference
 serving network fabrics. As Large Language Model (LLM) inference deployments
 scale to disaggregated prefill/decode architectures spanning hundreds or
-thousands of accelerators (GPUs/XPUs), the interconnect fabric becomes the
-critical bottleneck determining Time to First Token (TTFT), Inter-Token
-Latency (ITL), and aggregate throughput in tokens per second (TPS). This
+thousands of accelerators (GPUs/XPUs), the interconnect fabric determines
+Time to First Token (TTFT), Inter-Token Latency (ITL), and aggregate
+throughput in tokens per second (TPS). This
 document establishes vendor-independent, reproducible test procedures for
 benchmarking fabric-level performance under realistic AI inference workloads.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <p id="section-abstract-2">Coverage includes RDMA-based KV cache transfer between disaggregated prefill
 and decode workers, Mixture-of-Experts (MoE) expert parallelism AllToAll
 communication, request routing and load balancing for inference serving,
 congestion management under bursty inference traffic patterns, and scale/soak
-testing. The methodology enables direct, equivalent comparison across
-implementations, NIC transport stacks (RoCEv2, UET), and fabric architectures.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
-<p id="section-abstract-3">This document is a companion to <span>[<a href="#TRAINING-BENCH" class="cite xref">TRAINING-BENCH</a>]</span>, which addresses training
-workloads.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
+testing. The methodology enables direct comparison across NIC transport
+stacks (RoCEv2 and UET) and fabric architectures.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+<p id="section-abstract-3">This document is a companion to the AI training fabric benchmarking
+methodology, which addresses training workloads.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
 </section>
 <section class="note rfcEditorRemove" id="section-note.1">
       <h2 id="name-about-this-document">
@@ -1175,7 +1176,7 @@ workloads.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 6 December 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 January 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1479,17 +1480,15 @@ workloads.<a href="#section-abstract-3" class="pilcrow">¶</a></p>
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Large Language Model (LLM) inference serving has emerged as a dominant consumer
-of datacenter network capacity, with fundamentally different fabric requirements
-compared to training workloads. While training workloads are characterized by
-bulk synchronous collective operations (AllReduce, AllGather) with predictable
-periodicity, inference workloads exhibit bursty, latency-sensitive
-request/response patterns with strict Service Level Objectives (SLOs) on
-per-token latency and time-to-first-token.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">The advent of disaggregated serving architectures, where the computationally
-intensive prefill phase (prompt processing) is physically separated from the
-memory-bound decode phase (token generation), introduces a new class of
-fabric-critical data movement: KV cache transfer. A single large prompt
+<p id="section-1-1">Large Language Model (LLM) inference now consumes datacenter network capacity
+at a scale comparable to training, but with different fabric requirements.
+Training workloads generate bulk synchronous collective operations –
+AllReduce, AllGather – at predictable intervals. Inference workloads produce
+bursty, latency-sensitive request/response patterns with strict Service Level
+Objectives (SLOs) on per-token latency and time-to-first-token.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">Disaggregated serving architectures physically separate the prefill phase
+(prompt processing) from the decode phase (token generation). This separation
+creates a new category of fabric-critical data movement: KV cache transfer. A single large prompt
 processed by a typical large-scale model generates multiple gigabytes of KV
 cache state that must be transferred from prefill workers to decode workers
 within a fraction of the target TTFT SLO.<a href="#section-1-2" class="pilcrow">¶</a></p>
@@ -1528,7 +1527,7 @@ appear in all capitals, as shown here.<a href="#section-1.1-1" class="pilcrow">�
 the interaction between fabric behavior and application-level inference metrics
  (TTFT, ITL, TPS).<a href="#section-1.2-1" class="pilcrow">¶</a></p>
 <p id="section-1.2-2">The DUT boundary for all measurements in this document is defined as the NIC-to-NIC
-Ethernet fabric segment — specifically, the path from the point of packet transmission
+Ethernet fabric segment – specifically, the path from the point of packet transmission
  by the source NIC Ethernet port to the point of packet reception at the destination NIC
  Ethernet port.<a href="#section-1.2-2" class="pilcrow">¶</a></p>
 <p id="section-1.2-3">Intra-node transfer segments (proprietary accelerator interconnects GPU-to-GPU, and PCIe / Compute Express Link (CXL) GPU-to-NIC) are explicitly
@@ -1548,7 +1547,7 @@ OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contrib
 <p id="section-1.3-1">This document builds upon the foundational BMWG benchmarking framework
 established by <span>[<a href="#RFC1242" class="cite xref">RFC1242</a>]</span>, <span>[<a href="#RFC2544" class="cite xref">RFC2544</a>]</span>, <span>[<a href="#RFC2889" class="cite xref">RFC2889</a>]</span>, and <span>[<a href="#RFC6349" class="cite xref">RFC6349</a>]</span>.<a href="#section-1.3-1" class="pilcrow">¶</a></p>
 <p id="section-1.3-2">The test structure follows RFC 2544 conventions for trial duration (minimum 60
-seconds), statistical repetition (minimum 20 trials for latency, 50 for burst),
+seconds), statistical repetition (minimum 20 trials per configuration),
 and reporting format (graphical and tabular).<a href="#section-1.3-2" class="pilcrow">¶</a></p>
 <p id="section-1.3-3">The methodologies extend RFC 2544 Section 26 benchmarks (throughput, latency,
 frame loss rate, back-to-back frames, system recovery, reset) to
@@ -1567,12 +1566,12 @@ terminology, test topology conventions, and reporting formats
 (<a href="#reporting" class="auto internal xref">Section 14</a>). Both documents use the terminology defined in
 <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>, which provides the common terminology base for AI fabric
 benchmarking.<a href="#section-1.4-1" class="pilcrow">¶</a></p>
-<p id="section-1.4-2">Where training workloads are dominated by bulk synchronous collective
-communication (AllReduce, AllGather) with high bandwidth utilization and
-periodic synchronization barriers, inference workloads are dominated by bursty,
-latency-sensitive point-to-point transfers (KV cache) and fine-grained AllToAll
-dispatch (MoE expert parallelism). Implementers deploying converged fabrics that
-serve both training and inference workloads should run both test suites.<a href="#section-1.4-2" class="pilcrow">¶</a></p>
+<p id="section-1.4-2">Training workloads generate bulk synchronous collective communication
+(AllReduce, AllGather) with high bandwidth utilization and periodic
+synchronization barriers; inference workloads generate bursty, latency-sensitive
+point-to-point transfers (KV cache) and fine-grained AllToAll dispatch for MoE
+expert parallelism. Implementers deploying converged fabrics that serve both
+training and inference workloads should run both test suites.<a href="#section-1.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1689,7 +1688,8 @@ switches to minimize spine-hop latency.<a href="#section-3.1.1-1" class="pilcrow
 <p id="section-3.1.2-1">Required for inference clusters exceeding 2,048 accelerators or for multi-model
 serving deployments where different model instances occupy different fabric pods.
 KV cache transfer traffic between prefill and decode workers in different pods
-traverses the superspine tier, making superspine bandwidth and latency critical.<a href="#section-3.1.2-1" class="pilcrow">¶</a></p>
+traverses the superspine tier, so superspine bandwidth and latency directly
+affect KV cache transfer performance.<a href="#section-3.1.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="topology-c-disaggregated-prefilldecode-placement">
@@ -1758,7 +1758,7 @@ cache across DP ranks within the decode pool, requiring AllToAll communication
 during decode.<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-3.2-2.3">
-            <p id="section-3.2-2.3.1"><strong>KV Cache Transfer Network:</strong> The Ethernet fabric segment connecting prefill and decode worker pools. This segment carries one-sided RDMA PUT operations (or PUT-with-signal) transferring KV cache blocks from prefill GPU memory to decode GPU memory via RDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport (UET).<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+            <p id="section-3.2-2.3.1"><strong>KV Cache Transfer Network:</strong> The Ethernet fabric segment connecting prefill and decode worker pools. This segment carries one-sided RDMA PUT operations (or PUT-with-signal) transferring KV cache blocks from prefill GPU memory to decode GPU memory via RDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport (UET) <span>[<a href="#UEC-1.0" class="cite xref">UEC-1.0</a>]</span>.<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
 <p id="section-3.2-2.3.2">
 The end-to-end transfer from GPU memory to remote GPU memory traverses three segments:<a href="#section-3.2-2.3.2" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -1776,8 +1776,9 @@ The end-to-end transfer from GPU memory to remote GPU memory traverses three seg
 Benchmarking procedures in <a href="#test-cat1" class="auto internal xref">Section 5</a> and <a href="#test-cat2" class="auto internal xref">Section 6</a> measure fabric-segment latency and throughput exclusively. When end-to-end measurements are reported (e.g., TTFT decomposition), the intra-node segments are labelled separately.<a href="#section-3.2-2.3.4" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="section-3.2-2.3.5">
 <pre>
-GPU Memory --&gt; [PCIe/CXL] --&gt; NIC --&gt; [ETHERNET FABRIC] --&gt; NIC --&gt; [PCIe/CXL] --&gt; GPU Memory
-&lt;---intra-node (out of scope)---&gt;|&lt;------DUT (in scope)-------&gt;|&lt;---intra-node (out of scope)---&gt;
+GPU Memory --&gt; [PCIe/CXL] --&gt; NIC    intra-node (out of scope)
+NIC --&gt; [ETHERNET FABRIC] --&gt; NIC    DUT (in scope)
+NIC --&gt; [PCIe/CXL] --&gt; GPU Memory    intra-node (out of scope)
 </pre><a href="#section-3.2-2.3.5" class="pilcrow">¶</a>
 </div>
 </li>
@@ -1900,7 +1901,7 @@ accuracy &lt;= 1 millisecond.<a href="#section-3.4.2-2.5.1" class="pilcrow">¶</
 </li>
           </ul>
 <p id="section-3.4.2-3">When a software workload emulator is used, the complete software configuration
-is documented per <a href="#dut-id" class="auto internal xref">Section 3.3</a>, as framework version, RDMA library version,
+is documented per <a href="#reporting" class="auto internal xref">Section 14</a>, as framework version, RDMA library version,
 and GPU driver version materially affect results.<a href="#section-3.4.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -1914,13 +1915,12 @@ and GPU driver version materially affect results.<a href="#section-3.4.2-3" clas
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-kpi-framework-and-metrics-t" class="section-name selfRef">KPI Framework and Metrics Taxonomy</a>
       </h2>
 <p id="section-4-1">This section defines the Key Performance Indicators measured across all test
-categories. KPIs are organized into four tiers: Primary Latency KPIs
-(end-user-facing response time metrics), Primary Throughput KPIs (system-level
-capacity metrics), Fabric-Level KPIs (network-specific measurements), and Fabric
-Health Indicators (operational monitoring metrics).<a href="#section-4-1" class="pilcrow">¶</a></p>
+categories. KPIs are organized into four tiers: Primary Latency KPIs, Primary
+Throughput KPIs, Fabric-Level KPIs, and Fabric Health Indicators. Each tier is
+defined in the subsections below.<a href="#section-4-1" class="pilcrow">¶</a></p>
 <ul class="normal ulEmpty">
 <li class="normal ulEmpty" id="section-4-2.1">
-          <p id="section-4-2.1.1">NOTE: Per BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. The KPI tables in this section define what is measured; they do not set thresholds. Indicative non-normative reference values reflecting current industry observations are provided in <a href="#indicative-reference-values" class="auto internal xref">Appendix B</a>; those values <span class="bcp14">MUST NOT</span> be used as pass/fail thresholds in vendor evaluations.<a href="#section-4-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-4-2.1.1">NOTE: Per BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. The KPI tables in this section define what is measured; they do not set pass/fail criteria. Indicative non-normative reference values reflecting current industry observations are provided in <a href="#indicative-reference-values" class="auto internal xref">Appendix B</a>; those values <span class="bcp14">MUST NOT</span> be used as pass/fail criteria in vendor evaluations.<a href="#section-4-2.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <div id="primary-latency-kpis">
@@ -2019,20 +2019,26 @@ Health Indicators (operational monitoring metrics).<a href="#section-4-1" class=
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Goodput</td>
               <td class="text-left" rowspan="1" colspan="1">GB/s or tokens/s</td>
-              <td class="text-left" rowspan="1" colspan="1">See the Goodput definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span> Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements</td>
+              <td class="text-left" rowspan="1" colspan="1">See the Goodput definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>. Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements</td>
               <td class="text-left" rowspan="1" colspan="1">SUT-E successful completion events</td>
-            </tr>
-            <tr>
-              <td class="text-left" rowspan="1" colspan="1">KV_BW</td>
-              <td class="text-left" rowspan="1" colspan="1">GB/s</td>
-              <td class="text-left" rowspan="1" colspan="1">Aggregate KV cache transfer bandwidth between prefill and decode pools</td>
-              <td class="text-left" rowspan="1" colspan="1">DUT-PD RDMA counters</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">Request_Rate</td>
               <td class="text-left" rowspan="1" colspan="1">req/s</td>
               <td class="text-left" rowspan="1" colspan="1">Maximum sustained request arrival rate meeting all latency SLOs</td>
               <td class="text-left" rowspan="1" colspan="1">SUT-E admission control boundary</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">Prefix_cache_hit_rate</td>
+              <td class="text-left" rowspan="1" colspan="1">%</td>
+              <td class="text-left" rowspan="1" colspan="1">Fraction of requests whose shared prefix KV cache segment is already resident on the assigned worker, avoiding a fabric transfer</td>
+              <td class="text-left" rowspan="1" colspan="1">SUT-E request router counters</td>
+            </tr>
+            <tr>
+              <td class="text-left" rowspan="1" colspan="1">JFI_decode</td>
+              <td class="text-left" rowspan="1" colspan="1">dimensionless (0-1)</td>
+              <td class="text-left" rowspan="1" colspan="1">Jain Fairness Index of per-decode-worker load (KV cache receive rate, GPU utilization, output TPS)</td>
+              <td class="text-left" rowspan="1" colspan="1">SUT-E per-worker counters</td>
             </tr>
           </tbody>
         </table>
@@ -2068,8 +2074,8 @@ Health Indicators (operational monitoring metrics).<a href="#section-4-1" class=
             <tr>
               <td class="text-left" rowspan="1" colspan="1">KV_xfer_bandwidth</td>
               <td class="text-left" rowspan="1" colspan="1">GB/s</td>
-              <td class="text-left" rowspan="1" colspan="1">Sustained unidirectional KV cache transfer throughput per NIC port</td>
-              <td class="text-left" rowspan="1" colspan="1">DUT-N</td>
+              <td class="text-left" rowspan="1" colspan="1">Sustained unidirectional KV cache transfer throughput, reported per NIC port and as the aggregate between prefill and decode pools</td>
+              <td class="text-left" rowspan="1" colspan="1">DUT-N, DUT-PD</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">EP_alltoall_latency</td>
@@ -2302,7 +2308,10 @@ traffic patterns and their impact on end-to-end inference metrics.<a href="#sect
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-end-to-end-disaggregated-tt" class="section-name selfRef">End-to-End Disaggregated TTFT</a>
         </h3>
 <p id="section-6.1-1"><strong>Objective:</strong> To measure TTFT as a function of prompt length in a disaggregated
-serving configuration, isolating the fabric contribution.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+serving configuration, isolating the fabric contribution. This test
+characterizes the disaggregated-serving KV cache transfer path under normal
+serving conditions on a configured xPyD cluster; the single-request unloaded
+TTFT baseline is established separately in <a href="#ttft-prompt-length" class="auto internal xref">Section 10.1</a>.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <p id="section-6.1-2"><strong>Procedure:</strong> Configure a disaggregated serving system (SUT-E) with a specified
 xPyD ratio (e.g., 3P9D for a 12-node cluster). Submit inference requests with
 prompt lengths of 128, 512, 1024, 2048, 4096, 8192, and 16384 tokens. For each
@@ -2330,11 +2339,14 @@ capacity.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
 xPyD ratios: 1P11D, 2P10D, 3P9D, 4P8D, 6P6D, 8P4D, 10P2D, 11P1D. For each
 ratio, submit a sustained request stream matching a target request rate with a
 specified prompt length distribution (e.g., Zipf with alpha=1.0 over
-[128, 8192] tokens). Measure TTFT P99, ITL P99, TPS_output, and Goodput for
+[128, 8192] tokens). Measure TTFT P99, ITL P99, TPS_output, and Inference_Goodput for
 each configuration.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
 <p id="section-6.2-3"><strong>Measurement:</strong> Report all four metrics for each xPyD ratio and request rate.
-Identify the Pareto-optimal ratio(s) that maximize TPS_output while meeting
-TTFT P99 &lt; 500 ms and ITL P99 &lt; 50 ms.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+Identify the Pareto-optimal ratio(s) across the TPS_output, TTFT, and ITL
+trade-off, that is, the ratios for which no other ratio improves one metric
+without worsening another. For reference, an illustrative interactive-serving
+objective is TTFT P99 &lt; 500 ms and ITL P99 &lt; 50 ms; these values are provided
+for context only and are not benchmark requirements or acceptance criteria.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
 <p id="section-6.2-4"><strong>Reporting Format:</strong> Results are reported as a multi-panel figure with
 one panel per request rate, each showing xPyD ratio on the X axis and metrics
 on dual Y axes (TTFT/ITL on left, TPS on right). The Pareto frontier is
@@ -2416,7 +2428,7 @@ H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2
               <th class="text-left" rowspan="1" colspan="1">E (experts)</th>
               <th class="text-left" rowspan="1" colspan="1">k (top-k)</th>
               <th class="text-left" rowspan="1" colspan="1">H_model</th>
-              <th class="text-left" rowspan="1" colspan="1">T_dispatch (B=128, BF16, N=96)</th>
+              <th class="text-left" rowspan="1" colspan="1">T_dispatch per GPU pair (B=128, BF16, N=96)</th>
             </tr>
           </thead>
           <tbody>
@@ -2425,28 +2437,28 @@ H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2
               <td class="text-left" rowspan="1" colspan="1">8</td>
               <td class="text-left" rowspan="1" colspan="1">2</td>
               <td class="text-left" rowspan="1" colspan="1">4096</td>
-              <td class="text-left" rowspan="1" colspan="1">2.1 MB/GPU</td>
+              <td class="text-left" rowspan="1" colspan="1">21.8 KB</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M2</td>
               <td class="text-left" rowspan="1" colspan="1">64</td>
               <td class="text-left" rowspan="1" colspan="1">4</td>
               <td class="text-left" rowspan="1" colspan="1">7168</td>
-              <td class="text-left" rowspan="1" colspan="1">29  MB/GPU</td>
+              <td class="text-left" rowspan="1" colspan="1">76.5 KB</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M3</td>
               <td class="text-left" rowspan="1" colspan="1">256</td>
               <td class="text-left" rowspan="1" colspan="1">2</td>
               <td class="text-left" rowspan="1" colspan="1">7168</td>
-              <td class="text-left" rowspan="1" colspan="1">14  MB/GPU</td>
+              <td class="text-left" rowspan="1" colspan="1">38.2 KB</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M4</td>
               <td class="text-left" rowspan="1" colspan="1">256</td>
               <td class="text-left" rowspan="1" colspan="1">8</td>
               <td class="text-left" rowspan="1" colspan="1">7168</td>
-              <td class="text-left" rowspan="1" colspan="1">58  MB/GPU</td>
+              <td class="text-left" rowspan="1" colspan="1">153 KB</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">M5</td>
@@ -2458,12 +2470,17 @@ H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2
           </tbody>
         </table>
 </div>
-<p id="section-7.1-6"><strong>Measurement:</strong> Report aggregate bandwidth (GB/s), per-dispatch latency (us)
-at P50 and P99, and GPU idle time waiting for dispatch completion. The test is repeated a minimum of 20 times per configuration.<a href="#section-7.1-6" class="pilcrow">¶</a></p>
-<p id="section-7.1-7"><strong>Reporting Format:</strong> Results are reported as a heatmap with EP group size
+<p id="section-7.1-6">NOTE: T_dispatch values are the per-GPU-pair payload computed from the
+T_dispatch formula above (e.g., M1: 128 x 2 x 4096 x 2 bytes / 96 =
+21,845 bytes = 21.8 KB). The aggregate fabric load per dispatch is
+T_dispatch multiplied by the number of communicating GPU pairs; see the
+MoE AllToAll appendix for a worked example.<a href="#section-7.1-6" class="pilcrow">¶</a></p>
+<p id="section-7.1-7"><strong>Measurement:</strong> Report aggregate bandwidth (GB/s), per-dispatch latency (us)
+at P50 and P99, and GPU idle time waiting for dispatch completion. The test is repeated a minimum of 20 times per configuration.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
+<p id="section-7.1-8"><strong>Reporting Format:</strong> Results are reported as a heatmap with EP group size
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
-dimension. A companion latency table is included. Reports state which config row(s) were used. For M5, the values of E, k, H_model, P_bytes, and N are included in the results table.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
-<p id="section-7.1-8">NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, BusBW is computed per the BusBW definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>; algo_factor is fixed per collective type and does not depend on the algorithm the library selects at runtime. The runtime algorithm in use is verified via library tracing and documented as part of the test conditions.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
+dimension. A companion latency table is included. Reports state which config row(s) were used. For M5, the values of E, k, H_model, P_bytes, and N are included in the results table.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
+<p id="section-7.1-9">NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, BusBW is computed per the BusBW definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>; algo_factor is fixed per collective type and does not depend on the algorithm the library selects at runtime. The runtime algorithm in use is verified via library tracing and documented as part of the test conditions.<a href="#section-7.1-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="routing-mode-and-dispatch-mode-comparison">
@@ -2510,7 +2527,13 @@ dimension. A companion latency table is included. Reports state which config row
           </tbody>
         </table>
 </div>
-<p id="section-7.2-4"><strong>Measurement:</strong> Measure dispatch latency, fabric bandwidth, and routing mode impact on AllToAll traffic distribution and fabric congestion per <a href="#tbl-routing-modes" class="auto internal xref">Table 8</a>. Results from different routing modes are reported in separate result tables with the routing mode labelled.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<p id="section-7.2-4"><strong>Procedure:</strong> Execute the AllToAll dispatch procedure of the preceding
+AllToAll Dispatch Throughput test in both Normal Dispatch and Low-Latency
+Dispatch modes. Repeat the sequence for each selected routing mode from
+<a href="#tbl-routing-modes" class="auto internal xref">Table 8</a>, holding message sizes, EP group size, and iteration
+count constant across dispatch and routing modes so that results are
+directly comparable.<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<p id="section-7.2-5"><strong>Measurement:</strong> Measure dispatch latency, fabric bandwidth, and routing mode impact on AllToAll traffic distribution and fabric congestion per <a href="#tbl-routing-modes" class="auto internal xref">Table 8</a>. Results from different routing modes are reported in separate result tables with the routing mode labelled.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="wide-expert-parallelism-scaling">
@@ -2609,7 +2632,8 @@ during convergence, and Jain Fairness Index of the steady-state allocation.<a hr
         </h3>
 <p id="section-8.4-1"><strong>Objective:</strong> To verify that the fabric does not enter a PFC storm or deadlock
 condition under adversarial inference traffic patterns.<a href="#section-8.4-1" class="pilcrow">¶</a></p>
-<p id="section-8.4-2"><strong>Procedure:</strong> Per the companion training document, generate a PFC storm
+<p id="section-8.4-2"><strong>Procedure:</strong> Per the PFC Storm and Deadlock Resilience test of
+<span>[<a href="#TRAINING-BENCH" class="cite xref">TRAINING-BENCH</a>]</span>, generate a PFC storm
 scenario by creating circular buffer dependency across multiple switches.
 Simultaneously inject KV cache transfer traffic on all affected paths. Monitor
 for PFC storm propagation, deadlock, and recovery time. The test duration is at least 300 seconds.<a href="#section-8.4-2" class="pilcrow">¶</a></p>
@@ -2639,7 +2663,7 @@ path congestion when assigning requests.<a href="#section-9.1-1" class="pilcrow"
 a sustained request stream at rates of 10, 50, 100, and 200 req/s. Compare
 against round-robin routing (baseline).<a href="#section-9.1-2" class="pilcrow">¶</a></p>
 <p id="section-9.1-3"><strong>Measurement:</strong> Report the coefficient of variation (CV) of decode worker
-memory utilization, P99 TTFT, P99 ITL, KV cache eviction rate, and Goodput for
+memory utilization, P99 TTFT, P99 ITL, KV cache eviction rate, and Inference_Goodput for
 both KV-aware and round-robin routing.<a href="#section-9.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2664,8 +2688,8 @@ TTFT reduction (ms), and TPS improvement (%) for each (P, L) combination.<a href
 <a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-ecmp-and-dynamic-load-balan" class="section-name selfRef">ECMP and Dynamic Load Balancing Under Inference Traffic</a>
         </h3>
 <p id="section-9.3-1"><strong>Objective:</strong> To evaluate fabric-layer load balancing effectiveness under
-inference traffic patterns characterized by a mix of large KV cache flows and
-small EP dispatch flows.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+inference traffic patterns that mix large KV cache flows with small EP
+dispatch flows.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
 <p id="section-9.3-2"><strong>Procedure:</strong> Measure link utilization uniformity under: (a) KV cache transfers
 only (large flows, 16 MB+), (b) EP AllToAll dispatches only (small flows,
 &lt; 1 MB), (c) mixed KV cache and EP traffic.<a href="#section-9.3-2" class="pilcrow">¶</a></p>
@@ -2698,16 +2722,19 @@ output TPS. Report the max/min ratio for each metric.<a href="#section-9.4-3" cl
 <p id="section-10-1">Inference latency is the primary user-facing quality metric. This section
 defines benchmarks that isolate the fabric's contribution to end-to-end
 inference latency.<a href="#section-10-1" class="pilcrow">¶</a></p>
-<div id="ttft-under-varying-prompt-lengths">
+<div id="ttft-prompt-length">
 <section id="section-10.1">
         <h3 id="name-ttft-under-varying-prompt-l">
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-ttft-under-varying-prompt-l" class="section-name selfRef">TTFT Under Varying Prompt Lengths</a>
         </h3>
 <p id="section-10.1-1"><strong>Objective:</strong> To characterize TTFT as a function of prompt length, isolating
-the fabric-dependent KV cache transfer component.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+the fabric-dependent KV cache transfer component. This test establishes the
+single-request, unloaded-fabric baseline (no concurrent load), complementing
+<a href="#end-to-end-disaggregated-ttft" class="auto internal xref">Section 6.1</a>, which measures the same decomposition under
+normal serving conditions on a disaggregated xPyD configuration.<a href="#section-10.1-1" class="pilcrow">¶</a></p>
 <p id="section-10.1-2"><strong>Procedure:</strong> Submit single requests (no concurrent load) with prompt lengths
 of 128, 256, 512, 1024, 2048, 4096, 8192, and 16384 tokens. Measure TTFT and
-decompose into T_prefill, T_transfer, and T_decode_init. As a refernce the following table
+decompose into T_prefill, T_transfer, and T_decode_init. As a reference the following table
 is provided.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
 <span id="name-reference-configuration-mat"></span><div id="tab-conf-matrix">
 <table class="center" id="table-9">
@@ -2728,23 +2755,23 @@ is provided.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">CFG-A</td>
               <td class="text-left" rowspan="1" colspan="1">Small: L=32, H_kv=8 (Grouped-Query Attention, GQA), D=128, BF16</td>
-              <td class="text-left" rowspan="1" colspan="1">0.25 GB</td>
-              <td class="text-left" rowspan="1" colspan="1">2.0 GB</td>
-              <td class="text-left" rowspan="1" colspan="1">8.0 GB</td>
+              <td class="text-left" rowspan="1" colspan="1">0.54 GB</td>
+              <td class="text-left" rowspan="1" colspan="1">4.3 GB</td>
+              <td class="text-left" rowspan="1" colspan="1">17.2 GB</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">CFG-B</td>
               <td class="text-left" rowspan="1" colspan="1">Mid: L=80, H_kv=8 (GQA), D=128, BF16 (~70B-parameter dense class)</td>
               <td class="text-left" rowspan="1" colspan="1">1.3 GB</td>
-              <td class="text-left" rowspan="1" colspan="1">10.5 GB</td>
-              <td class="text-left" rowspan="1" colspan="1">42.0 GB</td>
+              <td class="text-left" rowspan="1" colspan="1">10.7 GB</td>
+              <td class="text-left" rowspan="1" colspan="1">43.0 GB</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">CFG-C</td>
               <td class="text-left" rowspan="1" colspan="1">Large: L=96, H_kv=64 (Multi-Head Attention, MHA), D=128, BF16</td>
-              <td class="text-left" rowspan="1" colspan="1">12.3 GB</td>
-              <td class="text-left" rowspan="1" colspan="1">98.6 GB</td>
-              <td class="text-left" rowspan="1" colspan="1">&gt;300 GB</td>
+              <td class="text-left" rowspan="1" colspan="1">12.9 GB</td>
+              <td class="text-left" rowspan="1" colspan="1">103 GB</td>
+              <td class="text-left" rowspan="1" colspan="1">412 GB</td>
             </tr>
             <tr>
               <td class="text-left" rowspan="1" colspan="1">CFG-D</td>
@@ -2764,14 +2791,18 @@ is provided.<a href="#section-10.1-2" class="pilcrow">¶</a></p>
           </tbody>
         </table>
 </div>
-<p id="section-10.1-4"><strong>Measurement:</strong> Report TTFT, T_transfer, and T_transfer/TTFT at P50, P95, P99
+<p id="section-10.1-4">NOTE: S_KV values are computed per the S_KV formula in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>
+(S_KV = 2 x L x H_kv x D x C x P_bytes) using binary context lengths
+(4K = 4,096; 32K = 32,768; 128K = 131,072 tokens) and are expressed in
+decimal gigabytes (1 GB = 10^9 bytes).<a href="#section-10.1-4" class="pilcrow">¶</a></p>
+<p id="section-10.1-5"><strong>Measurement:</strong> Report TTFT, T_transfer, and T_transfer/TTFT at P50, P95, P99
 for each prompt length. The test is repeated a minimum of 100 times per
-prompt length<a href="#section-10.1-4" class="pilcrow">¶</a></p>
-<p id="section-10.1-5"><strong>Reporting Format:</strong> Results specify the configuration ID (CFG-A through
+prompt length.<a href="#section-10.1-5" class="pilcrow">¶</a></p>
+<p id="section-10.1-6"><strong>Reporting Format:</strong> Results specify the configuration ID (CFG-A through
  CFG-E) or provide complete values for L, H_kv, D, C, and P_bytes for any test that
 specifies KV cache message sizes. Results are reported as a line graph with
 prompt length on the X axis and TTFT (ms) on the Y axis, with separate lines for P50
-and P99. The T_transfer component is shown as a shaded region.<a href="#section-10.1-5" class="pilcrow">¶</a></p>
+and P99. The T_transfer component is shown as a shaded region.<a href="#section-10.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="itl-characterization-and-tail-latency">
@@ -2786,7 +2817,7 @@ and record the timestamp of each emitted token. Repeat under: (a) unloaded
 fabric, (b) loaded fabric (50% of capacity), and (c) heavily loaded fabric (90%
 of capacity plus concurrent EP dispatches).<a href="#section-10.2-2" class="pilcrow">¶</a></p>
 <p id="section-10.2-3"><strong>Measurement:</strong> Report ITL at P50, P95, P99, P99.9, and maximum for each load
-condition. Report the number of tokens exhibiting ITL &gt; 100 ms (stall events).
+condition. Report the number of tokens with ITL &gt; 100 ms (stall events).
 The test generates at least 10,000 ITL samples per condition.<a href="#section-10.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2836,12 +2867,16 @@ deployment.<a href="#section-11-1" class="pilcrow">¶</a></p>
         </h3>
 <p id="section-11.1-1"><strong>Objective:</strong> To determine the maximum sustained aggregate TPS achievable while
 meeting latency SLOs.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
-<p id="section-11.1-2"><strong>Procedure:</strong> Increase the request arrival rate from 1 req/s to the point where
-either TTFT P99 exceeds 500 ms or ITL P99 exceeds 50 ms. At each rate, measure
-TPS_output, TPS_input, Goodput, and all latency KPIs.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
-<p id="section-11.1-3"><strong>Measurement:</strong> Report TPS_output, TPS_input, Goodput, TTFT P99, ITL P99, and
+<p id="section-11.1-2"><strong>Procedure:</strong> Increase the request arrival rate from 1 req/s until either
+TTFT P99 or ITL P99 exceeds the declared SLO pair (e.g., TTFT P99 &gt; 500 ms,
+ITL P99 &gt; 50 ms). At each rate, measure
+TPS_output, TPS_input, Inference_Goodput, and all latency KPIs.<a href="#section-11.1-2" class="pilcrow">¶</a></p>
+<p id="section-11.1-3">NOTE: For reference, interactive serving deployments typically target TTFT
+&lt; 500 ms and ITL &lt; 50 ms P99; these values are informative only and not
+requirements of this methodology.<a href="#section-11.1-3" class="pilcrow">¶</a></p>
+<p id="section-11.1-4"><strong>Measurement:</strong> Report TPS_output, TPS_input, Inference_Goodput, TTFT P99, ITL P99, and
 fabric utilization at the SLO-bounded throughput. Report the fabric utilization
-at the SLO boundary as a key efficiency metric.<a href="#section-11.1-3" class="pilcrow">¶</a></p>
+at the SLO boundary as a key efficiency metric.<a href="#section-11.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="batch-size-scaling-and-continuous-batching-impact">
@@ -2864,13 +2899,13 @@ concurrent transfers for each batch size, with and without continuous batching.<
         <h3 id="name-goodput-under-preemption-an">
 <a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-goodput-under-preemption-an" class="section-name selfRef">Goodput Under Preemption and Eviction</a>
         </h3>
-<p id="section-11.3-1"><strong>Objective:</strong> To measure the Goodput loss when fabric congestion forces KV
+<p id="section-11.3-1"><strong>Objective:</strong> To measure the Inference_Goodput loss when fabric congestion forces KV
 cache eviction or request preemption.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
 <p id="section-11.3-2"><strong>Procedure:</strong> Oversubscribe the system beyond the SLO-bounded throughput (at
 110%, 125%, 150%, and 200% of the rate found in Test 11.1). Measure the rate of
-KV cache evictions, request preemptions, and the resulting Goodput reduction.<a href="#section-11.3-2" class="pilcrow">¶</a></p>
-<p id="section-11.3-3"><strong>Measurement:</strong> Report Goodput, eviction rate (evictions/s), preemption rate
-(preemptions/s), wasted fabric bandwidth (GB/s), and the Goodput/TPS_output
+KV cache evictions, request preemptions, and the resulting Inference_Goodput reduction.<a href="#section-11.3-2" class="pilcrow">¶</a></p>
+<p id="section-11.3-3"><strong>Measurement:</strong> Report Inference_Goodput, eviction rate (evictions/s), preemption rate
+(preemptions/s), wasted fabric bandwidth (GB/s), and the Inference_Goodput/TPS_output
 ratio (efficiency).<a href="#section-11.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
@@ -2888,7 +2923,7 @@ ratio (efficiency).<a href="#section-11.3-3" class="pilcrow">¶</a></p>
 <a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-fabric-scale-limits-for-inf" class="section-name selfRef">Fabric Scale Limits for Inference Clusters</a>
         </h3>
 <p id="section-12.1-1"><strong>Objective:</strong> To determine the maximum inference cluster size supportable by
-the DUT fabric while meeting performance requirements.<a href="#section-12.1-1" class="pilcrow">¶</a></p>
+the DUT fabric while maintaining the declared SLO pair.<a href="#section-12.1-1" class="pilcrow">¶</a></p>
 <p id="section-12.1-2"><strong>Procedure:</strong> Progressively scale the cluster from a minimal configuration
 (e.g., 2 nodes, 16 GPUs) to the fabric's capacity (e.g., 1024 nodes, 8192
 GPUs). At each scale point (following powers of two), measure KV cache transfer
@@ -2914,6 +2949,8 @@ reach steady-state throughput. Repeat for scale-down events.<a href="#section-12
 <p id="section-12.2-3"><strong>Measurement:</strong> Report fabric convergence time (ms), first-transfer time (ms),
 and time to steady-state (ms) for scale-up and scale-down events. Report any
 packet loss or latency spikes during the scaling transition.<a href="#section-12.2-3" class="pilcrow">¶</a></p>
+<p id="section-12.2-4">This test is conducted under controlled laboratory conditions with a simulated
+autoscaler. It does not apply to live serving infrastructure.<a href="#section-12.2-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="link-failure-convergence-impact-on-serving">
@@ -2957,8 +2994,11 @@ minutes: TTFT P99, ITL P99, TPS_output, KV_xfer_latency P99, fabric link
 utilization, switch CPU/memory usage, NIC counters (RDMA retransmissions, QP
 errors), and PFC/ECN event counts.<a href="#section-13.1-2" class="pilcrow">¶</a></p>
 <p id="section-13.1-3"><strong>Measurement:</strong> Report the trend of all sampled metrics over the 24-hour
-period. The DUT is expected to exhibit zero NIC QP errors, zero routing flaps, and less than
-1% variation in TTFT P99 over the test duration.<a href="#section-13.1-3" class="pilcrow">¶</a></p>
+period. Report the NIC QP error count, the routing flap count, and the
+variation in TTFT P99 over the test duration. Any nonzero QP error or routing
+flap count, or TTFT P99 variation exceeding 1%, is reported and investigated;
+these thresholds are reporting triggers for investigation, not pass/fail
+criteria.<a href="#section-13.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="kv-cache-memory-leak-detection">
@@ -3002,8 +3042,10 @@ perturbation.<a href="#section-13.3-3" class="pilcrow">¶</a></p>
 <a href="#section-14" class="section-number selfRef">14. </a><a href="#name-reporting-format" class="section-name selfRef">Reporting Format</a>
       </h2>
 <p id="section-14-1">All test results are reported following the conventions established in
-<span>[<a href="#RFC2544" class="cite xref">RFC2544</a>]</span> Section 26. In addition, the following inference-specific reporting
-elements apply:<a href="#section-14-1" class="pilcrow">¶</a></p>
+<span>[<a href="#RFC2544" class="cite xref">RFC2544</a>]</span> Section 26. Where BusBW is reported (e.g., in the MoE expert
+parallelism tests), results <span class="bcp14">MUST</span> follow the BusBW reporting format
+defined in Section 3 of <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>. In addition, the following
+inference-specific reporting elements apply:<a href="#section-14-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-14-2.1">
           <p id="section-14-2.1.1"><strong>System Configuration Report:</strong> the report includes: model name and
@@ -3163,17 +3205,13 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Avramov, L.</span> and <span class="refAuthor">J. Rapp</span>, <span class="refTitle">"Data Center Benchmarking Terminology"</span>, <span class="seriesInfo">RFC 8238</span>, <span class="seriesInfo">DOI 10.17487/RFC8238</span>, <time datetime="2017-08" class="refDate">August 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8238">https://www.rfc-editor.org/rfc/rfc8238</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="RFC8239">[RFC8239]</dt>
-        <dd>
-<span class="refAuthor">Avramov, L.</span> and <span class="refAuthor">J. Rapp</span>, <span class="refTitle">"Data Center Benchmarking Methodology"</span>, <span class="seriesInfo">RFC 8239</span>, <span class="seriesInfo">DOI 10.17487/RFC8239</span>, <time datetime="2017-08" class="refDate">August 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8239">https://www.rfc-editor.org/rfc/rfc8239</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="TERMINOLOGY">[TERMINOLOGY]</dt>
         <dd>
-<span class="refAuthor">Calabria, F.</span>, <span class="refAuthor">Pignataro, C.</span>, <span class="refAuthor">Wu, Q.</span>, and <span class="refAuthor">G. Fioccola</span>, <span class="refTitle">"Benchmarking Terminology for AI Network Fabrics"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-calabria-bmwg-ai-fabric-terminology-01</span>, <time datetime="2026-04-21" class="refDate">21 April 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-terminology-01">https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-terminology-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Calabria, F.</span>, <span class="refAuthor">Pignataro, C.</span>, <span class="refAuthor">Wu, Q.</span>, <span class="refAuthor">Fioccola, G.</span>, and <span class="refAuthor">S. Reddy</span>, <span class="refTitle">"Benchmarking Terminology for AI Network Fabrics"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-calabria-bmwg-ai-fabric-terminology-02</span>, <time datetime="2026-06-04" class="refDate">4 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-terminology-02">https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-terminology-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="TRAINING-BENCH">[TRAINING-BENCH]</dt>
         <dd>
-<span class="refAuthor">Calabria, F.</span>, <span class="refAuthor">Pignataro, C.</span>, <span class="refAuthor">Wu, Q.</span>, and <span class="refAuthor">G. Fioccola</span>, <span class="refTitle">"Benchmarking Methodology for AI Training Network Fabrics"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-calabria-bmwg-ai-fabric-training-bench-01</span>, <time datetime="2026-04-21" class="refDate">21 April 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-training-bench-01">https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-training-bench-01</a>&gt;</span>. </dd>
+<span class="refAuthor">Calabria, F.</span>, <span class="refAuthor">Pignataro, C.</span>, <span class="refAuthor">Wu, Q.</span>, <span class="refAuthor">Fioccola, G.</span>, and <span class="refAuthor">S. Reddy</span>, <span class="refTitle">"Benchmarking Methodology for AI Training Network Fabrics"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-calabria-bmwg-ai-fabric-training-bench-02</span>, <time datetime="2026-06-04" class="refDate">4 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-training-bench-02">https://datatracker.ietf.org/doc/html/draft-calabria-bmwg-ai-fabric-training-bench-02</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="UEC-1.0">[UEC-1.0]</dt>
       <dd>
@@ -3189,12 +3227,8 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
         </h3>
 <dl class="references">
 <dt id="RFC3849">[RFC3849]</dt>
-        <dd>
-<span class="refAuthor">Huston, G.</span>, <span class="refAuthor">Lord, A.</span>, and <span class="refAuthor">P. Smith</span>, <span class="refTitle">"IPv6 Address Prefix Reserved for Documentation"</span>, <span class="seriesInfo">RFC 3849</span>, <span class="seriesInfo">DOI 10.17487/RFC3849</span>, <time datetime="2004-07" class="refDate">July 2004</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3849">https://www.rfc-editor.org/rfc/rfc3849</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC7432">[RFC7432]</dt>
       <dd>
-<span class="refAuthor">Sajassi, A., Ed.</span>, <span class="refAuthor">Aggarwal, R.</span>, <span class="refAuthor">Bitar, N.</span>, <span class="refAuthor">Isaac, A.</span>, <span class="refAuthor">Uttaro, J.</span>, <span class="refAuthor">Drake, J.</span>, and <span class="refAuthor">W. Henderickx</span>, <span class="refTitle">"BGP MPLS-Based Ethernet VPN"</span>, <span class="seriesInfo">RFC 7432</span>, <span class="seriesInfo">DOI 10.17487/RFC7432</span>, <time datetime="2015-02" class="refDate">February 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7432">https://www.rfc-editor.org/rfc/rfc7432</a>&gt;</span>. </dd>
+<span class="refAuthor">Huston, G.</span>, <span class="refAuthor">Lord, A.</span>, and <span class="refAuthor">P. Smith</span>, <span class="refTitle">"IPv6 Address Prefix Reserved for Documentation"</span>, <span class="seriesInfo">RFC 3849</span>, <span class="seriesInfo">DOI 10.17487/RFC3849</span>, <time datetime="2004-07" class="refDate">July 2004</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc3849">https://www.rfc-editor.org/rfc/rfc3849</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -3233,6 +3267,21 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
             <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
           </tr>
           <tr>
+            <td class="text-left" rowspan="1" colspan="1">TTFT_fabric</td>
+            <td class="text-left" rowspan="1" colspan="1">6.1, 10.1</td>
+            <td class="text-left" rowspan="1" colspan="1">DUT-PD</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">ITL_fabric</td>
+            <td class="text-left" rowspan="1" colspan="1">10.2</td>
+            <td class="text-left" rowspan="1" colspan="1">DUT-F</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">E2E_latency</td>
+            <td class="text-left" rowspan="1" colspan="1">10.3</td>
+            <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
+          </tr>
+          <tr>
             <td class="text-left" rowspan="1" colspan="1">TPS_output</td>
             <td class="text-left" rowspan="1" colspan="1">6.2, 11.1, 11.2, 11.3</td>
             <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
@@ -3243,7 +3292,12 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
             <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
           </tr>
           <tr>
-            <td class="text-left" rowspan="1" colspan="1">Goodput</td>
+            <td class="text-left" rowspan="1" colspan="1">TPS_per_GPU</td>
+            <td class="text-left" rowspan="1" colspan="1">11.2</td>
+            <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">Inference_Goodput</td>
             <td class="text-left" rowspan="1" colspan="1">11.1, 11.3</td>
             <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
           </tr>
@@ -3279,7 +3333,7 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">ECN_marking_rate</td>
-            <td class="text-left" rowspan="1" colspan="1">8.1, 8.3</td>
+            <td class="text-left" rowspan="1" colspan="1">8.1</td>
             <td class="text-left" rowspan="1" colspan="1">DUT-S</td>
           </tr>
           <tr>
@@ -3294,7 +3348,7 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">Packet_drop_rate</td>
-            <td class="text-left" rowspan="1" colspan="1">8.1, 8.2, 12.3</td>
+            <td class="text-left" rowspan="1" colspan="1">8.3, 12.2</td>
             <td class="text-left" rowspan="1" colspan="1">DUT-F</td>
           </tr>
           <tr>
@@ -3303,12 +3357,12 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
             <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
           </tr>
           <tr>
-            <td class="text-left" rowspan="1" colspan="1">Prefix Cache Hit Rate</td>
+            <td class="text-left" rowspan="1" colspan="1">Prefix_cache_hit_rate</td>
             <td class="text-left" rowspan="1" colspan="1">9.2</td>
             <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
           </tr>
           <tr>
-            <td class="text-left" rowspan="1" colspan="1">JFI (Decode Worker)</td>
+            <td class="text-left" rowspan="1" colspan="1">JFI_decode</td>
             <td class="text-left" rowspan="1" colspan="1">9.4</td>
             <td class="text-left" rowspan="1" colspan="1">SUT-E</td>
           </tr>
@@ -3322,7 +3376,7 @@ observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
       <h2 id="name-indicative-reference-values">
 <a href="#appendix-B" class="section-number selfRef">Appendix B. </a><a href="#name-indicative-reference-values" class="section-name selfRef">Indicative Reference Values (Non-Normative)</a>
       </h2>
-<p id="appendix-B-1">This appendix provides indicative reference values for the KPIs defined in <a href="#kpi-framework" class="auto internal xref">Section 4</a>, reflecting current industry observations for interactive inference workloads as of 2025-2026. These values are NON-NORMATIVE and do not constitute benchmarking acceptance criteria or performance requirements. Per the BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. Implementers may use these values as contextual references when interpreting results; they <span class="bcp14">MUST NOT</span> be used as pass/fail thresholds in vendor evaluations. Deployment-specific SLOs will vary by application, model architecture, and operator requirements.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">This appendix provides indicative reference values for the KPIs defined in <a href="#kpi-framework" class="auto internal xref">Section 4</a>. The values reflect current industry observations for interactive inference workloads as of 2025-2026. These values are NON-NORMATIVE and do not constitute benchmarking acceptance criteria or performance requirements. Per the BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. Implementers may use these values as contextual references when interpreting results; they <span class="bcp14">MUST NOT</span> be used as pass/fail criteria in vendor evaluations. Deployment-specific SLOs will vary by application, model architecture, and operator requirements.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
 <span id="name-indicative-reference-values-"></span><div id="tab-indicative-values">
 <table class="center" id="table-12">
         <caption>
@@ -3393,7 +3447,7 @@ following capabilities their serving framework supports.<a href="#appendix-C-1" 
           <tr>
             <td class="text-left" rowspan="1" colspan="1">KV Cache Transfer Protocol</td>
             <td class="text-left" rowspan="1" colspan="1">Protocol and library used for prefill-to-decode KV state transfer (one-sided PUT, two-sided SEND/RECV, GPU-initiated)</td>
-            <td class="text-left" rowspan="1" colspan="1">Determines RDMA verb types under test and applicable frame formats (Appendix C)</td>
+            <td class="text-left" rowspan="1" colspan="1">Determines RDMA verb types under test and applicable frame formats (<a href="#kv-frame" class="auto internal xref">Appendix D</a>)</td>
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">MoE Expert Parallelism (EP) Support</td>
@@ -3542,7 +3596,7 @@ following capabilities their serving framework supports.<a href="#appendix-C-1" 
           <p id="appendix-D-4.3.1">Typical MTU for RoCEv2 deployments is 4096 bytes; larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling.<a href="#appendix-D-4.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-D-4.4">
-          <p id="appendix-D-4.4.1">For UET-based KV cache transfers, the frame format defined in <span>[<a href="#TRAINING-BENCH" class="cite xref">TRAINING-BENCH</a>]</span> Appendix D ("UET Frame Format") applies; the DUT IP port is 4793 and the transport service indicator selects between ROD and RUD per test.<a href="#appendix-D-4.4.1" class="pilcrow">¶</a></p>
+          <p id="appendix-D-4.4.1">For UET-based KV cache transfers, the frame format defined in the UET Frame Format appendix of <span>[<a href="#TRAINING-BENCH" class="cite xref">TRAINING-BENCH</a>]</span> applies; the UDP destination port is 4793 and the transport service indicator selects between ROD and RUD per test.<a href="#appendix-D-4.4.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
@@ -3620,21 +3674,22 @@ other GPU.<a href="#appendix-E-1" class="pilcrow">¶</a></p>
         </tbody>
       </table>
 </div>
-<p id="appendix-E-3">For a representative dense MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B * k * H_model * 2) / N is approximately<a href="#appendix-E-3" class="pilcrow">¶</a></p>
+<p id="appendix-E-3">For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B * k * H_model * 2) / N is approximately<a href="#appendix-E-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-E-4.1">
           <p id="appendix-E-4.1.1">Normal Dispatch (prefill, batch=256): 256 * 2 * 7168 * 2 bytes / 96 GPUs
-= ~76 KB per GPU pair, ~870 MB aggregate across all pairs.<a href="#appendix-E-4.1.1" class="pilcrow">¶</a></p>
+= ~76 KB per GPU pair, ~700 MB aggregate across all 96 x 95 = 9,120 pairs.<a href="#appendix-E-4.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-E-4.2">
           <p id="appendix-E-4.2.1">Low-Latency Dispatch (decode, batch=8): 8 * 2 * 7168 * 2 bytes / 96 GPUs
-= ~2.4 KB per GPU pair, ~27 MB aggregate.<a href="#appendix-E-4.2.1" class="pilcrow">¶</a></p>
+= ~2.4 KB per GPU pair, ~22 MB aggregate.<a href="#appendix-E-4.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="appendix-E-5">With 61 MoE layers (representative of a publicly described large-scale MoE architecture) and a decode iteration time target of ~30 ms, the decode
-phase requires 61 AllToAll dispatches within 30 ms, yielding ~2,000 dispatches
-per second per decode step, consuming approximately 54 GB/s aggregate inter-node
-bandwidth for the Low-Latency Dispatch path.<a href="#appendix-E-5" class="pilcrow">¶</a></p>
+phase requires 61 AllToAll dispatches within 30 ms. This yields 61 dispatches
+per decode step, or approximately 2,000 dispatches per second, and consumes
+approximately 45 GB/s
+aggregate inter-node bandwidth for the Low-Latency Dispatch path.<a href="#appendix-E-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="model-architecture-parameters">
@@ -3642,16 +3697,17 @@ bandwidth for the Low-Latency Dispatch path.<a href="#appendix-E-5" class="pilcr
       <h2 id="name-model-architecture-paramete">
 <a href="#appendix-F" class="section-number selfRef">Appendix F. </a><a href="#name-model-architecture-paramete" class="section-name selfRef">Model Architecture Parameters</a>
       </h2>
-<p id="appendix-F-1">This appendix provides a sample calculation for the S_KV formula already provided.
-It's based on a '70B parameter model at FP16 with 4K context' model<a href="#appendix-F-1" class="pilcrow">¶</a></p>
+<p id="appendix-F-1">This appendix provides a sample calculation for the S_KV formula defined in
+<span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>.
+It is based on a 70B-parameter dense model at FP16 with 4K context.<a href="#appendix-F-1" class="pilcrow">¶</a></p>
 <div class="alignLeft art-text artwork" id="appendix-F-2">
 <pre>
-Parameter                      Symbol   Value   Source
-Transformer layers             L        80      Published architecture
-KV attention heads (GQA-8)     H_kv     8       H_total=64 / GQA_ratio=8
-Per-head dimension             D        128     model_dim(8192) / H_total(64)
-Context length                 C        4,096   Given
-Precision                      P_bytes  2       FP16 = 2 bytes/element
+Parameter                   Symbol   Value  Source
+Transformer layers          L        80     Published architecture
+KV attention heads (GQA-8)  H_kv     8      H_total=64 / GQA_ratio=8
+Per-head dimension          D        128    model_dim(8192)/64
+Context length              C        4,096  Given
+Precision                   P_bytes  2      FP16 = 2 bytes/element
 
 Step-by-Step Calculation
 
@@ -3677,7 +3733,7 @@ Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-G-1">This work has benefited from the discussions that occurred during the joint IPPM and BMWG meeting and on the BMWG mailing list. Thanks to Carsten Rossenhoevel, Mohamed Boucadair, and Sowjanya Reddy for valuable review and comments.<a href="#appendix-G-1" class="pilcrow">¶</a></p>
+<p id="appendix-G-1">This work has benefited from the discussions that occurred during the joint IPPM and BMWG meeting and on the BMWG mailing list. Thanks to Carsten Rossenhoevel and Mohamed Boucadair for valuable review and comments.<a href="#appendix-G-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
