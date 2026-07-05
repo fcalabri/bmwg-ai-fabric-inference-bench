@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-06-25T02:06:06.448867+00:00",
+  "timestamp": "2026-07-05T01:53:57.605429+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -1385,6 +1385,46 @@
               "updatedAt": "2026-06-23T03:26:58Z"
             }
           ]
+        }
+      ]
+    },
+    {
+      "number": 27,
+      "id": "PR_kwDORX8k_s7t8CY4",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/27",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "03 idnits and text normalization across document, detail DUT in and out-scope \r\n\r\nMoE formula cleanup / correction \r\n\r\nTTFT based on prompt length -  section re-work ",
+      "createdAt": "2026-07-04T22:07:51Z",
+      "updatedAt": "2026-07-04T22:09:17Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "317a873483b2aeb109131db9802ecd6cf5a1a7c9",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "inference-03-edits",
+      "headRefOid": "c96aa6aa9b76312b85e4ddab26431b3048f9c8b8",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s8AAAABE_0mKA",
+          "commit": {
+            "abbreviatedOid": "c96aa6a"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-04T22:09:17Z",
+          "updatedAt": "2026-07-04T22:09:17Z",
+          "comments": []
         }
       ]
     }
