@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 27 December 2026                           Blue Fern Consulting
+Expires: 7 January 2027                             Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                            25 June 2026
+                                                             6 July 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -24,23 +24,22 @@ Abstract
    inference serving network fabrics.  As Large Language Model (LLM)
    inference deployments scale to disaggregated prefill/decode
    architectures spanning hundreds or thousands of accelerators (GPUs/
-   XPUs), the interconnect fabric becomes the critical bottleneck
-   determining Time to First Token (TTFT), Inter-Token Latency (ITL),
-   and aggregate throughput in tokens per second (TPS).  This document
-   establishes vendor-independent, reproducible test procedures for
-   benchmarking fabric-level performance under realistic AI inference
-   workloads.
+   XPUs), the interconnect fabric determines Time to First Token (TTFT),
+   Inter-Token Latency (ITL), and aggregate throughput in tokens per
+   second (TPS).  This document establishes vendor-independent,
+   reproducible test procedures for benchmarking fabric-level
+   performance under realistic AI inference workloads.
 
    Coverage includes RDMA-based KV cache transfer between disaggregated
    prefill and decode workers, Mixture-of-Experts (MoE) expert
    parallelism AllToAll communication, request routing and load
    balancing for inference serving, congestion management under bursty
    inference traffic patterns, and scale/soak testing.  The methodology
-   enables direct, equivalent comparison across implementations, NIC
-   transport stacks (RoCEv2, UET), and fabric architectures.
+   enables direct comparison across NIC transport stacks (RoCEv2 and
+   UET) and fabric architectures.
 
-   This document is a companion to [TRAINING-BENCH], which addresses
-   training workloads.
+   This document is a companion to the AI training fabric benchmarking
+   methodology, which addresses training workloads.
 
 About This Document
 
@@ -75,7 +74,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 27 December 2026.
+   This Internet-Draft will expire on 7 January 2027.
 
 Copyright Notice
 
@@ -175,23 +174,21 @@ Table of Contents
 
 1.  Introduction
 
-   Large Language Model (LLM) inference serving has emerged as a
-   dominant consumer of datacenter network capacity, with fundamentally
-   different fabric requirements compared to training workloads.  While
-   training workloads are characterized by bulk synchronous collective
-   operations (AllReduce, AllGather) with predictable periodicity,
-   inference workloads exhibit bursty, latency-sensitive request/
-   response patterns with strict Service Level Objectives (SLOs) on per-
-   token latency and time-to-first-token.
+   Large Language Model (LLM) inference now consumes datacenter network
+   capacity at a scale comparable to training, but with different fabric
+   requirements.  Training workloads generate bulk synchronous
+   collective operations – AllReduce, AllGather – at predictable
+   intervals.  Inference workloads produce bursty, latency-sensitive
+   request/response patterns with strict Service Level Objectives (SLOs)
+   on per-token latency and time-to-first-token.
 
-   The advent of disaggregated serving architectures, where the
-   computationally intensive prefill phase (prompt processing) is
-   physically separated from the memory-bound decode phase (token
-   generation), introduces a new class of fabric-critical data movement:
-   KV cache transfer.  A single large prompt processed by a typical
-   large-scale model generates multiple gigabytes of KV cache state that
-   must be transferred from prefill workers to decode workers within a
-   fraction of the target TTFT SLO.
+   Disaggregated serving architectures physically separate the prefill
+   phase (prompt processing) from the decode phase (token generation).
+   This separation creates a new category of fabric-critical data
+   movement: KV cache transfer.  A single large prompt processed by a
+   typical large-scale model generates multiple gigabytes of KV cache
+   state that must be transferred from prefill workers to decode workers
+   within a fraction of the target TTFT SLO.
 
    As clusters scale with thousands of concurrent requests, this creates
    sustained multi-terabyte-per-second aggregate transfer demands on the
@@ -228,7 +225,7 @@ Table of Contents
    TPS).
 
    The DUT boundary for all measurements in this document is defined as
-   the NIC-to-NIC Ethernet fabric segment — specifically, the path from
+   the NIC-to-NIC Ethernet fabric segment – specifically, the path from
    the point of packet transmission by the source NIC Ethernet port to
    the point of packet reception at the destination NIC Ethernet port.
 
@@ -256,8 +253,8 @@ Table of Contents
    [RFC6349].
 
    The test structure follows RFC 2544 conventions for trial duration
-   (minimum 60 seconds), statistical repetition (minimum 20 trials for
-   latency, 50 for burst), and reporting format (graphical and tabular).
+   (minimum 60 seconds), statistical repetition (minimum 20 trials per
+   configuration), and reporting format (graphical and tabular).
 
    The methodologies extend RFC 2544 Section 26 benchmarks (throughput,
    latency, frame loss rate, back-to-back frames, system recovery,
@@ -274,13 +271,13 @@ Table of Contents
    defined in [TERMINOLOGY], which provides the common terminology base
    for AI fabric benchmarking.
 
-   Where training workloads are dominated by bulk synchronous collective
-   communication (AllReduce, AllGather) with high bandwidth utilization
-   and periodic synchronization barriers, inference workloads are
-   dominated by bursty, latency-sensitive point-to-point transfers (KV
-   cache) and fine-grained AllToAll dispatch (MoE expert parallelism).
-   Implementers deploying converged fabrics that serve both training and
-   inference workloads should run both test suites.
+   Training workloads generate bulk synchronous collective communication
+   (AllReduce, AllGather) with high bandwidth utilization and periodic
+   synchronization barriers; inference workloads generate bursty,
+   latency-sensitive point-to-point transfers (KV cache) and fine-
+   grained AllToAll dispatch for MoE expert parallelism.  Implementers
+   deploying converged fabrics that serve both training and inference
+   workloads should run both test suites.
 
 2.  Terminology
 
@@ -368,7 +365,8 @@ Table of Contents
    multi-model serving deployments where different model instances
    occupy different fabric pods.  KV cache transfer traffic between
    prefill and decode workers in different pods traverses the superspine
-   tier, making superspine bandwidth and latency critical.
+   tier, so superspine bandwidth and latency directly affect KV cache
+   transfer performance.
 
 3.1.3.  Topology C: Disaggregated Prefill/Decode Placement
 
@@ -405,50 +403,51 @@ Table of Contents
    physically distinct pools connected by the fabric.  The test topology
    includes the following components:
 
-*  *Prefill Worker Pool:* N Prefill nodes, each containing G
-   accelerators with high-compute capability.  These workers execute
-   the prefill phase and generate KV cache state.  Tensor Parallelism
-   (TP) is applied within each node; Data Parallelism (DP) is applied
-   across nodes.  Each prefill worker communicates with one or more
-   decode workers via RDMA-based KV cache transfer.
+   *  *Prefill Worker Pool:* N Prefill nodes, each containing G
+      accelerators with high-compute capability.  These workers execute
+      the prefill phase and generate KV cache state.  Tensor Parallelism
+      (TP) is applied within each node; Data Parallelism (DP) is applied
+      across nodes.  Each prefill worker communicates with one or more
+      decode workers via RDMA-based KV cache transfer.
 
-*  *Decode Worker Pool:* M Decode nodes, each containing G
-   accelerators with high memory bandwidth.  These workers receive KV
-   cache state from prefill workers and execute the autoregressive
-   decode phase.  DP Attention may partition the KV cache across DP
-   ranks within the decode pool, requiring AllToAll communication
-   during decode.
+   *  *Decode Worker Pool:* M Decode nodes, each containing G
+      accelerators with high memory bandwidth.  These workers receive KV
+      cache state from prefill workers and execute the autoregressive
+      decode phase.  DP Attention may partition the KV cache across DP
+      ranks within the decode pool, requiring AllToAll communication
+      during decode.
 
-*  *KV Cache Transfer Network:* The Ethernet fabric segment
-   connecting prefill and decode worker pools.  This segment carries
-   one-sided RDMA PUT operations (or PUT-with-signal) transferring KV
-   cache blocks from prefill GPU memory to decode GPU memory via RDMA
-   over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport
-   (UET).
+   *  *KV Cache Transfer Network:* The Ethernet fabric segment
+      connecting prefill and decode worker pools.  This segment carries
+      one-sided RDMA PUT operations (or PUT-with-signal) transferring KV
+      cache blocks from prefill GPU memory to decode GPU memory via RDMA
+      over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport (UET)
+      [UEC-1.0].
 
-   The end-to-end transfer from GPU memory to remote GPU memory
-   traverses three segments:
+      The end-to-end transfer from GPU memory to remote GPU memory
+      traverses three segments:
 
-   -  (1) GPU-to-NIC: PCIe/CXL (intra-node, out of scope as DUT);
+      -  (1) GPU-to-NIC: PCIe/CXL (intra-node, out of scope as DUT);
 
-   -  (2) NIC-to-NIC: Ethernet fabric (the DUT, in scope);
+      -  (2) NIC-to-NIC: Ethernet fabric (the DUT, in scope);
 
-   -  (3) NIC-to-GPU: PCIe/CXL at destination (intra-node, out of
-      scope as DUT).
+      -  (3) NIC-to-GPU: PCIe/CXL at destination (intra-node, out of
+         scope as DUT).
 
-   Benchmarking procedures in Section 5 and Section 6 measure fabric-
-   segment latency and throughput exclusively.  When end-to-end
-   measurements are reported (e.g., TTFT decomposition), the intra-
-   node segments are labelled separately.
+      Benchmarking procedures in Section 5 and Section 6 measure fabric-
+      segment latency and throughput exclusively.  When end-to-end
+      measurements are reported (e.g., TTFT decomposition), the intra-
+      node segments are labelled separately.
 
-GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] --> GPU Memory
-<---intra-node (out of scope)--->|<------DUT (in scope)------->|<---intra-node (out of scope)--->
+      GPU Memory --> [PCIe/CXL] --> NIC    intra-node (out of scope)
+      NIC --> [ETHERNET FABRIC] --> NIC    DUT (in scope)
+      NIC --> [PCIe/CXL] --> GPU Memory    intra-node (out of scope)
 
-*  *Request Router:* A network-layer or application-layer load
-   balancer that assigns incoming inference requests to prefill
-   workers and subsequently routes KV cache to the appropriate decode
-   workers.  KV-aware routing and prefix-aware caching policies are
-   under test.
+   *  *Request Router:* A network-layer or application-layer load
+      balancer that assigns incoming inference requests to prefill
+      workers and subsequently routes KV cache to the appropriate decode
+      workers.  KV-aware routing and prefix-aware caching policies are
+      under test.
 
 3.3.  Device Under Test (DUT) Identification
 
@@ -533,7 +532,7 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
       with timestamp accuracy <= 1 millisecond.
 
    When a software workload emulator is used, the complete software
-   configuration is documented per Section 3.3, as framework version,
+   configuration is documented per Section 14, as framework version,
    RDMA library version, and GPU driver version materially affect
    results.
 
@@ -541,10 +540,8 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
    This section defines the Key Performance Indicators measured across
    all test categories.  KPIs are organized into four tiers: Primary
-   Latency KPIs (end-user-facing response time metrics), Primary
-   Throughput KPIs (system-level capacity metrics), Fabric-Level KPIs
-   (network-specific measurements), and Fabric Health Indicators
-   (operational monitoring metrics).
+   Latency KPIs, Primary Throughput KPIs, Fabric-Level KPIs, and Fabric
+   Health Indicators.  Each tier is defined in the subsections below.
 
       NOTE: Per BMWG charter, the definition of acceptance criteria or
       performance requirements is explicitly outside the scope of this
@@ -585,100 +582,124 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
 4.2.  Primary Throughput KPIs
 
-   +==============+===========+==========================+=============+
-   | KPI          | Unit      | Definition               | Measurement |
-   |              |           |                          | Point       |
-   +==============+===========+==========================+=============+
-   | TPS_input    | tokens/s  | Aggregate input          | SUT-E       |
-   |              |           | (prefill) tokens         | prefill     |
-   |              |           | processed per second     | completion  |
-   |              |           | across all workers       | events      |
-   +--------------+-----------+--------------------------+-------------+
-   | TPS_output   | tokens/s  | Aggregate output         | SUT-E token |
-   |              |           | (decode) tokens          | emission    |
-   |              |           | generated per second     | events      |
-   |              |           | across all workers       |             |
-   +--------------+-----------+--------------------------+-------------+
-   | TPS_per_GPU  | tokens/s/ | Output tokens per        | SUT-E per-  |
-   |              | GPU       | second normalized by     | worker      |
-   |              |           | number of decode GPUs    | counters    |
-   +--------------+-----------+--------------------------+-------------+
-   | Goodput      | GB/s or   | See the Goodput          | SUT-E       |
-   |              | tokens/s  | definition in            | successful  |
-   |              |           | [TERMINOLOGY].  Reports  | completion  |
-   |              |           | use Inference_Goodput    | events      |
-   |              |           | for token-rate           |             |
-   |              |           | measurements and         |             |
-   |              |           | Fabric_Goodput for       |             |
-   |              |           | byte-rate fabric         |             |
-   |              |           | measurements             |             |
-   +--------------+-----------+--------------------------+-------------+
-   | KV_BW        | GB/s      | Aggregate KV cache       | DUT-PD RDMA |
-   |              |           | transfer bandwidth       | counters    |
-   |              |           | between prefill and      |             |
-   |              |           | decode pools             |             |
-   +--------------+-----------+--------------------------+-------------+
-   | Request_Rate | req/s     | Maximum sustained        | SUT-E       |
-   |              |           | request arrival rate     | admission   |
-   |              |           | meeting all latency      | control     |
-   |              |           | SLOs                     | boundary    |
-   +--------------+-----------+--------------------------+-------------+
+   +=====================+=============+==================+===========+
+   |KPI                  |Unit         |Definition        |Measurement|
+   |                     |             |                  |Point      |
+   +=====================+=============+==================+===========+
+   |TPS_input            |tokens/s     |Aggregate input   |SUT-E      |
+   |                     |             |(prefill) tokens  |prefill    |
+   |                     |             |processed per     |completion |
+   |                     |             |second across all |events     |
+   |                     |             |workers           |           |
+   +---------------------+-------------+------------------+-----------+
+   |TPS_output           |tokens/s     |Aggregate output  |SUT-E token|
+   |                     |             |(decode) tokens   |emission   |
+   |                     |             |generated per     |events     |
+   |                     |             |second across all |           |
+   |                     |             |workers           |           |
+   +---------------------+-------------+------------------+-----------+
+   |TPS_per_GPU          |tokens/s/GPU |Output tokens per |SUT-E per- |
+   |                     |             |second normalized |worker     |
+   |                     |             |by number of      |counters   |
+   |                     |             |decode GPUs       |           |
+   +---------------------+-------------+------------------+-----------+
+   |Goodput              |GB/s or      |See the Goodput   |SUT-E      |
+   |                     |tokens/s     |definition in     |successful |
+   |                     |             |[TERMINOLOGY].    |completion |
+   |                     |             |Reports use       |events     |
+   |                     |             |Inference_Goodput |           |
+   |                     |             |for token-rate    |           |
+   |                     |             |measurements and  |           |
+   |                     |             |Fabric_Goodput for|           |
+   |                     |             |byte-rate fabric  |           |
+   |                     |             |measurements      |           |
+   +---------------------+-------------+------------------+-----------+
+   |Request_Rate         |req/s        |Maximum sustained |SUT-E      |
+   |                     |             |request arrival   |admission  |
+   |                     |             |rate meeting all  |control    |
+   |                     |             |latency SLOs      |boundary   |
+   +---------------------+-------------+------------------+-----------+
+   |Prefix_cache_hit_rate|%            |Fraction of       |SUT-E      |
+   |                     |             |requests whose    |request    |
+   |                     |             |shared prefix KV  |router     |
+   |                     |             |cache segment is  |counters   |
+   |                     |             |already resident  |           |
+   |                     |             |on the assigned   |           |
+   |                     |             |worker, avoiding a|           |
+   |                     |             |fabric transfer   |           |
+   +---------------------+-------------+------------------+-----------+
+   |JFI_decode           |dimensionless|Jain Fairness     |SUT-E per- |
+   |                     |(0-1)        |Index of per-     |worker     |
+   |                     |             |decode-worker load|counters   |
+   |                     |             |(KV cache receive |           |
+   |                     |             |rate, GPU         |           |
+   |                     |             |utilization,      |           |
+   |                     |             |output TPS)       |           |
+   +---------------------+-------------+------------------+-----------+
 
-                      Table 4: Primary Throughput KPIs
+                     Table 4: Primary Throughput KPIs
 
 4.3.  Fabric-Level KPIs
 
-   +=======================+========+=========================+=======+
-   | KPI                   | Unit   | Definition              | DUT   |
-   +=======================+========+=========================+=======+
-   | KV_xfer_latency       | us     | One-sided RDMA PUT      | DUT-N |
-   |                       |        | completion time for a   |       |
-   |                       |        | single KV cache block   |       |
-   |                       |        | transfer                |       |
-   +-----------------------+--------+-------------------------+-------+
-   | KV_xfer_bandwidth     | GB/s   | Sustained               | DUT-N |
-   |                       |        | unidirectional KV cache |       |
-   |                       |        | transfer throughput per |       |
-   |                       |        | NIC port                |       |
-   +-----------------------+--------+-------------------------+-------+
-   | EP_alltoall_latency   | us     | Round-trip time for a   | DUT-F |
-   |                       |        | complete MoE expert     |       |
-   |                       |        | parallelism AllToAll    |       |
-   |                       |        | dispatch                |       |
-   +-----------------------+--------+-------------------------+-------+
-   | EP_alltoall_bandwidth | GB/s   | Aggregate AllToAll      | DUT-F |
-   |                       |        | bandwidth across all EP |       |
-   |                       |        | ranks during dispatch   |       |
-   +-----------------------+--------+-------------------------+-------+
-   | Fabric_FCT            | us     | Flow completion time    | DUT-F |
-   |                       |        | for a KV cache transfer |       |
-   |                       |        | flow through the fabric |       |
-   +-----------------------+--------+-------------------------+-------+
-   | Buffer_utilization    | %      | Peak switch buffer      | DUT-S |
-   |                       |        | utilization during KV   |       |
-   |                       |        | cache transfer bursts   |       |
-   +-----------------------+--------+-------------------------+-------+
-   | ECN_marking_rate      | %      | Fraction of packets     | DUT-S |
-   |                       |        | marked with ECN-CE      |       |
-   |                       |        | during inference        |       |
-   |                       |        | traffic                 |       |
-   +-----------------------+--------+-------------------------+-------+
-   | PFC_frame_count       | frames | Number of PFC PAUSE     | DUT-S |
-   |                       |        | frames generated per    |       |
-   |                       |        | unit time               |       |
-   +-----------------------+--------+-------------------------+-------+
-   | Link_utilization      | %      | Average and peak link   | DUT-F |
-   |                       |        | utilization on fabric   |       |
-   |                       |        | links carrying          |       |
-   |                       |        | inference traffic       |       |
-   +-----------------------+--------+-------------------------+-------+
-   | Packet_drop_rate      | ppm    | Packets dropped per     | DUT-F |
-   |                       |        | million due to buffer   |       |
-   |                       |        | overflow or transport   |       |
-   |                       |        | error                   |       |
-   +-----------------------+--------+-------------------------+-------+
+   +=======================+========+=========================+========+
+   | KPI                   | Unit   | Definition              | DUT    |
+   +=======================+========+=========================+========+
+   | KV_xfer_latency       | us     | One-sided RDMA PUT      | DUT-N  |
+   |                       |        | completion time for     |        |
+   |                       |        | a single KV cache       |        |
+   |                       |        | block transfer          |        |
+   +-----------------------+--------+-------------------------+--------+
+   | KV_xfer_bandwidth     | GB/s   | Sustained               | DUT-N, |
+   |                       |        | unidirectional KV       | DUT-PD |
+   |                       |        | cache transfer          |        |
+   |                       |        | throughput, reported    |        |
+   |                       |        | per NIC port and as     |        |
+   |                       |        | the aggregate           |        |
+   |                       |        | between prefill and     |        |
+   |                       |        | decode pools            |        |
+   +-----------------------+--------+-------------------------+--------+
+   | EP_alltoall_latency   | us     | Round-trip time for     | DUT-F  |
+   |                       |        | a complete MoE          |        |
+   |                       |        | expert parallelism      |        |
+   |                       |        | AllToAll dispatch       |        |
+   +-----------------------+--------+-------------------------+--------+
+   | EP_alltoall_bandwidth | GB/s   | Aggregate AllToAll      | DUT-F  |
+   |                       |        | bandwidth across all    |        |
+   |                       |        | EP ranks during         |        |
+   |                       |        | dispatch                |        |
+   +-----------------------+--------+-------------------------+--------+
+   | Fabric_FCT            | us     | Flow completion time    | DUT-F  |
+   |                       |        | for a KV cache          |        |
+   |                       |        | transfer flow           |        |
+   |                       |        | through the fabric      |        |
+   +-----------------------+--------+-------------------------+--------+
+   | Buffer_utilization    | %      | Peak switch buffer      | DUT-S  |
+   |                       |        | utilization during      |        |
+   |                       |        | KV cache transfer       |        |
+   |                       |        | bursts                  |        |
+   +-----------------------+--------+-------------------------+--------+
+   | ECN_marking_rate      | %      | Fraction of packets     | DUT-S  |
+   |                       |        | marked with ECN-CE      |        |
+   |                       |        | during inference        |        |
+   |                       |        | traffic                 |        |
+   +-----------------------+--------+-------------------------+--------+
+   | PFC_frame_count       | frames | Number of PFC PAUSE     | DUT-S  |
+   |                       |        | frames generated per    |        |
+   |                       |        | unit time               |        |
+   +-----------------------+--------+-------------------------+--------+
+   | Link_utilization      | %      | Average and peak        | DUT-F  |
+   |                       |        | link utilization on     |        |
+   |                       |        | fabric links            |        |
+   |                       |        | carrying inference      |        |
+   |                       |        | traffic                 |        |
+   +-----------------------+--------+-------------------------+--------+
+   | Packet_drop_rate      | ppm    | Packets dropped per     | DUT-F  |
+   |                       |        | million due to          |        |
+   |                       |        | buffer overflow or      |        |
+   |                       |        | transport error         |        |
+   +-----------------------+--------+-------------------------+--------+
 
-                        Table 5: Fabric-Level KPIs
+                         Table 5: Fabric-Level KPIs
 
 4.4.  Fabric Health Indicators
 
@@ -830,7 +851,10 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
    *Objective:* To measure TTFT as a function of prompt length in a
    disaggregated serving configuration, isolating the fabric
-   contribution.
+   contribution.  This test characterizes the disaggregated-serving KV
+   cache transfer path under normal serving conditions on a configured
+   xPyD cluster; the single-request unloaded TTFT baseline is
+   established separately in Section 10.1.
 
    *Procedure:* Configure a disaggregated serving system (SUT-E) with a
    specified xPyD ratio (e.g., 3P9D for a 12-node cluster).  Submit
@@ -937,25 +961,32 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
    *Canonical MoE Test Matrix*
 
-    +========+======================+=========+=========+=============+
-    | Config | E (experts)          | k (top- | H_model | T_dispatch  |
-    |        |                      | k)      |         | (B=128,     |
-    |        |                      |         |         | BF16, N=96) |
-    +========+======================+=========+=========+=============+
-    | M1     | 8                    | 2       | 4096    | 2.1 MB/GPU  |
-    +--------+----------------------+---------+---------+-------------+
-    | M2     | 64                   | 4       | 7168    | 29 MB/GPU   |
-    +--------+----------------------+---------+---------+-------------+
-    | M3     | 256                  | 2       | 7168    | 14 MB/GPU   |
-    +--------+----------------------+---------+---------+-------------+
-    | M4     | 256                  | 8       | 7168    | 58 MB/GPU   |
-    +--------+----------------------+---------+---------+-------------+
-    | M5     | (implementer-defined |         |         |             |
-    |        | — report all         |         |         |             |
-    |        | parameters)          |         |         |             |
-    +--------+----------------------+---------+---------+-------------+
+   +========+======================+=========+=========+==============+
+   | Config | E (experts)          | k (top- | H_model | T_dispatch   |
+   |        |                      | k)      |         | per GPU pair |
+   |        |                      |         |         | (B=128,      |
+   |        |                      |         |         | BF16, N=96)  |
+   +========+======================+=========+=========+==============+
+   | M1     | 8                    | 2       | 4096    | 21.8 KB      |
+   +--------+----------------------+---------+---------+--------------+
+   | M2     | 64                   | 4       | 7168    | 76.5 KB      |
+   +--------+----------------------+---------+---------+--------------+
+   | M3     | 256                  | 2       | 7168    | 38.2 KB      |
+   +--------+----------------------+---------+---------+--------------+
+   | M4     | 256                  | 8       | 7168    | 153 KB       |
+   +--------+----------------------+---------+---------+--------------+
+   | M5     | (implementer-defined |         |         |              |
+   |        | — report all         |         |         |              |
+   |        | parameters)          |         |         |              |
+   +--------+----------------------+---------+---------+--------------+
 
-                     Table 7: Canonical MoE Test Matrix
+                    Table 7: Canonical MoE Test Matrix
+
+   NOTE: T_dispatch values are the per-GPU-pair payload computed from
+   the T_dispatch formula above (e.g., M1: 128 x 2 x 4096 x 2 bytes / 96
+   = 21,845 bytes = 21.8 KB).  The aggregate fabric load per dispatch is
+   T_dispatch multiplied by the number of communicating GPU pairs; see
+   the MoE AllToAll appendix for a worked example.
 
    *Measurement:* Report aggregate bandwidth (GB/s), per-dispatch
    latency (us) at P50 and P99, and GPU idle time waiting for dispatch
@@ -1003,6 +1034,13 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
     +-------------+-------------------------+-------------------------+
 
                      Table 8: MoE Routing Mode Taxonomy
+
+   *Procedure:* Execute the AllToAll dispatch procedure of the preceding
+   AllToAll Dispatch Throughput test in both Normal Dispatch and Low-
+   Latency Dispatch modes.  Repeat the sequence for each selected
+   routing mode from Table 8, holding message sizes, EP group size, and
+   iteration count constant across dispatch and routing modes so that
+   results are directly comparable.
 
    *Measurement:* Measure dispatch latency, fabric bandwidth, and
    routing mode impact on AllToAll traffic distribution and fabric
@@ -1101,11 +1139,12 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
    *Objective:* To verify that the fabric does not enter a PFC storm or
    deadlock condition under adversarial inference traffic patterns.
 
-   *Procedure:* Per the companion training document, generate a PFC
-   storm scenario by creating circular buffer dependency across multiple
-   switches.  Simultaneously inject KV cache transfer traffic on all
-   affected paths.  Monitor for PFC storm propagation, deadlock, and
-   recovery time.  The test duration is at least 300 seconds.
+   *Procedure:* Per the PFC Storm and Deadlock Resilience test of
+   [TRAINING-BENCH], generate a PFC storm scenario by creating circular
+   buffer dependency across multiple switches.  Simultaneously inject KV
+   cache transfer traffic on all affected paths.  Monitor for PFC storm
+   propagation, deadlock, and recovery time.  The test duration is at
+   least 300 seconds.
 
    *Measurement:* Report whether PFC storm occurred (yes/no), deadlock
    occurred (yes/no), maximum PAUSE propagation depth (number of hops),
@@ -1148,8 +1187,8 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 9.3.  ECMP and Dynamic Load Balancing Under Inference Traffic
 
    *Objective:* To evaluate fabric-layer load balancing effectiveness
-   under inference traffic patterns characterized by a mix of large KV
-   cache flows and small EP dispatch flows.
+   under inference traffic patterns that mix large KV cache flows with
+   small EP dispatch flows.
 
    *Procedure:* Measure link utilization uniformity under: (a) KV cache
    transfers only (large flows, 16 MB+), (b) EP AllToAll dispatches only
@@ -1180,28 +1219,32 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 10.1.  TTFT Under Varying Prompt Lengths
 
    *Objective:* To characterize TTFT as a function of prompt length,
-   isolating the fabric-dependent KV cache transfer component.
+   isolating the fabric-dependent KV cache transfer component.  This
+   test establishes the single-request, unloaded-fabric baseline (no
+   concurrent load), complementing Section 6.1, which measures the same
+   decomposition under normal serving conditions on a disaggregated xPyD
+   configuration.
 
    *Procedure:* Submit single requests (no concurrent load) with prompt
    lengths of 128, 256, 512, 1024, 2048, 4096, 8192, and 16384 tokens.
    Measure TTFT and decompose into T_prefill, T_transfer, and
-   T_decode_init.  As a refernce the following table is provided.
+   T_decode_init.  As a reference the following table is provided.
 
    +==========+======================+==========+==========+==========+
    | Config   | Model Profile        | S_KV @   | S_KV @   | S_KV @   |
    | ID       |                      | 4K ctx   | 32K ctx  | 128K ctx |
    +==========+======================+==========+==========+==========+
-   | CFG-A    | Small: L=32, H_kv=8  | 0.25 GB  | 2.0 GB   | 8.0 GB   |
+   | CFG-A    | Small: L=32, H_kv=8  | 0.54 GB  | 4.3 GB   | 17.2 GB  |
    |          | (Grouped-Query       |          |          |          |
    |          | Attention, GQA),     |          |          |          |
    |          | D=128, BF16          |          |          |          |
    +----------+----------------------+----------+----------+----------+
-   | CFG-B    | Mid: L=80, H_kv=8    | 1.3 GB   | 10.5 GB  | 42.0 GB  |
+   | CFG-B    | Mid: L=80, H_kv=8    | 1.3 GB   | 10.7 GB  | 43.0 GB  |
    |          | (GQA), D=128, BF16   |          |          |          |
    |          | (~70B-parameter      |          |          |          |
    |          | dense class)         |          |          |          |
    +----------+----------------------+----------+----------+----------+
-   | CFG-C    | Large: L=96, H_kv=64 | 12.3 GB  | 98.6 GB  | >300 GB  |
+   | CFG-C    | Large: L=96, H_kv=64 | 12.9 GB  | 103 GB   | 412 GB   |
    |          | (Multi-Head          |          |          |          |
    |          | Attention, MHA),     |          |          |          |
    |          | D=128, BF16          |          |          |          |
@@ -1217,9 +1260,14 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 
                  Table 9: Reference Configuration Matrix
 
+   NOTE: S_KV values are computed per the S_KV formula in [TERMINOLOGY]
+   (S_KV = 2 x L x H_kv x D x C x P_bytes) using binary context lengths
+   (4K = 4,096; 32K = 32,768; 128K = 131,072 tokens) and are expressed
+   in decimal gigabytes (1 GB = 10^9 bytes).
+
    *Measurement:* Report TTFT, T_transfer, and T_transfer/TTFT at P50,
    P95, P99 for each prompt length.  The test is repeated a minimum of
-   100 times per prompt length
+   100 times per prompt length.
 
    *Reporting Format:* Results specify the configuration ID (CFG-A
    through CFG-E) or provide complete values for L, H_kv, D, C, and
@@ -1240,9 +1288,9 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
    dispatches).
 
    *Measurement:* Report ITL at P50, P95, P99, P99.9, and maximum for
-   each load condition.  Report the number of tokens exhibiting ITL >
-   100 ms (stall events).  The test generates at least 10,000 ITL
-   samples per condition.
+   each load condition.  Report the number of tokens with ITL > 100 ms
+   (stall events).  The test generates at least 10,000 ITL samples per
+   condition.
 
 10.3.  End-to-End Latency Under Multi-Tenant Load
 
@@ -1281,10 +1329,14 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
    *Objective:* To determine the maximum sustained aggregate TPS
    achievable while meeting latency SLOs.
 
-   *Procedure:* Increase the request arrival rate from 1 req/s to the
-   point where either TTFT P99 exceeds 500 ms or ITL P99 exceeds 50 ms.
-   At each rate, measure TPS_output, TPS_input, Inference_Goodput, and
-   all latency KPIs.
+   *Procedure:* Increase the request arrival rate from 1 req/s until
+   either TTFT P99 or ITL P99 exceeds the declared SLO pair (e.g., TTFT
+   P99 > 500 ms, ITL P99 > 50 ms).  At each rate, measure TPS_output,
+   TPS_input, Inference_Goodput, and all latency KPIs.
+
+   NOTE: For reference, interactive serving deployments typically target
+   TTFT < 500 ms and ITL < 50 ms P99; these values are informative only
+   and not requirements of this methodology.
 
    *Measurement:* Report TPS_output, TPS_input, Inference_Goodput, TTFT
    P99, ITL P99, and fabric utilization at the SLO-bounded throughput.
@@ -1328,7 +1380,8 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 12.1.  Fabric Scale Limits for Inference Clusters
 
    *Objective:* To determine the maximum inference cluster size
-   supportable by the DUT fabric while meeting performance requirements.
+   supportable by the DUT fabric while maintaining the declared SLO
+   pair.
 
    *Procedure:* Progressively scale the cluster from a minimal
    configuration (e.g., 2 nodes, 16 GPUs) to the fabric's capacity
@@ -1357,6 +1410,10 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
    time (ms), and time to steady-state (ms) for scale-up and scale-down
    events.  Report any packet loss or latency spikes during the scaling
    transition.
+
+   This test is conducted under controlled laboratory conditions with a
+   simulated autoscaler.  It does not apply to live serving
+   infrastructure.
 
 12.3.  Link Failure Convergence Impact on Serving
 
@@ -1395,9 +1452,11 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
    event counts.
 
    *Measurement:* Report the trend of all sampled metrics over the
-   24-hour period.  The DUT is expected to exhibit zero NIC QP errors,
-   zero routing flaps, and less than 1% variation in TTFT P99 over the
-   test duration.
+   24-hour period.  Report the NIC QP error count, the routing flap
+   count, and the variation in TTFT P99 over the test duration.  Any
+   nonzero QP error or routing flap count, or TTFT P99 variation
+   exceeding 1%, is reported and investigated; these thresholds are
+   reporting triggers for investigation, not pass/fail criteria.
 
 13.2.  KV Cache Memory Leak Detection
 
@@ -1434,8 +1493,10 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
 14.  Reporting Format
 
    All test results are reported following the conventions established
-   in [RFC2544] Section 26.  In addition, the following inference-
-   specific reporting elements apply:
+   in [RFC2544] Section 26.  Where BusBW is reported (e.g., in the MoE
+   expert parallelism tests), results MUST follow the BusBW reporting
+   format defined in Section 3 of [TERMINOLOGY].  In addition, the
+   following inference-specific reporting elements apply:
 
    *  *System Configuration Report:* the report includes: model name and
       parameter count, parallelism strategy (TP, DP, EP, PP
@@ -1604,10 +1665,6 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
               Terminology", RFC 8238, DOI 10.17487/RFC8238, August 2017,
               <https://www.rfc-editor.org/rfc/rfc8238>.
 
-   [RFC8239]  Avramov, L. and J. Rapp, "Data Center Benchmarking
-              Methodology", RFC 8239, DOI 10.17487/RFC8239, August 2017,
-              <https://www.rfc-editor.org/rfc/rfc8239>.
-
    [TERMINOLOGY]
               Calabria, F., Pignataro, C., Wu, Q., Fioccola, G., and S.
               Reddy, "Benchmarking Terminology for AI Network Fabrics",
@@ -1635,11 +1692,6 @@ GPU Memory --> [PCIe/CXL] --> NIC --> [ETHERNET FABRIC] --> NIC --> [PCIe/CXL] -
               DOI 10.17487/RFC3849, July 2004,
               <https://www.rfc-editor.org/rfc/rfc3849>.
 
-   [RFC7432]  Sajassi, A., Ed., Aggarwal, R., Bitar, N., Isaac, A.,
-              Uttaro, J., Drake, J., and W. Henderickx, "BGP MPLS-Based
-              Ethernet VPN", RFC 7432, DOI 10.17487/RFC7432, February
-              2015, <https://www.rfc-editor.org/rfc/rfc7432>.
-
 Appendix A.  KPI-to-Test Mapping Summary
 
    The following table provides a cross-reference from each KPI defined
@@ -1652,9 +1704,17 @@ Appendix A.  KPI-to-Test Mapping Summary
      +-----------------------+-----------------------+---------------+
      | ITL                   | 10.2, 10.3, 10.4      | SUT-E         |
      +-----------------------+-----------------------+---------------+
+     | TTFT_fabric           | 6.1, 10.1             | DUT-PD        |
+     +-----------------------+-----------------------+---------------+
+     | ITL_fabric            | 10.2                  | DUT-F         |
+     +-----------------------+-----------------------+---------------+
+     | E2E_latency           | 10.3                  | SUT-E         |
+     +-----------------------+-----------------------+---------------+
      | TPS_output            | 6.2, 11.1, 11.2, 11.3 | SUT-E         |
      +-----------------------+-----------------------+---------------+
      | TPS_input             | 11.1                  | SUT-E         |
+     +-----------------------+-----------------------+---------------+
+     | TPS_per_GPU           | 11.2                  | SUT-E         |
      +-----------------------+-----------------------+---------------+
      | Inference_Goodput     | 11.1, 11.3            | SUT-E         |
      +-----------------------+-----------------------+---------------+
@@ -1670,19 +1730,19 @@ Appendix A.  KPI-to-Test Mapping Summary
      +-----------------------+-----------------------+---------------+
      | Buffer_utilization    | 8.1, 8.2              | DUT-S         |
      +-----------------------+-----------------------+---------------+
-     | ECN_marking_rate      | 8.1, 8.3              | DUT-S         |
+     | ECN_marking_rate      | 8.1                   | DUT-S         |
      +-----------------------+-----------------------+---------------+
      | PFC_frame_count       | 8.2, 8.4              | DUT-S         |
      +-----------------------+-----------------------+---------------+
      | Link_utilization      | 5.3, 9.3, 12.1        | DUT-F         |
      +-----------------------+-----------------------+---------------+
-     | Packet_drop_rate      | 8.1, 8.2, 12.3        | DUT-F         |
+     | Packet_drop_rate      | 8.3, 12.2             | DUT-F         |
      +-----------------------+-----------------------+---------------+
      | Request_Rate          | 11.1                  | SUT-E         |
      +-----------------------+-----------------------+---------------+
-     | Prefix Cache Hit Rate | 9.2                   | SUT-E         |
+     | Prefix_cache_hit_rate | 9.2                   | SUT-E         |
      +-----------------------+-----------------------+---------------+
-     | JFI (Decode Worker)   | 9.4                   | SUT-E         |
+     | JFI_decode            | 9.4                   | SUT-E         |
      +-----------------------+-----------------------+---------------+
 
                        Table 11: KPI-to-Test Mapping
@@ -1690,16 +1750,16 @@ Appendix A.  KPI-to-Test Mapping Summary
 Appendix B.  Indicative Reference Values (Non-Normative)
 
    This appendix provides indicative reference values for the KPIs
-   defined in Section 4, reflecting current industry observations for
-   interactive inference workloads as of 2025-2026.  These values are
-   NON-NORMATIVE and do not constitute benchmarking acceptance criteria
-   or performance requirements.  Per the BMWG charter, the definition of
-   acceptance criteria or performance requirements is explicitly outside
-   the scope of this Working Group.  Implementers may use these values
-   as contextual references when interpreting results; they MUST NOT be
-   used as pass/fail criteria in vendor evaluations.  Deployment-
-   specific SLOs will vary by application, model architecture, and
-   operator requirements.
+   defined in Section 4.  The values reflect current industry
+   observations for interactive inference workloads as of 2025-2026.
+   These values are NON-NORMATIVE and do not constitute benchmarking
+   acceptance criteria or performance requirements.  Per the BMWG
+   charter, the definition of acceptance criteria or performance
+   requirements is explicitly outside the scope of this Working Group.
+   Implementers may use these values as contextual references when
+   interpreting results; they MUST NOT be used as pass/fail criteria in
+   vendor evaluations.  Deployment-specific SLOs will vary by
+   application, model architecture, and operator requirements.
 
            +=============+====================================+
            | KPI         | Indicative Reference (Interactive) |
@@ -1742,7 +1802,7 @@ Appendix C.  Inference Serving Framework Capability Categories
    | Transfer      | for prefill-to-decode KV  | verb types under      |
    | Protocol      | state transfer (one-sided | test and applicable   |
    |               | PUT, two-sided SEND/RECV, | frame formats         |
-   |               | GPU-initiated)            | (Appendix C)          |
+   |               | GPU-initiated)            | (Appendix D)          |
    +---------------+---------------------------+-----------------------+
    | MoE Expert    | Distribution of MoE       | Determines whether    |
    | Parallelism   | expert sub-networks       | MoE EP tests apply    |
@@ -1875,10 +1935,10 @@ Appendix D.  KV Cache Transfer Frame Format
       0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate
       Data) for PUT-with-signal completion signalling.
 
-   *  For UET-based KV cache transfers, the frame format defined in
-      [TRAINING-BENCH] Appendix D ("UET Frame Format") applies; the DUT
-      IP port is 4793 and the transport service indicator selects
-      between ROD and RUD per test.
+   *  For UET-based KV cache transfers, the frame format defined in the
+      UET Frame Format appendix of [TRAINING-BENCH] applies; the UDP
+      destination port is 4793 and the transport service indicator
+      selects between ROD and RUD per test.
 
 Appendix E.  MoE AllToAll Communication Pattern
 
@@ -1922,59 +1982,60 @@ Appendix E.  MoE AllToAll Communication Pattern
 
           Table 15: MoE Dispatch Traffic Characteristics by Mode
 
-   For a representative dense MoE configuration (M3: E=256, k=2,
-   H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16;
-   representative of a large publicly described MoE-class architecture),
-   the inter-node traffic per MoE layer dispatch using T_dispatch = (B *
-   k * H_model * 2) / N is approximately
+   For a representative MoE configuration (M3: E=256, k=2, H_model=7168,
+   EP=96 across 12 nodes of 8 accelerators, BF16; representative of a
+   large publicly described MoE-class architecture), the inter-node
+   traffic per MoE layer dispatch using T_dispatch = (B * k * H_model *
+   2) / N is approximately
 
    *  Normal Dispatch (prefill, batch=256): 256 * 2 * 7168 * 2 bytes /
-      96 GPUs = ~76 KB per GPU pair, ~870 MB aggregate across all pairs.
+      96 GPUs = ~76 KB per GPU pair, ~700 MB aggregate across all 96 x
+      95 = 9,120 pairs.
 
    *  Low-Latency Dispatch (decode, batch=8): 8 * 2 * 7168 * 2 bytes /
-      96 GPUs = ~2.4 KB per GPU pair, ~27 MB aggregate.
+      96 GPUs = ~2.4 KB per GPU pair, ~22 MB aggregate.
 
    With 61 MoE layers (representative of a publicly described large-
    scale MoE architecture) and a decode iteration time target of ~30 ms,
-   the decode phase requires 61 AllToAll dispatches within 30 ms,
-   yielding ~2,000 dispatches per second per decode step, consuming
-   approximately 54 GB/s aggregate inter-node bandwidth for the Low-
-   Latency Dispatch path.
+   the decode phase requires 61 AllToAll dispatches within 30 ms.  This
+   yields 61 dispatches per decode step, or approximately 2,000
+   dispatches per second, and consumes approximately 45 GB/s aggregate
+   inter-node bandwidth for the Low-Latency Dispatch path.
 
 Appendix F.  Model Architecture Parameters
 
    This appendix provides a sample calculation for the S_KV formula
-   already provided.  It's based on a '70B parameter model at FP16 with
-   4K context' model
+   defined in [TERMINOLOGY].  It is based on a 70B-parameter dense model
+   at FP16 with 4K context.
 
-Parameter                      Symbol   Value   Source
-Transformer layers             L        80      Published architecture
-KV attention heads (GQA-8)     H_kv     8       H_total=64 / GQA_ratio=8
-Per-head dimension             D        128     model_dim(8192) / H_total(64)
-Context length                 C        4,096   Given
-Precision                      P_bytes  2       FP16 = 2 bytes/element
+   Parameter                   Symbol   Value  Source
+   Transformer layers          L        80     Published architecture
+   KV attention heads (GQA-8)  H_kv     8      H_total=64 / GQA_ratio=8
+   Per-head dimension          D        128    model_dim(8192)/64
+   Context length              C        4,096  Given
+   Precision                   P_bytes  2      FP16 = 2 bytes/element
 
-Step-by-Step Calculation
+   Step-by-Step Calculation
 
-S_KV = 2  ×  L  ×  H_kv  ×   D   ×    C    × P_bytes
+   S_KV = 2  ×  L  ×  H_kv  ×   D   ×    C    × P_bytes
 
- = 2  ×  80  ×   8   ×  128  ×  4,096  ×    2
+    = 2  ×  80  ×   8   ×  128  ×  4,096  ×    2
 
-Step 1:  2  × 80           =         160   (K + V tensors × layers)
+   Step 1:  2  × 80           =         160   (K + V tensors × layers)
 
-Step 2:  160 × 8           =       1,280   (× KV heads)
+   Step 2:  160 × 8           =       1,280   (× KV heads)
 
-Step 3:  1,280 × 128       =     163,840   (× head dimension)
+   Step 3:  1,280 × 128       =     163,840   (× head dimension)
 
-Step 4:  163,840 × 4,096   = 671,088,640   (× context tokens)
+   Step 4:  163,840 × 4,096   = 671,088,640   (× context tokens)
 
-Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
+   Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
 
 Acknowledgments
 
    This work has benefited from the discussions that occurred during the
    joint IPPM and BMWG meeting and on the BMWG mailing list.  Thanks to
-   Carsten Rossenhoevel, and Mohamed Boucadair for valuable review and
+   Carsten Rossenhoevel and Mohamed Boucadair for valuable review and
    comments.
 
 Authors' Addresses
