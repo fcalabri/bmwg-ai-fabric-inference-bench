@@ -60,10 +60,9 @@ author:
 normative:
   RFC1242:
   RFC2544:
-  RFC2889:
-  RFC6349:
   RFC6815:
   RFC8238:
+  RFC8239:
   TERMINOLOGY: I-D.calabria-bmwg-ai-fabric-terminology
   TRAINING-BENCH: I-D.calabria-bmwg-ai-fabric-training-bench
   UEC-1.0:
@@ -74,7 +73,21 @@ normative:
     target: "https://ultraethernet.org"
 
 informative:
+  RFC2889:
+  RFC6349:
   RFC3849:
+  IBTA-ROCE:
+    title: "InfiniBand Architecture Specification Volume 1, Annex A17: RoCEv2"
+    target: https://www.infinibandta.org
+    author:
+      - org: InfiniBand Trade Association
+    date: 2014-09
+  DEEPEP:
+    title: "DeepEP: an efficient expert-parallel communication library"
+    author:
+      - org: DeepSeek AI
+    date: 2025
+    target: https://github.com/deepseek-ai/DeepEP
 
 ...
 
@@ -163,11 +176,15 @@ All methodologies assume controlled laboratory conditions per BMWG convention.
 ## Relationship to Existing BMWG Work
 
 This document builds upon the foundational BMWG benchmarking framework
-established by {{RFC1242}}, {{RFC2544}}, {{RFC2889}}, and {{RFC6349}}.
+established by {{RFC1242}} and {{RFC2544}}, with additional background from
+{{RFC2889}} and {{RFC6349}}. {{RFC8238}} and {{RFC8239}} establish data center
+benchmarking terminology and methodology that this document extends for AI
+inference fabric traffic patterns.
 
 The test structure follows RFC 2544 conventions for trial duration (minimum 60
-seconds), statistical repetition (minimum 20 trials per configuration),
-and reporting format (graphical and tabular).
+seconds) and reporting format (graphical and tabular); statistical repetition
+(minimum 20 trials per configuration) is a convention of this document and is
+not defined by RFC 2544.
 
 The methodologies extend RFC 2544 Section 26 benchmarks (throughput, latency,
 frame loss rate, back-to-back frames, system recovery, reset) to
@@ -336,8 +353,8 @@ The hardware traffic generator satisfies all of the following:
   configurable RDMA verb types (one-sided PUT, PUT-with-signal, two-sided
   SEND/RECV).
 
-* Configurable message sizes from 4 KB (minimum KV cache page) to 256 MB
-  (large KV cache block).
+* Configurable message sizes from 4 KB (minimum KV cache page) to 1 GB
+  (large KV cache block), to cover the message sizes used in {{test-cat1}}.
 
 * Configurable QP counts from 1 QP to a minimum of 256 QPs per
   source-destination port pair.
@@ -624,7 +641,7 @@ expert parallelism across the DUT fabric.
 **Procedure:** Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
 The dispatch payload per GPU per MoE layer is:
 
-T_dispatch = (B × k × H_model × P_bytes) / N. where B = batch size (tokens), k = top-k routing count,
+T_dispatch = (B × k × H_model × P_bytes) / N. where B = per-GPU batch size (tokens), k = top-k routing count,
 H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size
 
 **Canonical MoE Test Matrix**
@@ -1029,7 +1046,7 @@ errors), and PFC/ECN event counts.
 **Measurement:** Report the trend of all sampled metrics over the 24-hour
 period. Report the NIC QP error count, the routing flap count, and the
 variation in TTFT P99 over the test duration. Any nonzero QP error or routing
-flap count, or TTFT P99 variation exceeding 1%, is reported and investigated;
+flap count, or TTFT P99 variation exceeding 1%, MUST be reported and investigated;
 these thresholds are reporting triggers for investigation, not pass/fail
 criteria.
 
@@ -1195,7 +1212,7 @@ NOTE: The specific framework name, version, and configuration are documented in 
 
 # KV Cache Transfer Frame Format {#kv-frame}
 
-This appendix defines the reference frame format for KV cache transfer benchmarking over RoCEv2 using one-sided RDMA WRITE (PUT) operations. The frame format follows the standard RoCEv2 encapsulation defined in the InfiniBand Architecture Specification Volume 1 Annex A17 (RoCEv2).
+This appendix defines the reference frame format for KV cache transfer benchmarking over RoCEv2 using one-sided RDMA WRITE (PUT) operations. The frame format follows the standard RoCEv2 encapsulation defined in the InfiniBand Architecture Specification Volume 1 Annex A17 (RoCEv2) {{IBTA-ROCE}}.
 
 | Offset | Field | Size | Value / Description |
 |---|---|---|---|
@@ -1216,7 +1233,7 @@ Notes:
 
 - The UDP Source Port uses entropy-based values for ECMP load distribution across fabric paths.
 - The RETH carries the remote virtual address, remote key, and DMA length for the one-sided WRITE operation. For KV cache transfers, the DMA Length field indicates the size of the KV cache block being transferred.
-- Typical MTU for RoCEv2 deployments is 4096 bytes; larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling.
+- Typical RDMA path MTU for RoCEv2 deployments is 4096 bytes (requiring an Ethernet frame MTU of approximately 4200+ bytes, i.e., jumbo frames, to carry the RoCEv2/IP/UDP/BTH/RETH header overhead); larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling.
 - For UET-based KV cache transfers, the frame format defined in the UET Frame Format appendix of {{TRAINING-BENCH}} applies; the UDP destination port is 4793 and the transport service indicator selects between ROD and RUD per test.
 
 # MoE AllToAll Communication Pattern
@@ -1233,7 +1250,7 @@ other GPU.
 | Batch Size | 128 - 512 tokens | 1 - 16 tokens |
 | Payload per GPU pair | Variable (depends on routing) | Fixed (padded to max) |
 | Shape Compatibility | Dynamic (symbolic) | Static (graph-capturable) |
-| QP Parallelism | 24 QPs per connection | 8 - 16 QPs per connection |
+| QP Parallelism {{DEEPEP}} | 24 QPs per connection | 8 - 16 QPs per connection |
 | RDMA Primitive | Two-sided SEND/RECV or one-sided PUT | One-sided PUT (GPU-direct RDMA, GIN) |
 | GPU Initiation | CPU-initiated or GIN | GIN (device-initiated, GPU-to-NIC direct) |
 | Typical per-dispatch size | 1 - 10 MB aggregate | 10 KB - 1 MB aggregate |
@@ -1241,12 +1258,18 @@ other GPU.
 | Latency Target | < 1 ms per dispatch | < 200 us per dispatch |
 {: #tab-moe-dispatch title="MoE Dispatch Traffic Characteristics by Mode"}
 
+NOTE: The QP Parallelism values are DeepEP {{DEEPEP}} implementation defaults, shown as an illustrative example; they are not a normative requirement of this methodology and MAY differ across CCL implementations.
+
 For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B × k × H_model × 2) / N is approximately
 
 * Normal Dispatch (prefill, batch=256): 256 × 2 × 7168 × 2 bytes / 96 GPUs
-  = ~76 KB per GPU pair, ~700 MB aggregate across all 96 × 95 = 9,120 pairs.
+  = ~76 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
+  96 × 88 = 8,448 cross the fabric (the remaining 672 pairs are intra-node,
+  within each of the 12 8-GPU nodes, and do not traverse the fabric).
+  Fabric-visible aggregate: ~76 KB × 8,448 ≈ 648 MB.
 * Low-Latency Dispatch (decode, batch=8): 8 × 2 × 7168 × 2 bytes / 96 GPUs
-  = ~2.4 KB per GPU pair, ~22 MB aggregate.
+  = ~2.4 KB per GPU pair; fabric-visible aggregate (8,448 pairs): ~2.4 KB × 8,448
+  ≈ 20.5 MB.
 
 With 61 MoE layers (representative of a publicly described large-scale MoE architecture) and a decode iteration time target of ~30 ms, the decode
 phase requires 61 AllToAll dispatches within 30 ms. This yields 61 dispatches
