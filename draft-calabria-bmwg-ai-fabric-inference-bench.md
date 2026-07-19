@@ -120,8 +120,8 @@ within a fraction of the target TTFT SLO.
 
 As clusters scale with thousands of concurrent requests, this creates sustained
 multi-terabyte-per-second aggregate transfer demands on the fabric.
-Simultaneously, Mixture-of-Experts (MoE) architectures introduce expert
-parallelism (EP), which distributes expert sub-networks across GPUs and requires
+Simultaneously, Mixture-of-Experts (MoE) architectures introduce Expert
+Parallelism (EP), which distributes expert sub-networks across GPUs and requires
 AllToAll communication for token-to-expert routing. Wide EP configurations
 (e.g., 96-way EP across 12 nodes of 8 GPUs each) generate fine-grained,
 latency-sensitive inter-node traffic that contends with KV cache transfers on
