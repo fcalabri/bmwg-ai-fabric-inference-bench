@@ -155,7 +155,7 @@ OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contrib
  measurably to an end-to-end latency measurement (e.g., TTFT decomposition in {{end-to-end-disaggregated-ttft}}), implementers report intra-node transfer time as a separately labelled component
  so that the fabric contribution can be isolated.  See {{dut-id}} for DUT boundary diagram.
 
-The document does NOT address benchmarking of individual accelerator (GPU/XPU) compute performance, model accuracy or quality metrics benchmarking of the inference serving
+The document does NOT address benchmarking of individual accelerator (GPU/XPU) compute performance, model accuracy or quality metrics, or benchmarking of the inference serving
  software stack in isolation from the fabric.
 
 All methodologies assume controlled laboratory conditions per BMWG convention.
@@ -209,7 +209,7 @@ The following terms are bench-specific extensions used only in this document and
 
 The scope of the DUT for the tests defined in this document is the Ethernet fabric segment connecting prefill and decode workers (and, where applicable, expert-parallel groups), consistent with the Fabric DUT Boundary defined in {{TERMINOLOGY}}.
 
-Worked examples of the S_KV formula and KV cache size computation for representative model architectures are provided in the appendix.
+Worked examples of the S_KV formula and KV cache size computation for representative model architectures are provided in {{model-architecture-parameters}}.
 
 ## Acronyms
 
@@ -289,7 +289,7 @@ following components:
   cache across DP ranks within the decode pool, requiring AllToAll communication
   during decode.
 
-* **KV Cache Transfer Network:** The Ethernet fabric segment connecting prefill and decode worker pools. This segment carries one-sided RDMA PUT operations (or PUT-with-signal) transferring KV cache blocks from prefill GPU memory to decode GPU memory via RDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport (UET) {{UEC-1.0}}.
+* **KV Cache Transfer Network:** The Ethernet fabric segment connecting prefill and decode worker pools. This segment carries one-sided RDMA PUT operations (the RDMA WRITE verb; PUT is used throughout this document as the general term, with WRITE used where the literal RC opcode name matters, e.g., {{kv-frame}}) or PUT-with-signal (RDMA WRITE with Immediate Data) transferring KV cache blocks from prefill GPU memory to decode GPU memory via RDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport (UET) {{UEC-1.0}}.
 
   The end-to-end transfer from GPU memory to remote GPU memory traverses three segments:
 
@@ -624,7 +624,7 @@ expert parallelism across the DUT fabric.
 **Procedure:** Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
 The dispatch payload per GPU per MoE layer is:
 
-T_dispatch = (B * k * H_model * P_bytes) / N. where B = batch size (tokens), k = top-k routing count,
+T_dispatch = (B × k × H_model × P_bytes) / N. where B = batch size (tokens), k = top-k routing count,
 H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size
 
 **Canonical MoE Test Matrix**
@@ -639,8 +639,8 @@ H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2
 {: #tbl-moe-matrix title="Canonical MoE Test Matrix"}
 
 NOTE: T_dispatch values are the per-GPU-pair payload computed from the
-T_dispatch formula above (e.g., M1: 128 x 2 x 4096 x 2 bytes / 96 =
-21,845 bytes = 21.8 KB). The aggregate fabric load per dispatch is
+T_dispatch formula above (e.g., M1: 128 × 2 × 4096 × 2 bytes / 96 =
+21,845 bytes ≈ 21.8 KB, decimal KB, 1 KB = 1,000 bytes). The aggregate fabric load per dispatch is
 T_dispatch multiplied by the number of communicating GPU pairs; see the
 MoE AllToAll appendix for a worked example.
 
@@ -661,7 +661,7 @@ NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside E
 
 | Mode                                                     | Description | Traffic Impact |
 | -------------------------------------------------------- | ----------- | -------------- |
-| Standard Top-k                                           | Each token routed to k. highest-scoring experts | Fixed, uniform AllToAll dispatch volume |
+| Standard Top-k                                           | Each token routed to k highest-scoring experts | Fixed, uniform AllToAll dispatch volume |
 | Expert Choice (EC)                                       | Experts select tokens; ensures load balance | Non-uniform message sizes; tests HOL-blocking resilience |
 | Top-k with Token Drop                                    | Overloaded experts drop excess tokens | Lower peak traffic; unpredictable under load |
 | Auxiliary Loss Top-k                                     | Load-balanced top-k via training loss | Near-uniform AllToAll; lower hot-spot risk |
@@ -686,7 +686,7 @@ The selected config row is identified in the results.
 
 **Measurement:** Report total dispatch latency (us), inter-node bandwidth
 (GB/s), and latency decomposition (intra-node vs. inter-node fraction). Report
-the scaling efficiency: (EP=8 latency) / (EP=N latency) * (N/8).
+the scaling efficiency: (EP=8 latency) / (EP=N latency) × (N/8).
 
 ## Expert Parallelism and KV Cache Transfer Contention
 
@@ -849,11 +849,11 @@ is provided.
 | CFG-B          | Mid: L=80, H_kv=8 (GQA), D=128, BF16 (~70B-parameter dense class)         | 1.3 GB            | 10.7 GB            | 43.0 GB             |
 | CFG-C          | Large: L=96, H_kv=64 (Multi-Head Attention, MHA), D=128, BF16 | 12.9 GB       | 103 GB             | 412 GB              |
 | CFG-D          | Mid INT8: L=80, H_kv=8 (GQA), D=128, INT8 (quantized)     | 0.67 GB           | 5.4 GB             | 21.5 GB             |
-| CFG-E (custom) | Implementer-defined:  L=___, H_kv=___, D=___, P=___       | Computed          | Computed           | Computed            |
+| CFG-E (custom) | Implementer-defined: L=[value], H_kv=[value], D=[value], P=[value] | Computed          | Computed           | Computed            |
 {: #tab-conf-matrix title="Reference Configuration Matrix"}
 
 NOTE: S_KV values are computed per the S_KV formula in {{TERMINOLOGY}}
-(S_KV = 2 x L x H_kv x D x C x P_bytes) using binary context lengths
+(S_KV = 2 × L × H_kv × D × C × P_bytes) using binary context lengths
 (4K = 4,096; 32K = 32,768; 128K = 131,072 tokens) and are expressed in
 decimal gigabytes (1 GB = 10^9 bytes).
 
@@ -1021,8 +1021,8 @@ inference serving load for 24 hours.
 
 **Procedure:** Configure the SUT-E at 80% of the SLO-bounded throughput
 determined in Test 11.1. Run a continuous request stream for 24 hours with a
-realistic prompt length distribution. Sample the following metrics every 15
-minutes: TTFT P99, ITL P99, TPS_output, KV_xfer_latency P99, fabric link
+realistic prompt length distribution. Sample the following metrics every 60
+seconds: TTFT P99, ITL P99, TPS_output, KV_xfer_latency P99, fabric link
 utilization, switch CPU/memory usage, NIC counters (RDMA retransmissions, QP
 errors), and PFC/ECN event counts.
 
@@ -1122,7 +1122,7 @@ The following considerations are specific to inference-serving benchmarking:
 
 # IANA Considerations
 
-This memo includes no request to IANA.
+This document has no IANA actions.
 
 --- back
 
@@ -1241,11 +1241,11 @@ other GPU.
 | Latency Target | < 1 ms per dispatch | < 200 us per dispatch |
 {: #tab-moe-dispatch title="MoE Dispatch Traffic Characteristics by Mode"}
 
-For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B * k * H_model * 2) / N is approximately
+For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B × k × H_model × 2) / N is approximately
 
-* Normal Dispatch (prefill, batch=256): 256 \* 2 \* 7168 \* 2 bytes / 96 GPUs
-  = ~76 KB per GPU pair, ~700 MB aggregate across all 96 x 95 = 9,120 pairs.
-* Low-Latency Dispatch (decode, batch=8): 8 \* 2 \* 7168 \* 2 bytes / 96 GPUs
+* Normal Dispatch (prefill, batch=256): 256 × 2 × 7168 × 2 bytes / 96 GPUs
+  = ~76 KB per GPU pair, ~700 MB aggregate across all 96 × 95 = 9,120 pairs.
+* Low-Latency Dispatch (decode, batch=8): 8 × 2 × 7168 × 2 bytes / 96 GPUs
   = ~2.4 KB per GPU pair, ~22 MB aggregate.
 
 With 61 MoE layers (representative of a publicly described large-scale MoE architecture) and a decode iteration time target of ~30 ms, the decode
