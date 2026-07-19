@@ -269,7 +269,7 @@ decode).
        | (One-sided PUT/Signal) |
        +------------------------+
 ~~~
-{: #fig-pd-topology title="Disaggregated Prefill/Decode Inference Topology"}
+{: #fig-pd-topology align="center" title="Disaggregated Prefill/Decode Inference Topology"}
 
 ## Disaggregated Prefill/Decode Topology
 
@@ -360,7 +360,7 @@ inference workloads. The WE supports all of the following:
   ({{test-cat3}}) are performed.
 
 * Measurement instrumentation providing per-request TTFT and ITL with timestamp
-  accuracy <= 1 millisecond.
+  accuracy ≤ 1 millisecond.
 
 When a software workload emulator is used, the complete software configuration
 is documented per {{reporting}}, as framework version, RDMA library version,
@@ -1288,4 +1288,4 @@ Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
 # Acknowledgments
 {:numbered="false"}
 
-This work has benefited from the discussions that occurred during the joint IPPM and BMWG meeting and on the BMWG mailing list. Thanks to Carsten Rossenhoevel and Mohamed Boucadair for valuable review and comments.
+This work has benefited from the discussions that occurred during the joint IPPM and BMWG meeting and on the BMWG mailing list. Thanks to Carsten Rossenhoevel and Mohamed Boucadair for valuable review and comments. Thanks to Andrew Yourtchenko for a thorough review of the document set.
