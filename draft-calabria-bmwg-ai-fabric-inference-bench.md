@@ -60,10 +60,9 @@ author:
 normative:
   RFC1242:
   RFC2544:
-  RFC2889:
-  RFC6349:
   RFC6815:
   RFC8238:
+  RFC8239:
   TERMINOLOGY: I-D.calabria-bmwg-ai-fabric-terminology
   TRAINING-BENCH: I-D.calabria-bmwg-ai-fabric-training-bench
   UEC-1.0:
@@ -74,7 +73,21 @@ normative:
     target: "https://ultraethernet.org"
 
 informative:
+  RFC2889:
+  RFC6349:
   RFC3849:
+  IBTA-ROCE:
+    title: "InfiniBand Architecture Specification Volume 1, Annex A17: RoCEv2"
+    target: https://www.infinibandta.org
+    author:
+      - org: InfiniBand Trade Association
+    date: 2014-09
+  DEEPEP:
+    title: "DeepEP: an efficient expert-parallel communication library"
+    author:
+      - org: DeepSeek AI
+    date: 2025
+    target: https://github.com/deepseek-ai/DeepEP
 
 ...
 
@@ -120,8 +133,8 @@ within a fraction of the target TTFT SLO.
 
 As clusters scale with thousands of concurrent requests, this creates sustained
 multi-terabyte-per-second aggregate transfer demands on the fabric.
-Simultaneously, Mixture-of-Experts (MoE) architectures introduce expert
-parallelism (EP), which distributes expert sub-networks across GPUs and requires
+Simultaneously, Mixture-of-Experts (MoE) architectures introduce Expert
+Parallelism (EP), which distributes expert sub-networks across GPUs and requires
 AllToAll communication for token-to-expert routing. Wide EP configurations
 (e.g., 96-way EP across 12 nodes of 8 GPUs each) generate fine-grained,
 latency-sensitive inter-node traffic that contends with KV cache transfers on
@@ -155,7 +168,7 @@ OUT OF SCOPE as primary benchmarked entities.  Where intra-node transfer contrib
  measurably to an end-to-end latency measurement (e.g., TTFT decomposition in {{end-to-end-disaggregated-ttft}}), implementers report intra-node transfer time as a separately labelled component
  so that the fabric contribution can be isolated.  See {{dut-id}} for DUT boundary diagram.
 
-The document does NOT address benchmarking of individual accelerator (GPU/XPU) compute performance, model accuracy or quality metrics benchmarking of the inference serving
+The document does NOT address benchmarking of individual accelerator (GPU/XPU) compute performance, model accuracy or quality metrics, or benchmarking of the inference serving
  software stack in isolation from the fabric.
 
 All methodologies assume controlled laboratory conditions per BMWG convention.
@@ -163,11 +176,15 @@ All methodologies assume controlled laboratory conditions per BMWG convention.
 ## Relationship to Existing BMWG Work
 
 This document builds upon the foundational BMWG benchmarking framework
-established by {{RFC1242}}, {{RFC2544}}, {{RFC2889}}, and {{RFC6349}}.
+established by {{RFC1242}} and {{RFC2544}}, with additional background from
+{{RFC2889}} and {{RFC6349}}. {{RFC8238}} and {{RFC8239}} establish data center
+benchmarking terminology and methodology that this document extends for AI
+inference fabric traffic patterns.
 
 The test structure follows RFC 2544 conventions for trial duration (minimum 60
-seconds), statistical repetition (minimum 20 trials per configuration),
-and reporting format (graphical and tabular).
+seconds) and reporting format (graphical and tabular); statistical repetition
+(minimum 20 trials per configuration) is a convention of this document and is
+not defined by RFC 2544.
 
 The methodologies extend RFC 2544 Section 26 benchmarks (throughput, latency,
 frame loss rate, back-to-back frames, system recovery, reset) to
@@ -209,7 +226,7 @@ The following terms are bench-specific extensions used only in this document and
 
 The scope of the DUT for the tests defined in this document is the Ethernet fabric segment connecting prefill and decode workers (and, where applicable, expert-parallel groups), consistent with the Fabric DUT Boundary defined in {{TERMINOLOGY}}.
 
-Worked examples of the S_KV formula and KV cache size computation for representative model architectures are provided in the appendix.
+Worked examples of the S_KV formula and KV cache size computation for representative model architectures are provided in {{model-architecture-parameters}}.
 
 ## Acronyms
 
@@ -229,7 +246,7 @@ placement and MoE expert distribution.
 Applicable to inference clusters up to approximately 2,048 accelerators. Prefill
 and decode worker groups are placed on separate leaf switches (or separate
 leaf switch groups) to isolate KV cache transfer traffic from decode-to-client
-response traffic. Expert parallelism (EP) traffic within a single MoE dispatch
+response traffic. Expert Parallelism (EP) traffic within a single MoE dispatch
 group is confined to a single leaf switch or a minimal number of leaf
 switches to minimize spine-hop latency.
 
@@ -269,7 +286,7 @@ decode).
        | (One-sided PUT/Signal) |
        +------------------------+
 ~~~
-{: #fig-pd-topology title="Disaggregated Prefill/Decode Inference Topology"}
+{: #fig-pd-topology align="center" title="Disaggregated Prefill/Decode Inference Topology"}
 
 ## Disaggregated Prefill/Decode Topology
 
@@ -289,7 +306,7 @@ following components:
   cache across DP ranks within the decode pool, requiring AllToAll communication
   during decode.
 
-* **KV Cache Transfer Network:** The Ethernet fabric segment connecting prefill and decode worker pools. This segment carries one-sided RDMA PUT operations (or PUT-with-signal) transferring KV cache blocks from prefill GPU memory to decode GPU memory via RDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport (UET) {{UEC-1.0}}.
+* **KV Cache Transfer Network:** The Ethernet fabric segment connecting prefill and decode worker pools. This segment carries one-sided RDMA PUT operations (the RDMA WRITE verb; PUT is used throughout this document as the general term, with WRITE used where the literal RC opcode name matters, e.g., {{kv-frame}}) or PUT-with-signal (RDMA WRITE with Immediate Data) transferring KV cache blocks from prefill GPU memory to decode GPU memory via RDMA over Converged Ethernet (RoCEv2) or Ultra Ethernet Transport (UET) {{UEC-1.0}}.
 
   The end-to-end transfer from GPU memory to remote GPU memory traverses three segments:
 
@@ -336,8 +353,8 @@ The hardware traffic generator satisfies all of the following:
   configurable RDMA verb types (one-sided PUT, PUT-with-signal, two-sided
   SEND/RECV).
 
-* Configurable message sizes from 4 KB (minimum KV cache page) to 256 MB
-  (large KV cache block).
+* Configurable message sizes from 4 KB (minimum KV cache page) to 1 GB
+  (large KV cache block), to cover the message sizes used in {{test-cat1}}.
 
 * Configurable QP counts from 1 QP to a minimum of 256 QPs per
   source-destination port pair.
@@ -360,7 +377,7 @@ inference workloads. The WE supports all of the following:
   ({{test-cat3}}) are performed.
 
 * Measurement instrumentation providing per-request TTFT and ITL with timestamp
-  accuracy <= 1 millisecond.
+  accuracy ≤ 1 millisecond.
 
 When a software workload emulator is used, the complete software configuration
 is documented per {{reporting}}, as framework version, RDMA library version,
@@ -396,7 +413,7 @@ defined in the subsections below.
 | Goodput | GB/s or tokens/s | See the Goodput definition in {{TERMINOLOGY}}. Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
 | Prefix_cache_hit_rate | % | Fraction of requests whose shared prefix KV cache segment is already resident on the assigned worker, avoiding a fabric transfer | SUT-E request router counters |
-| JFI_decode | dimensionless (0-1) | Jain Fairness Index of per-decode-worker load (KV cache receive rate, GPU utilization, output TPS) | SUT-E per-worker counters |
+| JFI_decode | dimensionless (0-1) | Jain's Fairness Index of per-decode-worker load (KV cache receive rate, GPU utilization, output TPS) | SUT-E per-worker counters |
 {: #tab-throughput-kpis title="Primary Throughput KPIs"}
 
 ## Fabric-Level KPIs
@@ -496,7 +513,7 @@ messages (representative of a medium-length prompt). Measure aggregate
 throughput and per-pair latency as N increases.
 
 **Measurement:** Report aggregate throughput (GB/s), per-pair median latency
-(us), per-pair P99 latency (us), Jain Fairness Index across pairs, and maximum
+(us), per-pair P99 latency (us), Jain's Fairness Index across pairs, and maximum
 fabric link utilization observed. The test is repeated a minimum of 20
 times per value of N.
 
@@ -624,7 +641,7 @@ expert parallelism across the DUT fabric.
 **Procedure:** Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
 The dispatch payload per GPU per MoE layer is:
 
-T_dispatch = (B * k * H_model * P_bytes) / N. where B = batch size (tokens), k = top-k routing count,
+T_dispatch = (B × k × H_model × P_bytes) / N. where B = per-GPU batch size (tokens), k = top-k routing count,
 H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size
 
 **Canonical MoE Test Matrix**
@@ -639,8 +656,8 @@ H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2
 {: #tbl-moe-matrix title="Canonical MoE Test Matrix"}
 
 NOTE: T_dispatch values are the per-GPU-pair payload computed from the
-T_dispatch formula above (e.g., M1: 128 x 2 x 4096 x 2 bytes / 96 =
-21,845 bytes = 21.8 KB). The aggregate fabric load per dispatch is
+T_dispatch formula above (e.g., M1: 128 × 2 × 4096 × 2 bytes / 96 =
+21,845 bytes ≈ 21.8 KB, decimal KB, 1 KB = 1,000 bytes). The aggregate fabric load per dispatch is
 T_dispatch multiplied by the number of communicating GPU pairs; see the
 MoE AllToAll appendix for a worked example.
 
@@ -661,7 +678,7 @@ NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside E
 
 | Mode                                                     | Description | Traffic Impact |
 | -------------------------------------------------------- | ----------- | -------------- |
-| Standard Top-k                                           | Each token routed to k. highest-scoring experts | Fixed, uniform AllToAll dispatch volume |
+| Standard Top-k                                           | Each token routed to k highest-scoring experts | Fixed, uniform AllToAll dispatch volume |
 | Expert Choice (EC)                                       | Experts select tokens; ensures load balance | Non-uniform message sizes; tests HOL-blocking resilience |
 | Top-k with Token Drop                                    | Overloaded experts drop excess tokens | Lower peak traffic; unpredictable under load |
 | Auxiliary Loss Top-k                                     | Load-balanced top-k via training loss | Near-uniform AllToAll; lower hot-spot risk |
@@ -686,7 +703,7 @@ The selected config row is identified in the results.
 
 **Measurement:** Report total dispatch latency (us), inter-node bandwidth
 (GB/s), and latency decomposition (intra-node vs. inter-node fraction). Report
-the scaling efficiency: (EP=8 latency) / (EP=N latency) * (N/8).
+the scaling efficiency: (EP=8 latency) / (EP=N latency) × (N/8).
 
 ## Expert Parallelism and KV Cache Transfer Contention
 
@@ -749,7 +766,7 @@ reversed.
 
 **Measurement:** Report convergence time (ms) to within 5% of steady-state
 rates, steady-state bandwidth allocation between traffic classes, packet loss
-during convergence, and Jain Fairness Index of the steady-state allocation.
+during convergence, and Jain's Fairness Index of the steady-state allocation.
 
 ## PFC Storm and Deadlock Resilience
 
@@ -812,7 +829,7 @@ only (large flows, 16 MB+), (b) EP AllToAll dispatches only (small flows,
 utilization (%), and the oversubscription ratio for each scenario and load
 balancing algorithm.
 
-## Jain Fairness Index for Decode Worker Utilization
+## Jain's Fairness Index for Decode Worker Utilization
 
 **Objective:** To measure how evenly the fabric distributes KV cache transfer
 load across decode workers.
@@ -849,11 +866,11 @@ is provided.
 | CFG-B          | Mid: L=80, H_kv=8 (GQA), D=128, BF16 (~70B-parameter dense class)         | 1.3 GB            | 10.7 GB            | 43.0 GB             |
 | CFG-C          | Large: L=96, H_kv=64 (Multi-Head Attention, MHA), D=128, BF16 | 12.9 GB       | 103 GB             | 412 GB              |
 | CFG-D          | Mid INT8: L=80, H_kv=8 (GQA), D=128, INT8 (quantized)     | 0.67 GB           | 5.4 GB             | 21.5 GB             |
-| CFG-E (custom) | Implementer-defined:  L=___, H_kv=___, D=___, P=___       | Computed          | Computed           | Computed            |
+| CFG-E (custom) | Implementer-defined: L=[value], H_kv=[value], D=[value], P=[value] | Computed          | Computed           | Computed            |
 {: #tab-conf-matrix title="Reference Configuration Matrix"}
 
 NOTE: S_KV values are computed per the S_KV formula in {{TERMINOLOGY}}
-(S_KV = 2 x L x H_kv x D x C x P_bytes) using binary context lengths
+(S_KV = 2 × L × H_kv × D × C × P_bytes) using binary context lengths
 (4K = 4,096; 32K = 32,768; 128K = 131,072 tokens) and are expressed in
 decimal gigabytes (1 GB = 10^9 bytes).
 
@@ -1021,15 +1038,15 @@ inference serving load for 24 hours.
 
 **Procedure:** Configure the SUT-E at 80% of the SLO-bounded throughput
 determined in Test 11.1. Run a continuous request stream for 24 hours with a
-realistic prompt length distribution. Sample the following metrics every 15
-minutes: TTFT P99, ITL P99, TPS_output, KV_xfer_latency P99, fabric link
+realistic prompt length distribution. Sample the following metrics every 60
+seconds: TTFT P99, ITL P99, TPS_output, KV_xfer_latency P99, fabric link
 utilization, switch CPU/memory usage, NIC counters (RDMA retransmissions, QP
 errors), and PFC/ECN event counts.
 
 **Measurement:** Report the trend of all sampled metrics over the 24-hour
 period. Report the NIC QP error count, the routing flap count, and the
 variation in TTFT P99 over the test duration. Any nonzero QP error or routing
-flap count, or TTFT P99 variation exceeding 1%, is reported and investigated;
+flap count, or TTFT P99 variation exceeding 1%, MUST be reported and investigated;
 these thresholds are reporting triggers for investigation, not pass/fail
 criteria.
 
@@ -1116,13 +1133,13 @@ The following considerations are specific to inference-serving benchmarking:
 
 - **Synthetic prompt inputs:** The KV cache contains intermediate state derived from prompt content. Synthetic inputs SHOULD be used for all tests in this document so that no production prompt content is processed in the test environment. KV cache transfer benchmarks use payload patterns that do not reflect real user data.
 - **One-sided RDMA write semantics:** KV cache transfers in this document use one-sided RDMA PUT operations to remote NIC memory. Such operations bypass remote-CPU authorization at the data path; generators that leak onto adjacent fabrics could write arbitrary bytes to remote NICs. Line-rate RDMA traffic generators MUST be confined to the test fabric.
-- **PFC leakage:** PFC PAUSE frames generated under bursty KV cache or AllToAll incast conditions ({{test-cat4}}) that escape the test environment can hang adjacent production switches sharing the same priority class. Physical or VLAN-based isolation of the test fabric is required.
+- **PFC leakage:** PFC PAUSE frames generated under bursty KV cache or AllToAll incast conditions ({{test-cat4}}) that escape the test environment can cause adjacent production switches sharing the same priority class to stop responding. Physical or VLAN-based isolation of the test fabric is required.
 - **RDMA QP and PDC namespace isolation:** when RDMA/RoCEv2 traffic is used, the test environment SHOULD be isolated from production RDMA fabrics to prevent QP number space collisions or inadvertent PFC propagation. When UET traffic is used, the test environment MUST ensure that UDP port 4793 traffic does not leak to production networks and that PDC identifier spaces are isolated.
 - **UET transport security sub-layer (TSS):** SHOULD NOT be enabled during performance benchmarking unless transport security overhead is explicitly being measured.
 
 # IANA Considerations
 
-This memo includes no request to IANA.
+This document has no IANA actions.
 
 --- back
 
@@ -1195,7 +1212,7 @@ NOTE: The specific framework name, version, and configuration are documented in 
 
 # KV Cache Transfer Frame Format {#kv-frame}
 
-This appendix defines the reference frame format for KV cache transfer benchmarking over RoCEv2 using one-sided RDMA WRITE (PUT) operations. The frame format follows the standard RoCEv2 encapsulation defined in the InfiniBand Architecture Specification Volume 1 Annex A17 (RoCEv2).
+This appendix defines the reference frame format for KV cache transfer benchmarking over RoCEv2 using one-sided RDMA WRITE (PUT) operations. The frame format follows the standard RoCEv2 encapsulation defined in the InfiniBand Architecture Specification Volume 1 Annex A17 (RoCEv2) {{IBTA-ROCE}}.
 
 | Offset | Field | Size | Value / Description |
 |---|---|---|---|
@@ -1216,7 +1233,7 @@ Notes:
 
 - The UDP Source Port uses entropy-based values for ECMP load distribution across fabric paths.
 - The RETH carries the remote virtual address, remote key, and DMA length for the one-sided WRITE operation. For KV cache transfers, the DMA Length field indicates the size of the KV cache block being transferred.
-- Typical MTU for RoCEv2 deployments is 4096 bytes; larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling.
+- Typical RDMA path MTU for RoCEv2 deployments is 4096 bytes (requiring an Ethernet frame MTU of approximately 4200+ bytes, i.e., jumbo frames, to carry the RoCEv2/IP/UDP/BTH/RETH header overhead); larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling.
 - For UET-based KV cache transfers, the frame format defined in the UET Frame Format appendix of {{TRAINING-BENCH}} applies; the UDP destination port is 4793 and the transport service indicator selects between ROD and RUD per test.
 
 # MoE AllToAll Communication Pattern
@@ -1233,7 +1250,7 @@ other GPU.
 | Batch Size | 128 - 512 tokens | 1 - 16 tokens |
 | Payload per GPU pair | Variable (depends on routing) | Fixed (padded to max) |
 | Shape Compatibility | Dynamic (symbolic) | Static (graph-capturable) |
-| QP Parallelism | 24 QPs per connection | 8 - 16 QPs per connection |
+| QP Parallelism {{DEEPEP}} | 24 QPs per connection | 8 - 16 QPs per connection |
 | RDMA Primitive | Two-sided SEND/RECV or one-sided PUT | One-sided PUT (GPU-direct RDMA, GIN) |
 | GPU Initiation | CPU-initiated or GIN | GIN (device-initiated, GPU-to-NIC direct) |
 | Typical per-dispatch size | 1 - 10 MB aggregate | 10 KB - 1 MB aggregate |
@@ -1241,12 +1258,18 @@ other GPU.
 | Latency Target | < 1 ms per dispatch | < 200 us per dispatch |
 {: #tab-moe-dispatch title="MoE Dispatch Traffic Characteristics by Mode"}
 
-For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B * k * H_model * 2) / N is approximately
+NOTE: The QP Parallelism values are DeepEP {{DEEPEP}} implementation defaults, shown as an illustrative example; they are not a normative requirement of this methodology and MAY differ across CCL implementations.
 
-* Normal Dispatch (prefill, batch=256): 256 \* 2 \* 7168 \* 2 bytes / 96 GPUs
-  = ~76 KB per GPU pair, ~700 MB aggregate across all 96 x 95 = 9,120 pairs.
-* Low-Latency Dispatch (decode, batch=8): 8 \* 2 \* 7168 \* 2 bytes / 96 GPUs
-  = ~2.4 KB per GPU pair, ~22 MB aggregate.
+For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B × k × H_model × 2) / N is approximately
+
+* Normal Dispatch (prefill, batch=256): 256 × 2 × 7168 × 2 bytes / 96 GPUs
+  = ~76 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
+  96 × 88 = 8,448 cross the fabric (the remaining 672 pairs are intra-node,
+  within each of the 12 8-GPU nodes, and do not traverse the fabric).
+  Fabric-visible aggregate: ~76 KB × 8,448 ≈ 648 MB.
+* Low-Latency Dispatch (decode, batch=8): 8 × 2 × 7168 × 2 bytes / 96 GPUs
+  = ~2.4 KB per GPU pair; fabric-visible aggregate (8,448 pairs): ~2.4 KB × 8,448
+  ≈ 20.5 MB.
 
 With 61 MoE layers (representative of a publicly described large-scale MoE architecture) and a decode iteration time target of ~30 ms, the decode
 phase requires 61 AllToAll dispatches within 30 ms. This yields 61 dispatches
@@ -1288,4 +1311,4 @@ Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
 # Acknowledgments
 {:numbered="false"}
 
-This work has benefited from the discussions that occurred during the joint IPPM and BMWG meeting and on the BMWG mailing list. Thanks to Carsten Rossenhoevel and Mohamed Boucadair for valuable review and comments.
+This work has benefited from the discussions that occurred during the joint IPPM and BMWG meeting and on the BMWG mailing list. Thanks to Carsten Rossenhoevel and Mohamed Boucadair for valuable review and comments. Thanks to Andrew Yourtchenko for a thorough review of the document set.
