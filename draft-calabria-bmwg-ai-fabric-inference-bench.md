@@ -229,7 +229,7 @@ placement and MoE expert distribution.
 Applicable to inference clusters up to approximately 2,048 accelerators. Prefill
 and decode worker groups are placed on separate leaf switches (or separate
 leaf switch groups) to isolate KV cache transfer traffic from decode-to-client
-response traffic. Expert parallelism (EP) traffic within a single MoE dispatch
+response traffic. Expert Parallelism (EP) traffic within a single MoE dispatch
 group is confined to a single leaf switch or a minimal number of leaf
 switches to minimize spine-hop latency.
 
@@ -396,7 +396,7 @@ defined in the subsections below.
 | Goodput | GB/s or tokens/s | See the Goodput definition in {{TERMINOLOGY}}. Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
 | Prefix_cache_hit_rate | % | Fraction of requests whose shared prefix KV cache segment is already resident on the assigned worker, avoiding a fabric transfer | SUT-E request router counters |
-| JFI_decode | dimensionless (0-1) | Jain Fairness Index of per-decode-worker load (KV cache receive rate, GPU utilization, output TPS) | SUT-E per-worker counters |
+| JFI_decode | dimensionless (0-1) | Jain's Fairness Index of per-decode-worker load (KV cache receive rate, GPU utilization, output TPS) | SUT-E per-worker counters |
 {: #tab-throughput-kpis title="Primary Throughput KPIs"}
 
 ## Fabric-Level KPIs
@@ -496,7 +496,7 @@ messages (representative of a medium-length prompt). Measure aggregate
 throughput and per-pair latency as N increases.
 
 **Measurement:** Report aggregate throughput (GB/s), per-pair median latency
-(us), per-pair P99 latency (us), Jain Fairness Index across pairs, and maximum
+(us), per-pair P99 latency (us), Jain's Fairness Index across pairs, and maximum
 fabric link utilization observed. The test is repeated a minimum of 20
 times per value of N.
 
@@ -749,7 +749,7 @@ reversed.
 
 **Measurement:** Report convergence time (ms) to within 5% of steady-state
 rates, steady-state bandwidth allocation between traffic classes, packet loss
-during convergence, and Jain Fairness Index of the steady-state allocation.
+during convergence, and Jain's Fairness Index of the steady-state allocation.
 
 ## PFC Storm and Deadlock Resilience
 
@@ -812,7 +812,7 @@ only (large flows, 16 MB+), (b) EP AllToAll dispatches only (small flows,
 utilization (%), and the oversubscription ratio for each scenario and load
 balancing algorithm.
 
-## Jain Fairness Index for Decode Worker Utilization
+## Jain's Fairness Index for Decode Worker Utilization
 
 **Objective:** To measure how evenly the fabric distributes KV cache transfer
 load across decode workers.
