@@ -6,6 +6,7 @@
 *.upload
 *~
 .DS_Store
+.claude/
 .tags
 /*-[0-9][0-9].xml
 /.*.mk
