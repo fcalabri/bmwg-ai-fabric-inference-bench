@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 20 January 2027                            Blue Fern Consulting
+Expires: 21 January 2027                            Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                            19 July 2026
+                                                            20 July 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -74,7 +74,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 20 January 2027.
+   This Internet-Draft will expire on 21 January 2027.
 
 Copyright Notice
 
@@ -710,38 +710,44 @@ Table of Contents
 
 4.4.  Fabric Health Indicators
 
-      +=================+===============+==========================+
-      | Indicator       | Threshold     | Description              |
-      +=================+===============+==========================+
-      | CPU Utilization | < 30%         | Control plane CPU usage  |
-      | (switch)        |               | on switches under        |
-      |                 |               | inference traffic load   |
-      +-----------------+---------------+--------------------------+
-      | Memory Usage    | < 70%         | TCAM, buffer, and        |
-      | (switch)        |               | control plane memory     |
-      |                 |               | usage                    |
-      +-----------------+---------------+--------------------------+
-      | FEC Error Rate  | < 1e-12 post- | Forward Error Correction |
-      |                 | FEC Bit Error | effectiveness on fabric  |
-      |                 | Rate (BER)    | links                    |
-      +-----------------+---------------+--------------------------+
-      | CRC Error Count | 0             | Layer 2 CRC errors on    |
-      |                 |               | any fabric link          |
-      +-----------------+---------------+--------------------------+
-      | BGP/OSPF        | 0 flaps       | Routing protocol         |
-      | Stability       |               | adjacency stability      |
-      |                 |               | under inference load     |
-      +-----------------+---------------+--------------------------+
-      | NIC QP State    | 100% active   | All RDMA Queue Pairs in  |
-      |                 |               | active state (no error/  |
-      |                 |               | reset)                   |
-      +-----------------+---------------+--------------------------+
-      | GPU-NIC PCIe BW | > 90% of      | PCIe Gen5 x16 bandwidth  |
-      |                 | theoretical   | utilization between GPU  |
-      |                 |               | and NIC                  |
-      +-----------------+---------------+--------------------------+
+    +=============+===============+==================================+
+    | Indicator   | Typical       | Description                      |
+    |             | Healthy Range |                                  |
+    +=============+===============+==================================+
+    | CPU         | < 30%         | Control plane CPU usage on       |
+    | Utilization |               | switches under inference traffic |
+    | (switch)    |               | load                             |
+    +-------------+---------------+----------------------------------+
+    | Memory      | < 70%         | TCAM, buffer, and control plane  |
+    | Usage       |               | memory usage                     |
+    | (switch)    |               |                                  |
+    +-------------+---------------+----------------------------------+
+    | FEC Error   | < 1e-12 post- | Forward Error Correction         |
+    | Rate        | FEC Bit Error | effectiveness on fabric links    |
+    |             | Rate (BER)    |                                  |
+    +-------------+---------------+----------------------------------+
+    | CRC Error   | 0             | Layer 2 CRC errors on any fabric |
+    | Count       |               | link                             |
+    +-------------+---------------+----------------------------------+
+    | BGP/OSPF    | 0 flaps       | Routing protocol adjacency       |
+    | Stability   |               | stability under inference load   |
+    +-------------+---------------+----------------------------------+
+    | NIC QP      | 100% active   | All RDMA Queue Pairs in active   |
+    | State       |               | state (no error/reset)           |
+    +-------------+---------------+----------------------------------+
+    | GPU-NIC     | > 90% of      | PCIe bandwidth utilization       |
+    | PCIe BW     | theoretical   | between GPU and NIC (generation- |
+    |             |               | and width-dependent)             |
+    +-------------+---------------+----------------------------------+
 
                     Table 6: Fabric Health Indicators
+
+   NOTE: Per the BMWG charter, the definition of acceptance criteria or
+   performance requirements is explicitly outside the scope of this
+   Working Group.  The values above are indicative of a healthy fabric
+   under normal operating conditions, not pass/fail criteria;
+   deployment-specific thresholds are outside the scope of this
+   document.
 
 5.  Test Category 1: RDMA KV Cache Transfer Benchmarks
 
@@ -828,9 +834,13 @@ Table of Contents
 5.4.  Multi-Tier Storage Transfer Characterization
 
    *Objective:* To characterize KV cache transfer performance across the
-   memory/storage hierarchy: GPU HBM to GPU HBM (inter-node RDMA), GPU
-   HBM to remote CPU DRAM (offload), CPU DRAM to GPU HBM (reload), and
-   GPU HBM to NVMe/SSD (persistent cache).
+   memory/storage hierarchy, restricted to fabric-traversing (remote)
+   tier pairs: GPU HBM to remote GPU HBM (inter-node RDMA), GPU HBM to
+   remote CPU DRAM (offload), remote CPU DRAM to GPU HBM (reload), and
+   GPU HBM to remote NVMe/SSD (persistent cache on a remote storage
+   node).  Same-node (local) tier pairs are pure intra-node PCIe
+   transfers with zero DUT/fabric involvement and are out of scope per
+   [TERMINOLOGY] Section 1.2.
 
    *Procedure:* For each tier pair, measure unidirectional transfer
    throughput and latency for message sizes of 1 MB, 16 MB, and 256 MB.
@@ -1525,30 +1535,36 @@ Table of Contents
       tested, the number of trials, all measured KPI values with
       confidence intervals, and any anomalies observed.
 
-    +======================+============================+=============+
-    | Report Element       | Format                     | Required?   |
-    +======================+============================+=============+
-    | System Configuration | Structured table per above | Yes         |
-    |                      |                            | (required)  |
-    +----------------------+----------------------------+-------------+
-    | Workload Parameters  | Structured table per above | Yes         |
-    |                      |                            | (required)  |
-    +----------------------+----------------------------+-------------+
-    | KPI Summary Table    | Table with all measured    | Yes         |
-    |                      | KPIs                       | (required)  |
-    +----------------------+----------------------------+-------------+
-    | Latency Distribution | CDF or histogram per test  | Recommended |
-    | Plots                | section                    |             |
-    +----------------------+----------------------------+-------------+
-    | Throughput vs. Scale | Line chart per test        | Recommended |
-    | Graphs               | section                    |             |
-    +----------------------+----------------------------+-------------+
-    | Fabric Health        | Table per Table 6          | Yes         |
-    | Indicators           |                            | (required)  |
-    +----------------------+----------------------------+-------------+
-    | Raw Data Appendix    | Machine-readable format    | Optional    |
-    |                      | (CSV, JSON)                |             |
-    +----------------------+----------------------------+-------------+
+     +===============+==================+============================+
+     | Report        | Format           | Required?                  |
+     | Element       |                  |                            |
+     +===============+==================+============================+
+     | System        | Structured table | Yes (required)             |
+     | Configuration | per above        |                            |
+     +---------------+------------------+----------------------------+
+     | Workload      | Structured table | Yes (required)             |
+     | Parameters    | per above        |                            |
+     +---------------+------------------+----------------------------+
+     | KPI Summary   | Table with all   | Yes (required)             |
+     | Table         | measured KPIs    |                            |
+     +---------------+------------------+----------------------------+
+     | Latency       | CDF or histogram | Recommended                |
+     | Distribution  | per test section |                            |
+     | Plots         |                  |                            |
+     +---------------+------------------+----------------------------+
+     | Throughput    | Line chart per   | Recommended                |
+     | vs. Scale     | test section     |                            |
+     | Graphs        |                  |                            |
+     +---------------+------------------+----------------------------+
+     | Fabric Health | Table per        | Yes (values reported; the  |
+     | Indicators    | Table 6          | Typical Healthy Range      |
+     |               |                  | column is informative, not |
+     |               |                  | a pass/fail requirement)   |
+     +---------------+------------------+----------------------------+
+     | Raw Data      | Machine-readable | Optional                   |
+     | Appendix      | format (CSV,     |                            |
+     |               | JSON)            |                            |
+     +---------------+------------------+----------------------------+
 
                   Table 10: Reporting Format Requirements
 
@@ -1931,6 +1947,14 @@ Appendix D.  KV Cache Transfer Frame Format
     | 74 /   | KV Cache   | variable, | Key/value attention state    |
     | 94     | Payload    | up to MTU | data                         |
     +--------+------------+-----------+------------------------------+
+    | var    | ImmDt      | 4B        | Present only for OpCode 0x09 |
+    |        | (Immediate |           | or 0x0B (with-immediate      |
+    |        | Data)      |           | variants), used for PUT-     |
+    |        |            |           | with-signal completion       |
+    |        |            |           | signalling; absent otherwise |
+    |        |            |           | and subsequent offsets shift |
+    |        |            |           | back by 4B                   |
+    +--------+------------+-----------+------------------------------+
     | var    | ICRC       | 4B        | Invariant CRC                |
     +--------+------------+-----------+------------------------------+
     | var+4  | FCS        | 4B        | Ethernet Frame Check         |
@@ -1956,9 +1980,11 @@ Appendix D.  KV Cache Transfer Frame Format
       segmented into multiple packets by the NIC.  The first packet of a
       segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH;
       intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the
-      last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA
+      last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x09 (RDMA
       WRITE Last with Immediate Data) for PUT-with-signal completion
-      signalling.
+      signalling. (0x0B, RDMA WRITE Only with Immediate Data, is a
+      single-packet opcode and cannot terminate a First/Middle
+      sequence.)
 
    *  For UET-based KV cache transfers, the frame format defined in the
       UET Frame Format appendix of [TRAINING-BENCH] applies; the UDP
