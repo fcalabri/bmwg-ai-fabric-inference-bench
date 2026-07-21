@@ -646,10 +646,20 @@ latency-sensitive inter-GPU traffic patterns.
 expert parallelism across the DUT fabric.
 
 **Procedure:** Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
-The dispatch payload per GPU per MoE layer is:
+The dispatch payload per source-destination GPU pair per MoE layer is:
 
 T_dispatch = (B × k × H_model × P_bytes) / N. where B = per-GPU batch size (tokens), k = top-k routing count,
 H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size
+
+The corresponding total egress per GPU per MoE layer, summed over its N-1
+destination peers, is:
+
+T_egress = B × k × H_model × P_bytes × (N - 1) / N
+
+T_egress, not T_dispatch, characterizes the per-accelerator offered load: it
+equals T_dispatch × (N - 1). The fabric-visible portion of T_egress counts
+only inter-node destination peers; see the MoE AllToAll appendix for a worked
+example in which 88 of 95 destination peers are inter-node.
 
 **Canonical MoE Test Matrix**
 
@@ -1274,7 +1284,7 @@ NOTE: The QP Parallelism values are DeepEP {{DEEPEP}} implementation defaults, s
 For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16), the inter-node traffic per MoE layer dispatch using T_dispatch = (B × k × H_model × 2) / N is approximately
 
 * Normal Dispatch (prefill, batch=256): 256 × 2 × 7168 × 2 bytes / 96 GPUs
-  = ~76 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
+  = ~76.5 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
   96 × 88 = 8,448 cross the fabric (the remaining 672 pairs are intra-node,
   within each of the 12 8-GPU nodes, and do not traverse the fabric).
   Fabric-visible aggregate: ~76.5 KB × 8,448 ≈ 646 MB.
