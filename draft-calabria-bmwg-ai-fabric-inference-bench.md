@@ -434,7 +434,7 @@ defined in the subsections below.
 
 ## Fabric Health Indicators
 
-| Indicator | Threshold | Description |
+| Indicator | Typical Healthy Range | Description |
 |-----------|-----------|-------------|
 | CPU Utilization (switch) | < 30% | Control plane CPU usage on switches under inference traffic load |
 | Memory Usage (switch) | < 70% | TCAM, buffer, and control plane memory usage |
@@ -442,8 +442,10 @@ defined in the subsections below.
 | CRC Error Count | 0 | Layer 2 CRC errors on any fabric link |
 | BGP/OSPF Stability | 0 flaps | Routing protocol adjacency stability under inference load |
 | NIC QP State | 100% active | All RDMA Queue Pairs in active state (no error/reset) |
-| GPU-NIC PCIe BW | > 90% of theoretical | PCIe Gen5 x16 bandwidth utilization between GPU and NIC |
+| GPU-NIC PCIe BW | > 90% of theoretical | PCIe bandwidth utilization between GPU and NIC (generation- and width-dependent) |
 {: #tab-health title="Fabric Health Indicators"}
+
+NOTE: Per the BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. The values above are indicative of a healthy fabric under normal operating conditions, not pass/fail criteria; deployment-specific thresholds are outside the scope of this document.
 
 # Test Category 1: RDMA KV Cache Transfer Benchmarks {#test-cat1}
 
@@ -524,9 +526,12 @@ P99 latency on the right Y axis. The JFI value for each N is annotated.
 ## Multi-Tier Storage Transfer Characterization
 
 **Objective:** To characterize KV cache transfer performance across the
-memory/storage hierarchy: GPU HBM to GPU HBM (inter-node RDMA), GPU HBM to
-remote CPU DRAM (offload), CPU DRAM to GPU HBM (reload), and GPU HBM to
-NVMe/SSD (persistent cache).
+memory/storage hierarchy, restricted to fabric-traversing (remote) tier
+pairs: GPU HBM to remote GPU HBM (inter-node RDMA), GPU HBM to remote CPU
+DRAM (offload), remote CPU DRAM to GPU HBM (reload), and GPU HBM to remote
+NVMe/SSD (persistent cache on a remote storage node). Same-node (local) tier
+pairs are pure intra-node PCIe transfers with zero DUT/fabric involvement and
+are out of scope per {{TERMINOLOGY}} Section 1.2.
 
 **Procedure:** For each tier pair, measure unidirectional transfer throughput
 and latency for message sizes of 1 MB, 16 MB, and 256 MB. Use zero-copy
@@ -1111,7 +1116,7 @@ inference-specific reporting elements apply:
 | KPI Summary Table | Table with all measured KPIs | Yes (required) |
 | Latency Distribution Plots | CDF or histogram per test section | Recommended |
 | Throughput vs. Scale Graphs | Line chart per test section | Recommended |
-| Fabric Health Indicators | Table per {{tab-health}} | Yes (required) |
+| Fabric Health Indicators | Table per {{tab-health}} | Yes (values reported; the Typical Healthy Range column is informative, not a pass/fail requirement) |
 | Raw Data Appendix | Machine-readable format (CSV, JSON) | Optional |
 {: #tab-reporting title="Reporting Format Requirements"}
 
@@ -1222,9 +1227,10 @@ This appendix defines the reference frame format for KV cache transfer benchmark
 | 14 | 802.1Q Tag (optional) | 4B | When tagged: TCI (PCP for RDMA priority class, VID) followed by inner EtherType 0x0800 or 0x86DD. Omit this row when untagged and shift subsequent offsets back by 4B |
 | 18 | IPv4 / IPv6 Header | 20B (IPv4) or 40B (IPv6) | DSCP=26 (AF31), ECN=ECT(0), Proto=17 (UDP) |
 | 38 / 58 | UDP Header | 8B | DstPort=4791 (RoCEv2), SrcPort=entropy for ECMP, UDP Length, UDP Checksum |
-| 46 / 66 | BTH (Base Transport Header) | 12B | OpCode=0x0A (RDMA WRITE Only) or 0x0B (RDMA WRITE with Immediate Data) at the last packet of a PUT-with-signal sequence; SE, M, Pad, TVer flags; PKey; Destination QP Number (24 bits); A flag; PSN (24 bits) |
+| 46 / 66 | BTH (Base Transport Header) | 12B | OpCode=0x0A (RDMA WRITE Only) or 0x0B (RDMA WRITE Only with Immediate Data) for the single-packet reference frame defined here; segmented transfers use OpCodes 0x06/0x07/0x08/0x09 (see Notes); SE, M, Pad, TVer flags; PKey; Destination QP Number (24 bits); A flag; PSN (24 bits) |
 | 58 / 78 | RETH (RDMA Extended Transport Header) | 16B | Virtual Address (64 bits), R_Key (32 bits), DMA Length (32 bits). The DMA Length indicates the size of the KV cache block transferred by this WRITE operation |
-| 74 / 94 | KV Cache Payload | variable, up to MTU | Key/value attention state data |
+| 74 / 94 | ImmDt (Immediate Data) | 4B | Present only for OpCode 0x0B (RDMA WRITE Only with Immediate Data), used for PUT-with-signal completion signalling. Omit this row for OpCode 0x0A and shift subsequent offsets back by 4B |
+| 78 / 98 | KV Cache Payload | variable, up to MTU | Key/value attention state data (starts at 74 / 94 when ImmDt is absent) |
 | var | ICRC | 4B | Invariant CRC |
 | var+4 | FCS | 4B | Ethernet Frame Check Sequence |
 {: #tab-kv-frame title="RoCEv2 KV Cache Transfer Frame (One-Sided RDMA WRITE)"}
@@ -1233,7 +1239,7 @@ Notes:
 
 - The UDP Source Port uses entropy-based values for ECMP load distribution across fabric paths.
 - The RETH carries the remote virtual address, remote key, and DMA length for the one-sided WRITE operation. For KV cache transfers, the DMA Length field indicates the size of the KV cache block being transferred.
-- Typical RDMA path MTU for RoCEv2 deployments is 4096 bytes (requiring an Ethernet frame MTU of approximately 4200+ bytes, i.e., jumbo frames, to carry the RoCEv2/IP/UDP/BTH/RETH header overhead); larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x0B (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling.
+- Typical RDMA path MTU for RoCEv2 deployments is 4096 bytes (requiring an Ethernet frame MTU of approximately 4200+ bytes, i.e., jumbo frames, to carry the RoCEv2/IP/UDP/BTH/RETH header overhead); larger KV cache blocks (e.g., 64 KB pages) are segmented into multiple packets by the NIC. The first packet of a segmented WRITE carries OpCode 0x06 (RDMA WRITE First) and a RETH; intermediate packets carry OpCode 0x07 (RDMA WRITE Middle); the last packet carries OpCode 0x08 (RDMA WRITE Last) or 0x09 (RDMA WRITE Last with Immediate Data) for PUT-with-signal completion signalling. (0x0B, RDMA WRITE Only with Immediate Data, is a single-packet opcode and cannot terminate a First/Middle sequence.) In segmented sequences the RETH is carried only in the First (0x06) packet; a Last-with-Immediate packet (0x09) carries the 4B ImmDt immediately following the BTH, with no RETH.
 - For UET-based KV cache transfers, the frame format defined in the UET Frame Format appendix of {{TRAINING-BENCH}} applies; the UDP destination port is 4793 and the transport service indicator selects between ROD and RUD per test.
 
 # MoE AllToAll Communication Pattern
@@ -1266,15 +1272,15 @@ For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 acro
   = ~76 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
   96 × 88 = 8,448 cross the fabric (the remaining 672 pairs are intra-node,
   within each of the 12 8-GPU nodes, and do not traverse the fabric).
-  Fabric-visible aggregate: ~76 KB × 8,448 ≈ 648 MB.
+  Fabric-visible aggregate: ~76.5 KB × 8,448 ≈ 646 MB.
 * Low-Latency Dispatch (decode, batch=8): 8 × 2 × 7168 × 2 bytes / 96 GPUs
   = ~2.4 KB per GPU pair; fabric-visible aggregate (8,448 pairs): ~2.4 KB × 8,448
-  ≈ 20.5 MB.
+  ≈ 20.2 MB.
 
 With 61 MoE layers (representative of a publicly described large-scale MoE architecture) and a decode iteration time target of ~30 ms, the decode
 phase requires 61 AllToAll dispatches within 30 ms. This yields 61 dispatches
 per decode step, or approximately 2,000 dispatches per second, and consumes
-approximately 45 GB/s
+approximately 41 GB/s (61 × ~20.2 MB / 30 ms)
 aggregate inter-node bandwidth for the Low-Latency Dispatch path.
 
 # Model Architecture Parameters
