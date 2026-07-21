@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-07T01:56:10.611828+00:00",
+  "timestamp": "2026-07-21T01:24:59.855480+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -288,6 +288,84 @@
       "updatedAt": "2026-06-23T10:16:46Z",
       "closedAt": "2026-06-23T10:16:46Z",
       "comments": []
+    },
+    {
+      "number": 29,
+      "id": "I_kwDORX8k_s8AAAABJfNKig",
+      "title": "FHI \"Threshold\" column made a required report element, contradicting charter disclaimers",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/29",
+      "state": "OPEN",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "cpignata"
+      ],
+      "labels": [],
+      "body": "Actually found and reported by @ayourtch (Andrew Yourtchenko) in his review of the -03 draft set (Major finding [F13]):\n\nTable 6 (Fabric Health Indicators) gives every indicator a literal numeric \"Threshold\" (CPU < 30%, Memory < 70%, FEC < 1e-12, CRC errors = 0, 0 routing flaps, 100% QP active, PCIe BW > 90%), and Table 10 makes that table a required report element. This is acceptance-criteria-shaped content, contradicting the BMWG-charter disclaimers elsewhere in the document. The training document's own FHI table, correctly, has no thresholds.\n\nFix: renamed the column to an informative \"Typical Healthy Range\" with a charter disclaimer, and softened the reporting requirement to reflect the column is informative, not pass/fail \u2014 mirroring the pattern training-bench's own FHI table already uses.",
+      "createdAt": "2026-07-20T18:01:56Z",
+      "updatedAt": "2026-07-20T23:08:41Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fixed in 6480996.",
+          "createdAt": "2026-07-20T18:01:57Z",
+          "updatedAt": "2026-07-20T18:01:57Z"
+        }
+      ]
+    },
+    {
+      "number": 30,
+      "id": "I_kwDORX8k_s8AAAABJfNMWQ",
+      "title": "Test 5.4 storage-tier paths never state whether the peer is remote",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/30",
+      "state": "OPEN",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "cpignata"
+      ],
+      "labels": [],
+      "body": "Actually found and reported by @ayourtch (Andrew Yourtchenko) in his review of the -03 draft set (Major finding [F18]):\n\nTest 5.4's storage-tier paths (GPU HBM to CPU DRAM / NVMe) never state whether the peer is remote. A local (same-node) transfer is pure intra-node PCIe with zero DUT/fabric involvement, and TERMINOLOGY Section 1.2 excludes storage networking from scope.\n\nFix: restricted every tier pair to explicitly remote (fabric-traversing) peers, and added a note that same-node tier pairs are out of scope.",
+      "createdAt": "2026-07-20T18:01:59Z",
+      "updatedAt": "2026-07-20T23:08:44Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fixed in 6480996.",
+          "createdAt": "2026-07-20T18:02:00Z",
+          "updatedAt": "2026-07-20T18:02:00Z"
+        }
+      ]
+    },
+    {
+      "number": 31,
+      "id": "I_kwDORX8k_s8AAAABJfNUfg",
+      "title": "Appendix D opcode error: 0x0B mislabeled as \"RDMA WRITE Last with Immediate Data\"",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/31",
+      "state": "OPEN",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "cpignata"
+      ],
+      "labels": [],
+      "body": "Actually found and reported by @ayourtch (Andrew Yourtchenko) in his review of the -03 draft set (Major finding [F20]):\n\nAppendix D's segmented-WRITE description says the last packet \"carries OpCode ... 0x0B (RDMA WRITE Last with Immediate Data)\". Per the IBTA RC opcode table, Last-with-Immediate is actually 0x09; 0x0B is Only-with-Immediate, a single-packet opcode that cannot terminate a First/Middle sequence (a conformant responder would NAK it). The with-immediate variants also carry a 4-byte ImmDt field missing from the frame layout.\n\nVerified directly against the Linux kernel's canonical IB opcode header (include/rdma/ib_pack.h) before fixing: 0x09 = RDMA_WRITE_LAST_WITH_IMMEDIATE, 0x0B = RDMA_WRITE_ONLY_WITH_IMMEDIATE.\n\nFix: corrected the opcode to 0x09, added a note explaining why 0x0B doesn't apply here, and added the missing 4B ImmDt row to the frame table (present only for the with-immediate opcode variants, positioned after the payload).",
+      "createdAt": "2026-07-20T18:02:12Z",
+      "updatedAt": "2026-07-20T23:08:47Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Fixed in 6480996, verified against the Linux kernel's canonical IB opcode header.",
+          "createdAt": "2026-07-20T18:02:13Z",
+          "updatedAt": "2026-07-20T18:02:13Z"
+        }
+      ]
     }
   ],
   "pulls": [
@@ -1429,6 +1507,68 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 28,
+      "id": "PR_kwDORX8k_s7zjz0h",
+      "title": "Editorial pass: address Andrew Yourtchenko's review + acronym/inclusive-language cleanup",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/28",
+      "state": "MERGED",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "## Summary\n\nAddresses the minor and editorial issues identified by Andrew Yourtchenko in his review of the draft set (-03), plus a broader editorial pass covering acronym consistency, inclusive language, and idnits hygiene.\n\n- Fixed a genuine leaked-markup bug: CFG-E's blank-fill underscores were being silently swallowed by Markdown emphasis parsing, dropping content from the rendered table cell (verified against the actual HTML/XML output, not just suspected)\n- Fixed a garbled negative-scope sentence in the Scope and Applicability section and a stale cross-reference for the DUT boundary diagram\n- Fixed the RFC 2544 misattribution of a \"minimum 20 trials\" convention that RFC 2544 doesn't actually define\n- Fixed a wrong Appendix E traffic aggregate that included 672 intra-node GPU pairs that never cross the fabric (corrected from ~700 MB to the fabric-visible ~648 MB)\n- Fixed the IB-path-MTU-vs-Ethernet-MTU conflation in the frame format notes\n- Reference list fixes: added the missing RFC 8239, reclassified RFC 2889/6349 from normative to informative (mentioned once, never substantively relied on), added proper IBTA-ROCE and DeepEP citations\n- Fixed Expert Parallelism (EP) capitalization inconsistency and Jain's Fairness Index's missing possessive\n- Harmonized the 24-hour soak-test sampling interval and IANA Considerations wording with the companion documents (was 15x apart: 60s vs 15min)\n- Standardized multiplication notation to \u00d7 and switched <=/>= to \u2264/\u2265; centered the topology figure\n- Reviewed for NIST IR 8366 inclusive-language guidance (replaced \"hang\" with \"stop responding\")\n- Added Andrew Yourtchenko's review credit to Acknowledgments",
+      "createdAt": "2026-07-19T15:17:40Z",
+      "updatedAt": "2026-07-20T17:49:44Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "0153798df6dbf93b41265df40192715f47587556",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "carlos-editorial-2",
+      "headRefOid": "0c39a10f1a2e42ea5e2db05d9201cb328187e2f0",
+      "closedAt": "2026-07-19T15:51:52Z",
+      "mergedAt": "2026-07-19T15:51:52Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "fc5fdfee9e2b6e5515d7ce269d5f2051d9e5cf60"
+      },
+      "comments": [
+        {
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@ayourtch would appreciate your review here as well \u2014 thank you for the thorough review of the -03 draft set, several of these commits address findings from it directly.",
+          "createdAt": "2026-07-20T17:49:44Z",
+          "updatedAt": "2026-07-20T17:49:44Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 32,
+      "id": "PR_kwDORX8k_s70F5-r",
+      "title": "Fix three Major findings from Andrew Yourtchenko's review",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/32",
+      "state": "OPEN",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "## Summary\n\nFixes the three Major findings from Andrew Yourtchenko's review of the -03 draft set that weren't included in the earlier editorial PR (#28, already merged).\n\n- FHI \"Threshold\" column was a required report element, contradicting the charter's acceptance-criteria disclaimers; relabeled to an informative \"Typical Healthy Range\" with a disclaimer, mirroring the pattern training-bench's own FHI table already uses. Closes #29\n- Test 5.4's storage-tier paths never stated whether the peer was remote; a local (same-node) transfer would be pure intra-node PCIe with zero DUT/fabric involvement. Restricted every tier pair to explicitly remote and noted local pairs are out of scope. Closes #30\n- Appendix D mislabeled OpCode 0x0B as \"RDMA WRITE Last with Immediate Data\" for a segmented sequence; verified against the Linux kernel's canonical IB opcode header (0x09 = WRITE Last with Immediate, 0x0B = WRITE Only with Immediate, a single-packet opcode that cannot terminate a First/Middle sequence) and corrected the opcode. Also added the missing 4B ImmDt field. Closes #31",
+      "createdAt": "2026-07-20T23:08:05Z",
+      "updatedAt": "2026-07-20T23:08:06Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "fc5fdfee9e2b6e5515d7ce269d5f2051d9e5cf60",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "carlos-major-issues-1",
+      "headRefOid": "244480ca467ddcf5a8a6dfb81ca5df6d3f2cc2d3",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
