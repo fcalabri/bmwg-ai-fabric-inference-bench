@@ -236,10 +236,12 @@ Acronyms used in this document are expanded in the Acronyms appendix of {{TERMIN
 
 ## Reference Fabric Topologies
 
-The reference topologies from the companion training document (2-Tier Clos,
-3-Tier Clos, Rail-Optimized) remain applicable. Inference serving introduces
-additional topology considerations related to disaggregated prefill/decode
-placement and MoE expert distribution.
+The reference topologies from the companion training document remain
+applicable and retain their labels there: Topology A (2-Tier Clos), Topology B
+(3-Tier Clos), and Topology C (Rail-Optimized). Inference serving introduces an
+additional topology consideration related to disaggregated prefill/decode
+placement and MoE expert distribution, labelled Topology D below to avoid
+collision with the training document's Topology C.
 
 ### Topology A: 2-Tier Clos (Leaf-Spine)
 
@@ -258,7 +260,7 @@ KV cache transfer traffic between prefill and decode workers in different pods
 traverses the superspine tier, so superspine bandwidth and latency directly
 affect KV cache transfer performance.
 
-### Topology C: Disaggregated Prefill/Decode Placement
+### Topology D: Disaggregated Prefill/Decode Placement
 
 A topology variant specific to inference serving in which prefill workers and
 decode workers are placed in distinct physical locations within the fabric,
@@ -442,7 +444,7 @@ defined in the subsections below.
 | CRC Error Count | 0 | Layer 2 CRC errors on any fabric link |
 | BGP/OSPF Stability | 0 flaps | Routing protocol adjacency stability under inference load |
 | NIC QP State | 100% active | All RDMA Queue Pairs in active state (no error/reset) |
-| GPU-NIC PCIe BW | > 90% of theoretical | PCIe bandwidth utilization between GPU and NIC (generation- and width-dependent) |
+| GPU-NIC PCIe BW (contextual) | > 90% of theoretical | PCIe bandwidth utilization between GPU and NIC (generation- and width-dependent). Intra-node segment, outside the DUT boundary per {{TERMINOLOGY}}; reported as context because a starved PCIe link presents as fabric underperformance |
 {: #tab-health title="Fabric Health Indicators"}
 
 NOTE: Per the BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. The values above are indicative of a healthy fabric under normal operating conditions, not pass/fail criteria; deployment-specific thresholds are outside the scope of this document.
@@ -894,10 +896,13 @@ and P99. The T_transfer component is shown as a shaded region.
 **Objective:** To characterize inter-token latency distribution and identify
 fabric-induced tail latency during the decode phase.
 
-**Procedure:** Submit a single long-output request (e.g., 2048 output tokens)
-and record the timestamp of each emitted token. Repeat under: (a) unloaded
-fabric, (b) loaded fabric (50% of capacity), and (c) heavily loaded fabric (90%
-of capacity plus concurrent EP dispatches).
+**Procedure:** Submit long-output requests (e.g., 2048 output tokens each) and
+record the timestamp of each emitted token. A single 2048-token request yields
+at most 2,047 ITL samples, so requests are repeated (and/or issued
+concurrently) until the per-condition sample requirement below is met; the
+request count and concurrency level used are reported. Repeat under: (a)
+unloaded fabric, (b) loaded fabric (50% of capacity), and (c) heavily loaded
+fabric (90% of capacity plus concurrent EP dispatches).
 
 **Measurement:** Report ITL at P50, P95, P99, P99.9, and maximum for each load
 condition. Report the number of tokens with ITL > 100 ms (stall events).
@@ -1187,7 +1192,7 @@ This appendix provides indicative reference values for the KPIs defined in {{kpi
 |---|---|
 | TTFT | < 500 ms P99 |
 | ITL | < 50 ms P99 |
-| TTFT_fabric | < 300 ms P99 |
+| TTFT_fabric | < 20% of the TTFT P99 budget |
 | ITL_fabric | < 5 ms P99 |
 | E2E_latency | varies by output length |
 {: #tab-indicative-values title="Indicative Reference Values for Interactive Inference Serving (Non-Normative)"}
@@ -1266,7 +1271,7 @@ other GPU.
 
 NOTE: The QP Parallelism values are DeepEP {{DEEPEP}} implementation defaults, shown as an illustrative example; they are not a normative requirement of this methodology and MAY differ across CCL implementations.
 
-For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B × k × H_model × 2) / N is approximately
+For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16), the inter-node traffic per MoE layer dispatch using T_dispatch = (B × k × H_model × 2) / N is approximately
 
 * Normal Dispatch (prefill, batch=256): 256 × 2 × 7168 × 2 bytes / 96 GPUs
   = ~76 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
@@ -1277,7 +1282,7 @@ For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 acro
   = ~2.4 KB per GPU pair; fabric-visible aggregate (8,448 pairs): ~2.4 KB × 8,448
   ≈ 20.2 MB.
 
-With 61 MoE layers (representative of a publicly described large-scale MoE architecture) and a decode iteration time target of ~30 ms, the decode
+With 61 MoE layers and a decode iteration time target of ~30 ms, the decode
 phase requires 61 AllToAll dispatches within 30 ms. This yields 61 dispatches
 per decode step, or approximately 2,000 dispatches per second, and consumes
 approximately 41 GB/s (61 × ~20.2 MB / 30 ms)
