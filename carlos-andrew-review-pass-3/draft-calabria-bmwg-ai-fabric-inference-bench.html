@@ -2422,10 +2422,17 @@ latency-sensitive inter-GPU traffic patterns.<a href="#section-7-1" class="pilcr
 <p id="section-7.1-1"><strong>Objective:</strong> To determine the maximum AllToAll dispatch throughput for MoE
 expert parallelism across the DUT fabric.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
 <p id="section-7.1-2"><strong>Procedure:</strong> Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
-The dispatch payload per GPU per MoE layer is:<a href="#section-7.1-2" class="pilcrow">¶</a></p>
+The dispatch payload per source-destination GPU pair per MoE layer is:<a href="#section-7.1-2" class="pilcrow">¶</a></p>
 <p id="section-7.1-3">T_dispatch = (B × k × H_model × P_bytes) / N. where B = per-GPU batch size (tokens), k = top-k routing count,
 H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size<a href="#section-7.1-3" class="pilcrow">¶</a></p>
-<p id="section-7.1-4"><strong>Canonical MoE Test Matrix</strong><a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<p id="section-7.1-4">The corresponding total egress per GPU per MoE layer, summed over its N-1
+destination peers, is:<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<p id="section-7.1-5">T_egress = B × k × H_model × P_bytes × (N - 1) / N<a href="#section-7.1-5" class="pilcrow">¶</a></p>
+<p id="section-7.1-6">T_egress, not T_dispatch, characterizes the per-accelerator offered load: it
+equals T_dispatch × (N - 1). The fabric-visible portion of T_egress counts
+only inter-node destination peers; see the MoE AllToAll appendix for a worked
+example in which 88 of 95 destination peers are inter-node.<a href="#section-7.1-6" class="pilcrow">¶</a></p>
+<p id="section-7.1-7"><strong>Canonical MoE Test Matrix</strong><a href="#section-7.1-7" class="pilcrow">¶</a></p>
 <span id="name-canonical-moe-test-matrix"></span><div id="tbl-moe-matrix">
 <table class="center" id="table-7">
           <caption>
@@ -2480,17 +2487,17 @@ H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2
           </tbody>
         </table>
 </div>
-<p id="section-7.1-6">NOTE: T_dispatch values are the per-GPU-pair payload computed from the
+<p id="section-7.1-9">NOTE: T_dispatch values are the per-GPU-pair payload computed from the
 T_dispatch formula above (e.g., M1: 128 × 2 × 4096 × 2 bytes / 96 =
 21,845 bytes ≈ 21.8 KB, decimal KB, 1 KB = 1,000 bytes). The aggregate fabric load per dispatch is
 T_dispatch multiplied by the number of communicating GPU pairs; see the
-MoE AllToAll appendix for a worked example.<a href="#section-7.1-6" class="pilcrow">¶</a></p>
-<p id="section-7.1-7"><strong>Measurement:</strong> Report aggregate bandwidth (GB/s), per-dispatch latency (us)
-at P50 and P99, and GPU idle time waiting for dispatch completion. The test is repeated a minimum of 20 times per configuration.<a href="#section-7.1-7" class="pilcrow">¶</a></p>
-<p id="section-7.1-8"><strong>Reporting Format:</strong> Results are reported as a heatmap with EP group size
+MoE AllToAll appendix for a worked example.<a href="#section-7.1-9" class="pilcrow">¶</a></p>
+<p id="section-7.1-10"><strong>Measurement:</strong> Report aggregate bandwidth (GB/s), per-dispatch latency (us)
+at P50 and P99, and GPU idle time waiting for dispatch completion. The test is repeated a minimum of 20 times per configuration.<a href="#section-7.1-10" class="pilcrow">¶</a></p>
+<p id="section-7.1-11"><strong>Reporting Format:</strong> Results are reported as a heatmap with EP group size
 on the Y axis, batch size on the X axis, and throughput (GB/s) as the color
-dimension. A companion latency table is included. Reports state which config row(s) were used. For M5, the values of E, k, H_model, P_bytes, and N are included in the results table.<a href="#section-7.1-8" class="pilcrow">¶</a></p>
-<p id="section-7.1-9">NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, BusBW is computed per the BusBW definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>; algo_factor is fixed per collective type and does not depend on the algorithm the library selects at runtime. The runtime algorithm in use is verified via library tracing and documented as part of the test conditions.<a href="#section-7.1-9" class="pilcrow">¶</a></p>
+dimension. A companion latency table is included. Reports state which config row(s) were used. For M5, the values of E, k, H_model, P_bytes, and N are included in the results table.<a href="#section-7.1-11" class="pilcrow">¶</a></p>
+<p id="section-7.1-12">NOTE: When per-accelerator normalized throughput (BusBW) is reported alongside EP_alltoall_bandwidth, BusBW is computed per the BusBW definition in <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>; algo_factor is fixed per collective type and does not depend on the algorithm the library selects at runtime. The runtime algorithm in use is verified via library tracing and documented as part of the test conditions.<a href="#section-7.1-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="routing-mode-and-dispatch-mode-comparison">
@@ -3710,7 +3717,7 @@ other GPU.<a href="#appendix-E-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="appendix-E-5.1">
           <p id="appendix-E-5.1.1">Normal Dispatch (prefill, batch=256): 256 × 2 × 7168 × 2 bytes / 96 GPUs
-= ~76 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
+= ~76.5 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
 96 × 88 = 8,448 cross the fabric (the remaining 672 pairs are intra-node,
 within each of the 12 8-GPU nodes, and do not traverse the fabric).
 Fabric-visible aggregate: ~76.5 KB × 8,448 ≈ 646 MB.<a href="#appendix-E-5.1.1" class="pilcrow">¶</a></p>
