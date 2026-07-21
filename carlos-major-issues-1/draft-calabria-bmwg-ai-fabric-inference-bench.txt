@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 21 January 2027                            Blue Fern Consulting
+Expires: 22 January 2027                            Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                            20 July 2026
+                                                            21 July 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -74,7 +74,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 21 January 2027.
+   This Internet-Draft will expire on 22 January 2027.
 
 Copyright Notice
 
@@ -1896,72 +1896,74 @@ Appendix D.  KV Cache Transfer Frame Format
    encapsulation defined in the InfiniBand Architecture Specification
    Volume 1 Annex A17 (RoCEv2) [IBTA-ROCE].
 
-    +========+============+===========+==============================+
-    | Offset | Field      | Size      | Value / Description          |
-    +========+============+===========+==============================+
-    | 00     | Ethernet   | 6B        | DUT next-hop MAC             |
-    |        | Dst MAC    |           |                              |
-    +--------+------------+-----------+------------------------------+
-    | 06     | Ethernet   | 6B        | Test equipment MAC           |
-    |        | Src MAC    |           |                              |
-    +--------+------------+-----------+------------------------------+
-    | 12     | EtherType  | 2B        | 0x0800 (IPv4) or 0x86DD      |
-    |        | / Tag      |           | (IPv6) when untagged; 0x8100 |
-    |        | Protocol   |           | (TPID) when 802.1Q-tagged    |
-    |        | Identifier |           |                              |
-    |        | (TPID)     |           |                              |
-    +--------+------------+-----------+------------------------------+
-    | 14     | 802.1Q Tag | 4B        | When tagged: TCI (PCP for    |
-    |        | (optional) |           | RDMA priority class, VID)    |
-    |        |            |           | followed by inner EtherType  |
-    |        |            |           | 0x0800 or 0x86DD.  Omit this |
-    |        |            |           | row when untagged and shift  |
-    |        |            |           | subsequent offsets back by   |
-    |        |            |           | 4B                           |
-    +--------+------------+-----------+------------------------------+
-    | 18     | IPv4 /     | 20B       | DSCP=26 (AF31), ECN=ECT(0),  |
-    |        | IPv6       | (IPv4) or | Proto=17 (UDP)               |
-    |        | Header     | 40B       |                              |
-    |        |            | (IPv6)    |                              |
-    +--------+------------+-----------+------------------------------+
-    | 38 /   | UDP Header | 8B        | DstPort=4791 (RoCEv2),       |
-    | 58     |            |           | SrcPort=entropy for ECMP,    |
-    |        |            |           | UDP Length, UDP Checksum     |
-    +--------+------------+-----------+------------------------------+
-    | 46 /   | BTH (Base  | 12B       | OpCode=0x0A (RDMA WRITE      |
-    | 66     | Transport  |           | Only) or 0x0B (RDMA WRITE    |
-    |        | Header)    |           | with Immediate Data) at the  |
-    |        |            |           | last packet of a PUT-with-   |
-    |        |            |           | signal sequence; SE, M, Pad, |
-    |        |            |           | TVer flags; PKey;            |
-    |        |            |           | Destination QP Number (24    |
-    |        |            |           | bits); A flag; PSN (24 bits) |
-    +--------+------------+-----------+------------------------------+
-    | 58 /   | RETH (RDMA | 16B       | Virtual Address (64 bits),   |
-    | 78     | Extended   |           | R_Key (32 bits), DMA Length  |
-    |        | Transport  |           | (32 bits).  The DMA Length   |
-    |        | Header)    |           | indicates the size of the KV |
-    |        |            |           | cache block transferred by   |
-    |        |            |           | this WRITE operation         |
-    +--------+------------+-----------+------------------------------+
-    | 74 /   | KV Cache   | variable, | Key/value attention state    |
-    | 94     | Payload    | up to MTU | data                         |
-    +--------+------------+-----------+------------------------------+
-    | var    | ImmDt      | 4B        | Present only for OpCode 0x09 |
-    |        | (Immediate |           | or 0x0B (with-immediate      |
-    |        | Data)      |           | variants), used for PUT-     |
-    |        |            |           | with-signal completion       |
-    |        |            |           | signalling; absent otherwise |
-    |        |            |           | and subsequent offsets shift |
-    |        |            |           | back by 4B                   |
-    +--------+------------+-----------+------------------------------+
-    | var    | ICRC       | 4B        | Invariant CRC                |
-    +--------+------------+-----------+------------------------------+
-    | var+4  | FCS        | 4B        | Ethernet Frame Check         |
-    |        |            |           | Sequence                     |
-    +--------+------------+-----------+------------------------------+
+   +========+============+===========+=================================+
+   | Offset | Field      | Size      | Value / Description             |
+   +========+============+===========+=================================+
+   | 00     | Ethernet   | 6B        | DUT next-hop MAC                |
+   |        | Dst MAC    |           |                                 |
+   +--------+------------+-----------+---------------------------------+
+   | 06     | Ethernet   | 6B        | Test equipment MAC              |
+   |        | Src MAC    |           |                                 |
+   +--------+------------+-----------+---------------------------------+
+   | 12     | EtherType  | 2B        | 0x0800 (IPv4) or 0x86DD         |
+   |        | / Tag      |           | (IPv6) when untagged; 0x8100    |
+   |        | Protocol   |           | (TPID) when 802.1Q-tagged       |
+   |        | Identifier |           |                                 |
+   |        | (TPID)     |           |                                 |
+   +--------+------------+-----------+---------------------------------+
+   | 14     | 802.1Q Tag | 4B        | When tagged: TCI (PCP for       |
+   |        | (optional) |           | RDMA priority class, VID)       |
+   |        |            |           | followed by inner EtherType     |
+   |        |            |           | 0x0800 or 0x86DD.  Omit this    |
+   |        |            |           | row when untagged and shift     |
+   |        |            |           | subsequent offsets back by 4B   |
+   +--------+------------+-----------+---------------------------------+
+   | 18     | IPv4 /     | 20B       | DSCP=26 (AF31), ECN=ECT(0),     |
+   |        | IPv6       | (IPv4) or | Proto=17 (UDP)                  |
+   |        | Header     | 40B       |                                 |
+   |        |            | (IPv6)    |                                 |
+   +--------+------------+-----------+---------------------------------+
+   | 38 /   | UDP Header | 8B        | DstPort=4791 (RoCEv2),          |
+   | 58     |            |           | SrcPort=entropy for ECMP, UDP   |
+   |        |            |           | Length, UDP Checksum            |
+   +--------+------------+-----------+---------------------------------+
+   | 46 /   | BTH (Base  | 12B       | OpCode=0x0A (RDMA WRITE Only)   |
+   | 66     | Transport  |           | or 0x0B (RDMA WRITE Only with   |
+   |        | Header)    |           | Immediate Data) for the         |
+   |        |            |           | single-packet reference frame   |
+   |        |            |           | defined here; segmented         |
+   |        |            |           | transfers use OpCodes           |
+   |        |            |           | 0x06/0x07/0x08/0x09 (see        |
+   |        |            |           | Notes); SE, M, Pad, TVer        |
+   |        |            |           | flags; PKey; Destination QP     |
+   |        |            |           | Number (24 bits); A flag; PSN   |
+   |        |            |           | (24 bits)                       |
+   +--------+------------+-----------+---------------------------------+
+   | 58 /   | RETH (RDMA | 16B       | Virtual Address (64 bits),      |
+   | 78     | Extended   |           | R_Key (32 bits), DMA Length     |
+   |        | Transport  |           | (32 bits).  The DMA Length      |
+   |        | Header)    |           | indicates the size of the KV    |
+   |        |            |           | cache block transferred by      |
+   |        |            |           | this WRITE operation            |
+   +--------+------------+-----------+---------------------------------+
+   | 74 /   | ImmDt      | 4B        | Present only for OpCode 0x0B    |
+   | 94     | (Immediate |           | (RDMA WRITE Only with           |
+   |        | Data)      |           | Immediate Data), used for       |
+   |        |            |           | PUT-with-signal completion      |
+   |        |            |           | signalling.  Omit this row      |
+   |        |            |           | for OpCode 0x0A and shift       |
+   |        |            |           | subsequent offsets back by 4B   |
+   +--------+------------+-----------+---------------------------------+
+   | 78 /   | KV Cache   | variable, | Key/value attention state       |
+   | 98     | Payload    | up to MTU | data (starts at 74 / 94 when    |
+   |        |            |           | ImmDt is absent)                |
+   +--------+------------+-----------+---------------------------------+
+   | var    | ICRC       | 4B        | Invariant CRC                   |
+   +--------+------------+-----------+---------------------------------+
+   | var+4  | FCS        | 4B        | Ethernet Frame Check Sequence   |
+   +--------+------------+-----------+---------------------------------+
 
-     Table 14: RoCEv2 KV Cache Transfer Frame (One-Sided RDMA WRITE)
+      Table 14: RoCEv2 KV Cache Transfer Frame (One-Sided RDMA WRITE)
 
    Notes:
 
@@ -1984,7 +1986,9 @@ Appendix D.  KV Cache Transfer Frame Format
       WRITE Last with Immediate Data) for PUT-with-signal completion
       signalling. (0x0B, RDMA WRITE Only with Immediate Data, is a
       single-packet opcode and cannot terminate a First/Middle
-      sequence.)
+      sequence.)  In segmented sequences the RETH is carried only in the
+      First (0x06) packet; a Last-with-Immediate packet (0x09) carries
+      the 4B ImmDt immediately following the BTH, with no RETH.
 
    *  For UET-based KV cache transfers, the frame format defined in the
       UET Frame Format appendix of [TRAINING-BENCH] applies; the UDP
@@ -2048,18 +2052,19 @@ Appendix E.  MoE AllToAll Communication Pattern
       ordered GPU pairs, only 96 × 88 = 8,448 cross the fabric (the
       remaining 672 pairs are intra-node, within each of the 12 8-GPU
       nodes, and do not traverse the fabric).  Fabric-visible aggregate:
-      ~76 KB × 8,448 ≈ 648 MB.
+      ~76.5 KB × 8,448 ≈ 646 MB.
 
    *  Low-Latency Dispatch (decode, batch=8): 8 × 2 × 7168 × 2 bytes /
       96 GPUs = ~2.4 KB per GPU pair; fabric-visible aggregate (8,448
-      pairs): ~2.4 KB × 8,448 ≈ 20.5 MB.
+      pairs): ~2.4 KB × 8,448 ≈ 20.2 MB.
 
    With 61 MoE layers (representative of a publicly described large-
    scale MoE architecture) and a decode iteration time target of ~30 ms,
    the decode phase requires 61 AllToAll dispatches within 30 ms.  This
    yields 61 dispatches per decode step, or approximately 2,000
-   dispatches per second, and consumes approximately 45 GB/s aggregate
-   inter-node bandwidth for the Low-Latency Dispatch path.
+   dispatches per second, and consumes approximately 41 GB/s (61 × ~20.2
+   MB / 30 ms) aggregate inter-node bandwidth for the Low-Latency
+   Dispatch path.
 
 Appendix F.  Model Architecture Parameters
 
