@@ -236,10 +236,12 @@ Acronyms used in this document are expanded in the Acronyms appendix of {{TERMIN
 
 ## Reference Fabric Topologies
 
-The reference topologies from the companion training document (2-Tier Clos,
-3-Tier Clos, Rail-Optimized) remain applicable. Inference serving introduces
-additional topology considerations related to disaggregated prefill/decode
-placement and MoE expert distribution.
+The reference topologies from the companion training document remain
+applicable and retain their labels there: Topology A (2-Tier Clos), Topology B
+(3-Tier Clos), and Topology C (Rail-Optimized). Inference serving introduces an
+additional topology consideration related to disaggregated prefill/decode
+placement and MoE expert distribution, labelled Topology D below to avoid
+collision with the training document's Topology C.
 
 ### Topology A: 2-Tier Clos (Leaf-Spine)
 
@@ -258,7 +260,7 @@ KV cache transfer traffic between prefill and decode workers in different pods
 traverses the superspine tier, so superspine bandwidth and latency directly
 affect KV cache transfer performance.
 
-### Topology C: Disaggregated Prefill/Decode Placement
+### Topology D: Disaggregated Prefill/Decode Placement
 
 A topology variant specific to inference serving in which prefill workers and
 decode workers are placed in distinct physical locations within the fabric,
@@ -345,7 +347,7 @@ The following table defines the DUT configurations tested in this document:
 Tests in this document require one or both of the following traffic generation
 modes. The mode used is documented in all test reports.
 
-### Hardware Traffic Generator (RT) - Minimum Requirements
+### Hardware Traffic Generator (TG) - Minimum Requirements
 
 The hardware traffic generator satisfies all of the following:
 
@@ -442,7 +444,7 @@ defined in the subsections below.
 | CRC Error Count | 0 | Layer 2 CRC errors on any fabric link |
 | BGP/OSPF Stability | 0 flaps | Routing protocol adjacency stability under inference load |
 | NIC QP State | 100% active | All RDMA Queue Pairs in active state (no error/reset) |
-| GPU-NIC PCIe BW | > 90% of theoretical | PCIe bandwidth utilization between GPU and NIC (generation- and width-dependent) |
+| GPU-NIC PCIe BW (contextual) | > 90% of theoretical | PCIe bandwidth utilization between GPU and NIC (generation- and width-dependent). Intra-node segment, outside the DUT boundary per {{TERMINOLOGY}}; reported as context because a starved PCIe link presents as fabric underperformance |
 {: #tab-health title="Fabric Health Indicators"}
 
 NOTE: Per the BMWG charter, the definition of acceptance criteria or performance requirements is explicitly outside the scope of this Working Group. The values above are indicative of a healthy fabric under normal operating conditions, not pass/fail criteria; deployment-specific thresholds are outside the scope of this document.
@@ -531,7 +533,7 @@ pairs: GPU HBM to remote GPU HBM (inter-node RDMA), GPU HBM to remote CPU
 DRAM (offload), remote CPU DRAM to GPU HBM (reload), and GPU HBM to remote
 NVMe/SSD (persistent cache on a remote storage node). Same-node (local) tier
 pairs are pure intra-node PCIe transfers with zero DUT/fabric involvement and
-are out of scope per {{TERMINOLOGY}} Section 1.2.
+are out of scope per the Scope and Purpose section of {{TERMINOLOGY}}.
 
 **Procedure:** For each tier pair, measure unidirectional transfer throughput
 and latency for message sizes of 1 MB, 16 MB, and 256 MB. Use zero-copy
@@ -644,10 +646,20 @@ latency-sensitive inter-GPU traffic patterns.
 expert parallelism across the DUT fabric.
 
 **Procedure:** Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
-The dispatch payload per GPU per MoE layer is:
+The dispatch payload per source-destination GPU pair per MoE layer is:
 
 T_dispatch = (B × k × H_model × P_bytes) / N. where B = per-GPU batch size (tokens), k = top-k routing count,
 H_model = hidden dimension, P_bytes = precision bytes (e.g., BFloat16 (BF16) = 2), N = EP group size
+
+The corresponding total egress per GPU per MoE layer, summed over its N-1
+destination peers, is:
+
+T_egress = B × k × H_model × P_bytes × (N - 1) / N
+
+T_egress, not T_dispatch, characterizes the per-accelerator offered load: it
+equals T_dispatch × (N - 1). The fabric-visible portion of T_egress counts
+only inter-node destination peers; see the MoE AllToAll appendix for a worked
+example in which 88 of 95 destination peers are inter-node.
 
 **Canonical MoE Test Matrix**
 
@@ -894,10 +906,13 @@ and P99. The T_transfer component is shown as a shaded region.
 **Objective:** To characterize inter-token latency distribution and identify
 fabric-induced tail latency during the decode phase.
 
-**Procedure:** Submit a single long-output request (e.g., 2048 output tokens)
-and record the timestamp of each emitted token. Repeat under: (a) unloaded
-fabric, (b) loaded fabric (50% of capacity), and (c) heavily loaded fabric (90%
-of capacity plus concurrent EP dispatches).
+**Procedure:** Submit long-output requests (e.g., 2048 output tokens each) and
+record the timestamp of each emitted token. A single 2048-token request yields
+at most 2,047 ITL samples, so requests are repeated (and/or issued
+concurrently) until the per-condition sample requirement below is met; the
+request count and concurrency level used are reported. Repeat under: (a)
+unloaded fabric, (b) loaded fabric (50% of capacity), and (c) heavily loaded
+fabric (90% of capacity plus concurrent EP dispatches).
 
 **Measurement:** Report ITL at P50, P95, P99, P99.9, and maximum for each load
 condition. Report the number of tokens with ITL > 100 ms (stall events).
@@ -1088,8 +1103,8 @@ perturbation.
 
 All test results are reported following the conventions established in
 {{RFC2544}} Section 26. Where BusBW is reported (e.g., in the MoE expert
-parallelism tests), results MUST follow the BusBW reporting format
-defined in Section 3 of {{TERMINOLOGY}}. In addition, the following
+parallelism tests), results MUST follow the reporting requirements
+stated in the BusBW definition of {{TERMINOLOGY}}. In addition, the following
 inference-specific reporting elements apply:
 
 * **System Configuration Report:** the report includes: model name and
@@ -1126,7 +1141,7 @@ This document defines benchmarking methodology for controlled laboratory environ
 
 Benchmarking activities as described in this document are limited to technology characterization of AI inference serving fabrics using controlled stimuli in a laboratory environment, with dedicated address space and the constraints specified herein.
 
-The benchmarking network topology will be an independent test setup and MUST NOT be connected to devices that may forward the test traffic into a production network or misroute traffic to the test management network. This isolation requirement is particularly important for AI fabric benchmarking because the lossless transport modes referenced in this document (PFC, DCQCN, CBFC) propagate congestion hop-by-hop and can extend the blast radius of a misconfigured test beyond the immediate DUT.
+The benchmarking network topology will be an independent test setup and MUST NOT be connected to devices that may forward the test traffic into a production network or misroute traffic to the test management network. This isolation requirement is particularly important for AI fabric benchmarking because the hop-by-hop flow-control mechanisms referenced in this document (PFC, CBFC) propagate backpressure toward traffic sources and can extend the blast radius of a misconfigured test beyond the immediate DUT; DCQCN reduces, but does not eliminate, reliance on these mechanisms.
 
 Benchmarking is performed on a "black-box" basis, relying solely on measurements observable external to the DUT as defined in {{TERMINOLOGY}}.
 
@@ -1187,7 +1202,7 @@ This appendix provides indicative reference values for the KPIs defined in {{kpi
 |---|---|
 | TTFT | < 500 ms P99 |
 | ITL | < 50 ms P99 |
-| TTFT_fabric | < 300 ms P99 |
+| TTFT_fabric | < 20% of the TTFT P99 budget |
 | ITL_fabric | < 5 ms P99 |
 | E2E_latency | varies by output length |
 {: #tab-indicative-values title="Indicative Reference Values for Interactive Inference Serving (Non-Normative)"}
@@ -1266,10 +1281,10 @@ other GPU.
 
 NOTE: The QP Parallelism values are DeepEP {{DEEPEP}} implementation defaults, shown as an illustrative example; they are not a normative requirement of this methodology and MAY differ across CCL implementations.
 
-For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16; representative of a large publicly described MoE-class architecture), the inter-node traffic per MoE layer dispatch using T_dispatch = (B × k × H_model × 2) / N is approximately
+For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 across 12 nodes of 8 accelerators, BF16), the inter-node traffic per MoE layer dispatch using T_dispatch = (B × k × H_model × 2) / N is approximately
 
 * Normal Dispatch (prefill, batch=256): 256 × 2 × 7168 × 2 bytes / 96 GPUs
-  = ~76 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
+  = ~76.5 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
   96 × 88 = 8,448 cross the fabric (the remaining 672 pairs are intra-node,
   within each of the 12 8-GPU nodes, and do not traverse the fabric).
   Fabric-visible aggregate: ~76.5 KB × 8,448 ≈ 646 MB.
@@ -1277,7 +1292,7 @@ For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 acro
   = ~2.4 KB per GPU pair; fabric-visible aggregate (8,448 pairs): ~2.4 KB × 8,448
   ≈ 20.2 MB.
 
-With 61 MoE layers (representative of a publicly described large-scale MoE architecture) and a decode iteration time target of ~30 ms, the decode
+With 61 MoE layers and a decode iteration time target of ~30 ms, the decode
 phase requires 61 AllToAll dispatches within 30 ms. This yields 61 dispatches
 per decode step, or approximately 2,000 dispatches per second, and consumes
 approximately 41 GB/s (61 × ~20.2 MB / 30 ms)
