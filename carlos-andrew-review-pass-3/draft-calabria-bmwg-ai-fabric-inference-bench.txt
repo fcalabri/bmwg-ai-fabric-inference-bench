@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 22 January 2027                            Blue Fern Consulting
+Expires: 23 January 2027                            Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                            21 July 2026
+                                                            22 July 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -74,7 +74,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 22 January 2027.
+   This Internet-Draft will expire on 23 January 2027.
 
 Copyright Notice
 
@@ -107,7 +107,7 @@ Table of Contents
      3.2.  Disaggregated Prefill/Decode Topology
      3.3.  Device Under Test (DUT) Identification
      3.4.  Traffic Generator and Workload Emulator Requirements
-       3.4.1.  Hardware Traffic Generator (RT) - Minimum Requirements
+       3.4.1.  Hardware Traffic Generator (TG) - Minimum Requirements
        3.4.2.  Software Workload Emulator (WE) - Minimum Requirements
    4.  KPI Framework and Metrics Taxonomy
      4.1.  Primary Latency KPIs
@@ -505,7 +505,7 @@ Table of Contents
    Tests in this document require one or both of the following traffic
    generation modes.  The mode used is documented in all test reports.
 
-3.4.1.  Hardware Traffic Generator (RT) - Minimum Requirements
+3.4.1.  Hardware Traffic Generator (TG) - Minimum Requirements
 
    The hardware traffic generator satisfies all of the following:
 
@@ -848,7 +848,7 @@ Table of Contents
    GPU HBM to remote NVMe/SSD (persistent cache on a remote storage
    node).  Same-node (local) tier pairs are pure intra-node PCIe
    transfers with zero DUT/fabric involvement and are out of scope per
-   [TERMINOLOGY] Section 1.2.
+   the Scope and Purpose section of [TERMINOLOGY].
 
    *Procedure:* For each tier pair, measure unidirectional transfer
    throughput and latency for message sizes of 1 MB, 16 MB, and 256 MB.
@@ -1536,9 +1536,9 @@ Table of Contents
 
    All test results are reported following the conventions established
    in [RFC2544] Section 26.  Where BusBW is reported (e.g., in the MoE
-   expert parallelism tests), results MUST follow the BusBW reporting
-   format defined in Section 3 of [TERMINOLOGY].  In addition, the
-   following inference-specific reporting elements apply:
+   expert parallelism tests), results MUST follow the reporting
+   requirements stated in the BusBW definition of [TERMINOLOGY].  In
+   addition, the following inference-specific reporting elements apply:
 
    *  *System Configuration Report:* the report includes: model name and
       parameter count, parallelism strategy (TP, DP, EP, PP
@@ -1610,10 +1610,11 @@ Table of Contents
    and MUST NOT be connected to devices that may forward the test
    traffic into a production network or misroute traffic to the test
    management network.  This isolation requirement is particularly
-   important for AI fabric benchmarking because the lossless transport
-   modes referenced in this document (PFC, DCQCN, CBFC) propagate
-   congestion hop-by-hop and can extend the blast radius of a
-   misconfigured test beyond the immediate DUT.
+   important for AI fabric benchmarking because the hop-by-hop flow-
+   control mechanisms referenced in this document (PFC, CBFC) propagate
+   backpressure toward traffic sources and can extend the blast radius
+   of a misconfigured test beyond the immediate DUT; DCQCN reduces, but
+   does not eliminate, reliance on these mechanisms.
 
    Benchmarking is performed on a "black-box" basis, relying solely on
    measurements observable external to the DUT as defined in
