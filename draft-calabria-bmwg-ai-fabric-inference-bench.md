@@ -347,7 +347,7 @@ The following table defines the DUT configurations tested in this document:
 Tests in this document require one or both of the following traffic generation
 modes. The mode used is documented in all test reports.
 
-### Hardware Traffic Generator (RT) - Minimum Requirements
+### Hardware Traffic Generator (TG) - Minimum Requirements
 
 The hardware traffic generator satisfies all of the following:
 
@@ -533,7 +533,7 @@ pairs: GPU HBM to remote GPU HBM (inter-node RDMA), GPU HBM to remote CPU
 DRAM (offload), remote CPU DRAM to GPU HBM (reload), and GPU HBM to remote
 NVMe/SSD (persistent cache on a remote storage node). Same-node (local) tier
 pairs are pure intra-node PCIe transfers with zero DUT/fabric involvement and
-are out of scope per {{TERMINOLOGY}} Section 1.2.
+are out of scope per the Scope and Purpose section of {{TERMINOLOGY}}.
 
 **Procedure:** For each tier pair, measure unidirectional transfer throughput
 and latency for message sizes of 1 MB, 16 MB, and 256 MB. Use zero-copy
@@ -1103,8 +1103,8 @@ perturbation.
 
 All test results are reported following the conventions established in
 {{RFC2544}} Section 26. Where BusBW is reported (e.g., in the MoE expert
-parallelism tests), results MUST follow the BusBW reporting format
-defined in Section 3 of {{TERMINOLOGY}}. In addition, the following
+parallelism tests), results MUST follow the reporting requirements
+stated in the BusBW definition of {{TERMINOLOGY}}. In addition, the following
 inference-specific reporting elements apply:
 
 * **System Configuration Report:** the report includes: model name and
@@ -1141,7 +1141,7 @@ This document defines benchmarking methodology for controlled laboratory environ
 
 Benchmarking activities as described in this document are limited to technology characterization of AI inference serving fabrics using controlled stimuli in a laboratory environment, with dedicated address space and the constraints specified herein.
 
-The benchmarking network topology will be an independent test setup and MUST NOT be connected to devices that may forward the test traffic into a production network or misroute traffic to the test management network. This isolation requirement is particularly important for AI fabric benchmarking because the lossless transport modes referenced in this document (PFC, DCQCN, CBFC) propagate congestion hop-by-hop and can extend the blast radius of a misconfigured test beyond the immediate DUT.
+The benchmarking network topology will be an independent test setup and MUST NOT be connected to devices that may forward the test traffic into a production network or misroute traffic to the test management network. This isolation requirement is particularly important for AI fabric benchmarking because the hop-by-hop flow-control mechanisms referenced in this document (PFC, CBFC) propagate backpressure toward traffic sources and can extend the blast radius of a misconfigured test beyond the immediate DUT; DCQCN reduces, but does not eliminate, reliance on these mechanisms.
 
 Benchmarking is performed on a "black-box" basis, relying solely on measurements observable external to the DUT as defined in {{TERMINOLOGY}}.
 
