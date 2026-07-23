@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-21T01:24:59.855480+00:00",
+  "timestamp": "2026-07-23T01:43:28.155438+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -294,7 +294,7 @@
       "id": "I_kwDORX8k_s8AAAABJfNKig",
       "title": "FHI \"Threshold\" column made a required report element, contradicting charter disclaimers",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/29",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cpignata",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -303,8 +303,8 @@
       "labels": [],
       "body": "Actually found and reported by @ayourtch (Andrew Yourtchenko) in his review of the -03 draft set (Major finding [F13]):\n\nTable 6 (Fabric Health Indicators) gives every indicator a literal numeric \"Threshold\" (CPU < 30%, Memory < 70%, FEC < 1e-12, CRC errors = 0, 0 routing flaps, 100% QP active, PCIe BW > 90%), and Table 10 makes that table a required report element. This is acceptance-criteria-shaped content, contradicting the BMWG-charter disclaimers elsewhere in the document. The training document's own FHI table, correctly, has no thresholds.\n\nFix: renamed the column to an informative \"Typical Healthy Range\" with a charter disclaimer, and softened the reporting requirement to reflect the column is informative, not pass/fail \u2014 mirroring the pattern training-bench's own FHI table already uses.",
       "createdAt": "2026-07-20T18:01:56Z",
-      "updatedAt": "2026-07-20T23:08:41Z",
-      "closedAt": null,
+      "updatedAt": "2026-07-21T15:35:00Z",
+      "closedAt": "2026-07-21T15:35:00Z",
       "comments": [
         {
           "author": "cpignata",
@@ -320,7 +320,7 @@
       "id": "I_kwDORX8k_s8AAAABJfNMWQ",
       "title": "Test 5.4 storage-tier paths never state whether the peer is remote",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/30",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cpignata",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -329,8 +329,8 @@
       "labels": [],
       "body": "Actually found and reported by @ayourtch (Andrew Yourtchenko) in his review of the -03 draft set (Major finding [F18]):\n\nTest 5.4's storage-tier paths (GPU HBM to CPU DRAM / NVMe) never state whether the peer is remote. A local (same-node) transfer is pure intra-node PCIe with zero DUT/fabric involvement, and TERMINOLOGY Section 1.2 excludes storage networking from scope.\n\nFix: restricted every tier pair to explicitly remote (fabric-traversing) peers, and added a note that same-node tier pairs are out of scope.",
       "createdAt": "2026-07-20T18:01:59Z",
-      "updatedAt": "2026-07-20T23:08:44Z",
-      "closedAt": null,
+      "updatedAt": "2026-07-21T15:35:01Z",
+      "closedAt": "2026-07-21T15:35:00Z",
       "comments": [
         {
           "author": "cpignata",
@@ -346,7 +346,7 @@
       "id": "I_kwDORX8k_s8AAAABJfNUfg",
       "title": "Appendix D opcode error: 0x0B mislabeled as \"RDMA WRITE Last with Immediate Data\"",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/31",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "cpignata",
       "authorAssociation": "COLLABORATOR",
       "assignees": [
@@ -355,8 +355,8 @@
       "labels": [],
       "body": "Actually found and reported by @ayourtch (Andrew Yourtchenko) in his review of the -03 draft set (Major finding [F20]):\n\nAppendix D's segmented-WRITE description says the last packet \"carries OpCode ... 0x0B (RDMA WRITE Last with Immediate Data)\". Per the IBTA RC opcode table, Last-with-Immediate is actually 0x09; 0x0B is Only-with-Immediate, a single-packet opcode that cannot terminate a First/Middle sequence (a conformant responder would NAK it). The with-immediate variants also carry a 4-byte ImmDt field missing from the frame layout.\n\nVerified directly against the Linux kernel's canonical IB opcode header (include/rdma/ib_pack.h) before fixing: 0x09 = RDMA_WRITE_LAST_WITH_IMMEDIATE, 0x0B = RDMA_WRITE_ONLY_WITH_IMMEDIATE.\n\nFix: corrected the opcode to 0x09, added a note explaining why 0x0B doesn't apply here, and added the missing 4B ImmDt row to the frame table (present only for the with-immediate opcode variants, positioned after the payload).",
       "createdAt": "2026-07-20T18:02:12Z",
-      "updatedAt": "2026-07-20T23:08:47Z",
-      "closedAt": null,
+      "updatedAt": "2026-07-21T15:35:01Z",
+      "closedAt": "2026-07-21T15:35:01Z",
       "comments": [
         {
           "author": "cpignata",
@@ -366,6 +366,96 @@
           "updatedAt": "2026-07-20T18:02:13Z"
         }
       ]
+    },
+    {
+      "number": 33,
+      "id": "I_kwDORX8k_s8AAAABJohP0A",
+      "title": "Topology C means something different here than in training-bench",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/33",
+      "state": "CLOSED",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "cpignata"
+      ],
+      "labels": [],
+      "body": "We say the training document's topologies still apply, then define Topology C as Disaggregated Prefill/Decode. Training-bench uses Topology C for Rail-Optimized.\n\nFound by @ayourtch in his -03 review (F103).",
+      "createdAt": "2026-07-21T17:24:56Z",
+      "updatedAt": "2026-07-22T09:57:25Z",
+      "closedAt": "2026-07-22T09:57:25Z",
+      "comments": []
+    },
+    {
+      "number": 34,
+      "id": "I_kwDORX8k_s8AAAABJohQtQ",
+      "title": "ITL test can't produce the 10,000 samples it asks for",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/34",
+      "state": "CLOSED",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "cpignata"
+      ],
+      "labels": [],
+      "body": "The procedure submits a single request of ~2048 output tokens, which yields at most 2,047 inter-token gaps. The measurement section then asks for at least 10,000 samples per condition.\n\nNeeds repetition or concurrency, and the count should be reported.\n\nFound by @ayourtch in his -03 review (F97).",
+      "createdAt": "2026-07-21T17:24:59Z",
+      "updatedAt": "2026-07-22T09:57:25Z",
+      "closedAt": "2026-07-22T09:57:25Z",
+      "comments": []
+    },
+    {
+      "number": 35,
+      "id": "I_kwDORX8k_s8AAAABJohRnA",
+      "title": "Appendix E example cites an architecture whose top-k doesn't match",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/35",
+      "state": "CLOSED",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "cpignata"
+      ],
+      "labels": [],
+      "body": "The worked example computes with M3 (k=2) but describes it as representative of a well-known MoE architecture. That architecture's published top-k is 8, which is row M4. With k=8 the numbers are roughly 4x.\n\nEither switch to M4 or drop the attribution.\n\nFound by @ayourtch in his -03 review (F34).",
+      "createdAt": "2026-07-21T17:25:01Z",
+      "updatedAt": "2026-07-22T09:57:26Z",
+      "closedAt": "2026-07-22T09:57:26Z",
+      "comments": []
+    },
+    {
+      "number": 36,
+      "id": "I_kwDORX8k_s8AAAABJohSdg",
+      "title": "TTFT_fabric reference value is 60% of the whole TTFT budget",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/36",
+      "state": "CLOSED",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "cpignata"
+      ],
+      "labels": [],
+      "body": "Appendix B lists TTFT < 500 ms P99 and TTFT_fabric < 300 ms P99. That leaves 40% for everything else, including prefill, which the document elsewhere says dominates TTFT.\n\nFound by @ayourtch in his -03 review (F39).",
+      "createdAt": "2026-07-21T17:25:03Z",
+      "updatedAt": "2026-07-22T09:57:26Z",
+      "closedAt": "2026-07-22T09:57:26Z",
+      "comments": []
+    },
+    {
+      "number": 37,
+      "id": "I_kwDORX8k_s8AAAABJohT0A",
+      "title": "GPU-NIC PCIe health indicator measures an out-of-scope segment",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/37",
+      "state": "CLOSED",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [
+        "cpignata"
+      ],
+      "labels": [],
+      "body": "Section 1.2 puts the GPU-to-NIC PCIe path out of scope, but it's listed as a Fabric Health Indicator. It's genuinely useful as context (a starved PCIe link looks like a slow fabric), so probably worth keeping if labelled as such.\n\nFound by @ayourtch in his -03 review (F96).",
+      "createdAt": "2026-07-21T17:25:04Z",
+      "updatedAt": "2026-07-22T09:57:26Z",
+      "closedAt": "2026-07-22T09:57:26Z",
+      "comments": []
     }
   ],
   "pulls": [
@@ -1549,26 +1639,92 @@
       "id": "PR_kwDORX8k_s70F5-r",
       "title": "Fix three Major findings from Andrew Yourtchenko's review",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/32",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "cpignata",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "## Summary\n\nFixes the three Major findings from Andrew Yourtchenko's review of the -03 draft set that weren't included in the earlier editorial PR (#28, already merged).\n\n- FHI \"Threshold\" column was a required report element, contradicting the charter's acceptance-criteria disclaimers; relabeled to an informative \"Typical Healthy Range\" with a disclaimer, mirroring the pattern training-bench's own FHI table already uses. Closes #29\n- Test 5.4's storage-tier paths never stated whether the peer was remote; a local (same-node) transfer would be pure intra-node PCIe with zero DUT/fabric involvement. Restricted every tier pair to explicitly remote and noted local pairs are out of scope. Closes #30\n- Appendix D mislabeled OpCode 0x0B as \"RDMA WRITE Last with Immediate Data\" for a segmented sequence; verified against the Linux kernel's canonical IB opcode header (0x09 = WRITE Last with Immediate, 0x0B = WRITE Only with Immediate, a single-packet opcode that cannot terminate a First/Middle sequence) and corrected the opcode. Also added the missing 4B ImmDt field. Closes #31",
       "createdAt": "2026-07-20T23:08:05Z",
-      "updatedAt": "2026-07-20T23:08:06Z",
+      "updatedAt": "2026-07-21T17:01:37Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "fc5fdfee9e2b6e5515d7ce269d5f2051d9e5cf60",
       "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "headRefName": "carlos-major-issues-1",
-      "headRefOid": "244480ca467ddcf5a8a6dfb81ca5df6d3f2cc2d3",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "9463dafedf4a29922c649cdfc13fc4e9f8a25dd3",
+      "closedAt": "2026-07-21T15:34:59Z",
+      "mergedAt": "2026-07-21T15:34:59Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "de74cecb70ca0eed42f22554c4078d59b1198140"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s8AAAABGuQ0dA",
+          "commit": {
+            "abbreviatedOid": "9463daf"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "corrections made to the Appendix D Frame Format Table:\r\n- OpCode 0x0B has been identified as \u201cRDMA Write Only With Immediate Data\u201d and is applicable to one packet reference frame, and removed the incorrect text indicating that it terminated a segmented sequence. This was actually done by OpCode 0x09.\r\n\r\n- The 4 byte ImmDt field has been moved into its appropriate position within an IBTA frame format. It is now located between RETH and the payload, rather than immediately following the payload. The offsets have also been modified based on this movement (the payload will begin at offset 78/98 when including ImmDt or 74/94 when not including ImmDt).\r\n\r\n- A note has been added describing segmented transfer headers. RETH is included only once, in the first packet of a segmented transfer (OpCode = 0x06). In the last packet of a segmented transfer (OpCode = 0x09), ImmDt is carried directly after the BTH with no RETH.\r\n\r\n- The MoE All-To-All worked example had the earlier intra-node/inter-node pair split. The all-to-all aggregate size for the fabric has been modified to approximately 646 MB (prefill) and approximately 20.2 MB (decode); the decode bandwidth has been modified from 45 GB/s to approximately 41 GB/s. The derivation (61 x ~20.2 MB / 30 ms) is contained inline. The original figure was using the pre-split 9,120-pair number",
+          "createdAt": "2026-07-21T15:14:33Z",
+          "updatedAt": "2026-07-21T15:14:33Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 38,
+      "id": "PR_kwDORX8k_s70e_SR",
+      "title": "Third pass on Andrew's -03 review",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/38",
+      "state": "MERGED",
+      "author": "cpignata",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Five more from Andrew's review.\r\n\r\n- Renamed our Topology C to Topology D. Training-bench uses Topology C for Rail-Optimized, and we say its topologies still apply. Closes #33\r\n- ITL test asked for 10,000 samples from a single 2048-token request, which gives at most 2,047. Repeat and report the count. Closes #34\r\n- Dropped the architecture attribution from the Appendix E example; that architecture's top-k is 8 (row M4), not the k=2 we compute with. Kept the M3 numbers. Closes #35\r\n- TTFT_fabric was 300 ms against a 500 ms TTFT budget. Expressed as a fraction instead. Closes #36\r\n- Labelled the GPU-NIC PCIe indicator contextual, since that segment is outside the DUT boundary. Closes #37",
+      "createdAt": "2026-07-21T17:25:39Z",
+      "updatedAt": "2026-07-22T09:57:26Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "de74cecb70ca0eed42f22554c4078d59b1198140",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "carlos-andrew-review-pass-3",
+      "headRefOid": "096743034ae36867d074d77ffa95dfcf6277d630",
+      "closedAt": "2026-07-22T09:57:23Z",
+      "mergedAt": "2026-07-22T09:57:23Z",
+      "mergedBy": "cpignata",
+      "mergeCommit": {
+        "oid": "b6592e1ddc43445da7ba285bf0fef37b9fd5a456"
+      },
+      "comments": [
+        {
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@fcalabri , please review! :-) ",
+          "createdAt": "2026-07-21T17:29:32Z",
+          "updatedAt": "2026-07-21T17:29:32Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s8AAAABGw4Snw",
+          "commit": {
+            "abbreviatedOid": "ea1c3d9"
+          },
+          "author": "fcalabri",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "- Section 7.1 (F04): the formula intro still said \"dispatch payload per GPU per\r\n  MoE layer\"; T_dispatch is a per-source-destination-pair quantity (as Table 7\r\n  and the MoE appendix already state), so the label is corrected. Added the\r\n  per-accelerator egress formula T_egress = B \u00d7 k \u00d7 H_model \u00d7 P_bytes \u00d7 (N-1)/N\r\n  (= T_dispatch \u00d7 (N-1)), with a note that only inter-node peers are\r\n  fabric-visible (88 of 95 in the appendix worked example). Closes the\r\n  per-pair/per-accelerator ambiguity.\r\n\r\n- MoE appendix (F04/F92 follow-up): per-pair value aligned to ~76.5 KB (exact:\r\n  76,458 B) so the bullet matches the aggregate line and 76.5 KB \u00d7 8,448 \u2248\r\n  646 MB recomputes from the printed numbers.",
+          "createdAt": "2026-07-21T20:42:17Z",
+          "updatedAt": "2026-07-21T20:42:17Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
