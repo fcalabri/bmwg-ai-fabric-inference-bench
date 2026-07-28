@@ -405,7 +405,7 @@ defined in the subsections below.
 | E2E_latency | ms | End-to-end request latency from arrival to completion of all output tokens | SUT-E request/response boundary |
 {: #tab-latency-kpis title="Primary Latency KPIs"}
 
-## Primary Throughput KPIs
+## Primary Throughput and Efficiency KPIs
 
 | KPI | Unit | Definition | Measurement Point |
 |-----|------|------------|-------------------|
@@ -415,14 +415,14 @@ defined in the subsections below.
 | Goodput | GB/s or tokens/s | See the Goodput definition in {{TERMINOLOGY}}. Reports use Inference_Goodput for token-rate measurements and Fabric_Goodput for byte-rate fabric measurements | SUT-E successful completion events |
 | Request_Rate | req/s | Maximum sustained request arrival rate meeting all latency SLOs | SUT-E admission control boundary |
 | Prefix_cache_hit_rate | % | Fraction of requests whose shared prefix KV cache segment is already resident on the assigned worker, avoiding a fabric transfer | SUT-E request router counters |
-| JFI_decode | dimensionless (0-1) | Jain's Fairness Index of per-decode-worker load (KV cache receive rate, GPU utilization, output TPS) | SUT-E per-worker counters |
-{: #tab-throughput-kpis title="Primary Throughput KPIs"}
+| JFI_decode | dimensionless (0-1), one value per metric | Jain's Fairness Index per {{TERMINOLOGY}}, computed separately for each of: per-decode-worker KV cache receive rate, GPU utilization, and output TPS. Reports state which of the three the value applies to; results are not combined into a single index | SUT-E per-worker counters |
+{: #tab-throughput-kpis title="Primary Throughput and Efficiency KPIs"}
 
 ## Fabric-Level KPIs
 
 | KPI | Unit | Definition | DUT |
 |-----|------|------------|-----|
-| KV_xfer_latency | us | One-sided RDMA PUT completion time for a single KV cache block transfer | DUT-N |
+| KV_xfer_latency | us | One-sided RDMA PUT completion time for a single KV cache block transfer | DUT-N, DUT-PD |
 | KV_xfer_bandwidth | GB/s | Sustained unidirectional KV cache transfer throughput, reported per NIC port and as the aggregate between prefill and decode pools | DUT-N, DUT-PD |
 | EP_alltoall_latency | us | Round-trip time for a complete MoE expert parallelism AllToAll dispatch | DUT-F |
 | EP_alltoall_bandwidth | GB/s | Aggregate AllToAll bandwidth across all EP ranks during dispatch | DUT-F |
@@ -646,6 +646,10 @@ latency-sensitive inter-GPU traffic patterns.
 expert parallelism across the DUT fabric.
 
 **Procedure:** Generate a synthetic MoE dispatch workload where each GPU sends token embeddings to the experts selected by a top-k routing function.
+Repeat the workload across EP group sizes 8, 16, 32, 48, 64, 96 and a range
+of per-GPU batch sizes (e.g., 32, 64, 128, 256 tokens), holding the selected
+canonical MoE test matrix config row constant, to populate the
+EP-size-by-batch-size grid used in the Reporting Format below.
 The dispatch payload per source-destination GPU pair per MoE layer is:
 
 T_dispatch = (B × k × H_model × P_bytes) / N. where B = per-GPU batch size (tokens), k = top-k routing count,
@@ -720,7 +724,9 @@ The selected config row is identified in the results.
 
 **Measurement:** Report total dispatch latency (us), inter-node bandwidth
 (GB/s), and latency decomposition (intra-node vs. inter-node fraction). Report
-the scaling efficiency: (EP=8 latency) / (EP=N latency) × (N/8).
+the scaling efficiency: (EP=16 latency) / (EP=N latency), using EP=16 as the
+wide-EP baseline (the first configuration requiring inter-node fabric
+communication).
 
 ## Expert Parallelism and KV Cache Transfer Contention
 
@@ -1008,9 +1014,13 @@ GPUs). At each scale point (following powers of two), measure KV cache transfer
 throughput and latency, EP AllToAll dispatch latency, fabric control plane
 convergence time, routing table size, and end-to-end TTFT and TPS.
 
-**Measurement:** Report all KPIs at each scale point. Identify the scale limit
-as the point where any KPI degrades by more than 10% from the
-minimal-configuration baseline.
+**Measurement:** Report all KPIs at each scale point. A 10% degradation from
+the minimal-configuration baseline is used in this document as an
+illustrative reporting point for identifying the scale limit; per the BMWG
+charter, the definition of acceptance criteria or performance requirements is
+explicitly outside the scope of this Working Group, and this value is not a
+pass/fail threshold. Deployment-specific scale limits are outside the scope
+of this document.
 
 ## Dynamic Autoscaling Response Time
 
