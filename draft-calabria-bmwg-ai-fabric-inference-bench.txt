@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 23 January 2027                            Blue Fern Consulting
+Expires: 29 January 2027                            Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                            22 July 2026
+                                                            28 July 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -74,7 +74,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 23 January 2027.
+   This Internet-Draft will expire on 29 January 2027.
 
 Copyright Notice
 
@@ -111,7 +111,7 @@ Table of Contents
        3.4.2.  Software Workload Emulator (WE) - Minimum Requirements
    4.  KPI Framework and Metrics Taxonomy
      4.1.  Primary Latency KPIs
-     4.2.  Primary Throughput KPIs
+     4.2.  Primary Throughput and Efficiency KPIs
      4.3.  Fabric-Level KPIs
      4.4.  Fabric Health Indicators
    5.  Test Category 1: RDMA KV Cache Transfer Benchmarks
@@ -590,72 +590,82 @@ Table of Contents
 
                       Table 3: Primary Latency KPIs
 
-4.2.  Primary Throughput KPIs
+4.2.  Primary Throughput and Efficiency KPIs
 
-   +=====================+=============+==================+===========+
-   |KPI                  |Unit         |Definition        |Measurement|
-   |                     |             |                  |Point      |
-   +=====================+=============+==================+===========+
-   |TPS_input            |tokens/s     |Aggregate input   |SUT-E      |
-   |                     |             |(prefill) tokens  |prefill    |
-   |                     |             |processed per     |completion |
-   |                     |             |second across all |events     |
-   |                     |             |workers           |           |
-   +---------------------+-------------+------------------+-----------+
-   |TPS_output           |tokens/s     |Aggregate output  |SUT-E token|
-   |                     |             |(decode) tokens   |emission   |
-   |                     |             |generated per     |events     |
-   |                     |             |second across all |           |
-   |                     |             |workers           |           |
-   +---------------------+-------------+------------------+-----------+
-   |TPS_per_GPU          |tokens/s/GPU |Output tokens per |SUT-E per- |
-   |                     |             |second normalized |worker     |
-   |                     |             |by number of      |counters   |
-   |                     |             |decode GPUs       |           |
-   +---------------------+-------------+------------------+-----------+
-   |Goodput              |GB/s or      |See the Goodput   |SUT-E      |
-   |                     |tokens/s     |definition in     |successful |
-   |                     |             |[TERMINOLOGY].    |completion |
-   |                     |             |Reports use       |events     |
-   |                     |             |Inference_Goodput |           |
-   |                     |             |for token-rate    |           |
-   |                     |             |measurements and  |           |
-   |                     |             |Fabric_Goodput for|           |
-   |                     |             |byte-rate fabric  |           |
-   |                     |             |measurements      |           |
-   +---------------------+-------------+------------------+-----------+
-   |Request_Rate         |req/s        |Maximum sustained |SUT-E      |
-   |                     |             |request arrival   |admission  |
-   |                     |             |rate meeting all  |control    |
-   |                     |             |latency SLOs      |boundary   |
-   +---------------------+-------------+------------------+-----------+
-   |Prefix_cache_hit_rate|%            |Fraction of       |SUT-E      |
-   |                     |             |requests whose    |request    |
-   |                     |             |shared prefix KV  |router     |
-   |                     |             |cache segment is  |counters   |
-   |                     |             |already resident  |           |
-   |                     |             |on the assigned   |           |
-   |                     |             |worker, avoiding a|           |
-   |                     |             |fabric transfer   |           |
-   +---------------------+-------------+------------------+-----------+
-   |JFI_decode           |dimensionless|Jain's Fairness   |SUT-E per- |
-   |                     |(0-1)        |Index of per-     |worker     |
-   |                     |             |decode-worker load|counters   |
-   |                     |             |(KV cache receive |           |
-   |                     |             |rate, GPU         |           |
-   |                     |             |utilization,      |           |
-   |                     |             |output TPS)       |           |
-   +---------------------+-------------+------------------+-----------+
+   +=====================+=============+===================+===========+
+   |KPI                  |Unit         |Definition         |Measurement|
+   |                     |             |                   |Point      |
+   +=====================+=============+===================+===========+
+   |TPS_input            |tokens/s     |Aggregate input    |SUT-E      |
+   |                     |             |(prefill) tokens   |prefill    |
+   |                     |             |processed per      |completion |
+   |                     |             |second across all  |events     |
+   |                     |             |workers            |           |
+   +---------------------+-------------+-------------------+-----------+
+   |TPS_output           |tokens/s     |Aggregate output   |SUT-E token|
+   |                     |             |(decode) tokens    |emission   |
+   |                     |             |generated per      |events     |
+   |                     |             |second across all  |           |
+   |                     |             |workers            |           |
+   +---------------------+-------------+-------------------+-----------+
+   |TPS_per_GPU          |tokens/s/GPU |Output tokens per  |SUT-E per- |
+   |                     |             |second normalized  |worker     |
+   |                     |             |by number of       |counters   |
+   |                     |             |decode GPUs        |           |
+   +---------------------+-------------+-------------------+-----------+
+   |Goodput              |GB/s or      |See the Goodput    |SUT-E      |
+   |                     |tokens/s     |definition in      |successful |
+   |                     |             |[TERMINOLOGY].     |completion |
+   |                     |             |Reports use        |events     |
+   |                     |             |Inference_Goodput  |           |
+   |                     |             |for token-rate     |           |
+   |                     |             |measurements and   |           |
+   |                     |             |Fabric_Goodput for |           |
+   |                     |             |byte-rate fabric   |           |
+   |                     |             |measurements       |           |
+   +---------------------+-------------+-------------------+-----------+
+   |Request_Rate         |req/s        |Maximum sustained  |SUT-E      |
+   |                     |             |request arrival    |admission  |
+   |                     |             |rate meeting all   |control    |
+   |                     |             |latency SLOs       |boundary   |
+   +---------------------+-------------+-------------------+-----------+
+   |Prefix_cache_hit_rate|%            |Fraction of        |SUT-E      |
+   |                     |             |requests whose     |request    |
+   |                     |             |shared prefix KV   |router     |
+   |                     |             |cache segment is   |counters   |
+   |                     |             |already resident   |           |
+   |                     |             |on the assigned    |           |
+   |                     |             |worker, avoiding a |           |
+   |                     |             |fabric transfer    |           |
+   +---------------------+-------------+-------------------+-----------+
+   |JFI_decode           |dimensionless|Jain's Fairness    |SUT-E per- |
+   |                     |(0-1), one   |Index per          |worker     |
+   |                     |value per    |[TERMINOLOGY],     |counters   |
+   |                     |metric       |computed           |           |
+   |                     |             |separately for     |           |
+   |                     |             |each of: per-      |           |
+   |                     |             |decode-worker KV   |           |
+   |                     |             |cache receive      |           |
+   |                     |             |rate, GPU          |           |
+   |                     |             |utilization, and   |           |
+   |                     |             |output TPS.        |           |
+   |                     |             |Reports state      |           |
+   |                     |             |which of the three |           |
+   |                     |             |the value applies  |           |
+   |                     |             |to; results are    |           |
+   |                     |             |not combined into  |           |
+   |                     |             |a single index     |           |
+   +---------------------+-------------+-------------------+-----------+
 
-                     Table 4: Primary Throughput KPIs
+              Table 4: Primary Throughput and Efficiency KPIs
 
 4.3.  Fabric-Level KPIs
 
    +=======================+========+=========================+========+
    | KPI                   | Unit   | Definition              | DUT    |
    +=======================+========+=========================+========+
-   | KV_xfer_latency       | us     | One-sided RDMA PUT      | DUT-N  |
-   |                       |        | completion time for     |        |
+   | KV_xfer_latency       | us     | One-sided RDMA PUT      | DUT-N, |
+   |                       |        | completion time for     | DUT-PD |
    |                       |        | a single KV cache       |        |
    |                       |        | block transfer          |        |
    +-----------------------+--------+-------------------------+--------+
@@ -977,8 +987,12 @@ Table of Contents
 
    *Procedure:* Generate a synthetic MoE dispatch workload where each
    GPU sends token embeddings to the experts selected by a top-k routing
-   function.  The dispatch payload per source-destination GPU pair per
-   MoE layer is:
+   function.  Repeat the workload across EP group sizes 8, 16, 32, 48,
+   64, 96 and a range of per-GPU batch sizes (e.g., 32, 64, 128, 256
+   tokens), holding the selected canonical MoE test matrix config row
+   constant, to populate the EP-size-by-batch-size grid used in the
+   Reporting Format below.  The dispatch payload per source-destination
+   GPU pair per MoE layer is:
 
    T_dispatch = (B × k × H_model × P_bytes) / N. where B = per-GPU batch
    size (tokens), k = top-k routing count, H_model = hidden dimension,
@@ -1099,8 +1113,9 @@ Table of Contents
 
    *Measurement:* Report total dispatch latency (us), inter-node
    bandwidth (GB/s), and latency decomposition (intra-node vs. inter-
-   node fraction).  Report the scaling efficiency: (EP=8 latency) /
-   (EP=N latency) × (N/8).
+   node fraction).  Report the scaling efficiency: (EP=16 latency) /
+   (EP=N latency), using EP=16 as the wide-EP baseline (the first
+   configuration requiring inter-node fabric communication).
 
 7.4.  Expert Parallelism and KV Cache Transfer Contention
 
@@ -1432,9 +1447,14 @@ Table of Contents
    AllToAll dispatch latency, fabric control plane convergence time,
    routing table size, and end-to-end TTFT and TPS.
 
-   *Measurement:* Report all KPIs at each scale point.  Identify the
-   scale limit as the point where any KPI degrades by more than 10% from
-   the minimal-configuration baseline.
+   *Measurement:* Report all KPIs at each scale point.  A 10%
+   degradation from the minimal-configuration baseline is used in this
+   document as an illustrative reporting point for identifying the scale
+   limit; per the BMWG charter, the definition of acceptance criteria or
+   performance requirements is explicitly outside the scope of this
+   Working Group, and this value is not a pass/fail threshold.
+   Deployment-specific scale limits are outside the scope of this
+   document.
 
 12.2.  Dynamic Autoscaling Response Time
 
