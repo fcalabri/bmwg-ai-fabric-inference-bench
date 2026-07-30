@@ -661,9 +661,13 @@ destination peers, is:
 T_egress = B × k × H_model × P_bytes × (N - 1) / N
 
 T_egress, not T_dispatch, characterizes the per-accelerator offered load: it
-equals T_dispatch × (N - 1). The fabric-visible portion of T_egress counts
-only inter-node destination peers; see the MoE AllToAll appendix for a worked
-example in which 88 of 95 destination peers are inter-node.
+equals T_dispatch × (N - 1). The portion of T_egress that crosses the Fabric
+DUT Boundary counts only inter-node destination peers; this quantity is the
+Fabric-Visible Data Volume (S_fabric) defined in {{TERMINOLOGY}}, and expert
+placement across nodes determines it. Two results obtained at equal B, k, and
+N but different expert placement therefore represent different offered fabric
+workloads. See the MoE AllToAll appendix for a worked example in which 88 of
+95 destination peers are inter-node.
 
 **Canonical MoE Test Matrix**
 
@@ -727,6 +731,13 @@ The selected config row is identified in the results.
 the scaling efficiency: (EP=16 latency) / (EP=N latency), using EP=16 as the
 wide-EP baseline (the first configuration requiring inter-node fabric
 communication).
+
+Because S_fabric varies with EP group size and expert placement, the EP=8
+configuration presents no dispatch traffic to the fabric and is reported as a
+placement reference point rather than as a fabric result. Report S_fabric at
+each EP size per {{reporting}}; the scaling curve is interpreted against that
+series, since a change in dispatch latency across EP sizes reflects both the
+change in offered fabric work and the fabric's response to it.
 
 ## Expert Parallelism and KV Cache Transfer Contention
 
@@ -1134,6 +1145,21 @@ inference-specific reporting elements apply:
   trials, all measured KPI values with confidence intervals, and any anomalies
   observed.
 
+* **Fabric-Visible Data Volume Report:** for every MoE AllToAll result reported
+  under {{test-cat3}}, the report states: the application-level dispatch volume
+  per participant (T_egress); the Fabric-Visible Data Volume (S_fabric) defined
+  in {{TERMINOLOGY}}, together with the method used to obtain it (measurement
+  from NIC Ethernet port counters is preferred; derivation from the routing
+  function and the expert placement is acceptable when the derivation is
+  stated); and the expert placement across nodes, including EP group size and
+  accelerators per node. Intra-node transfer contributions are reported as a
+  separately labelled component per {{scope-and-applicability}} and are never
+  added to, subtracted from, or folded into a fabric KPI. Comparisons between
+  fabrics use the same expert placement on both sides; where placement cannot be
+  matched, the report gives S_fabric for each result so that the difference in
+  offered fabric work is visible, and the results are not presented as an
+  equal-workload comparison.
+
 | Report Element | Format | Required? |
 |----------------|--------|-----------|
 | System Configuration | Structured table per above | Yes (required) |
@@ -1142,6 +1168,7 @@ inference-specific reporting elements apply:
 | Latency Distribution Plots | CDF or histogram per test section | Recommended |
 | Throughput vs. Scale Graphs | Line chart per test section | Recommended |
 | Fabric Health Indicators | Table per {{tab-health}} | Yes (values reported; the Typical Healthy Range column is informative, not a pass/fail requirement) |
+| Fabric-Visible Data Volume | S_fabric with derivation method and expert placement | Yes (required) for {{test-cat3}} results |
 | Raw Data Appendix | Machine-readable format (CSV, JSON) | Optional |
 {: #tab-reporting title="Reporting Format Requirements"}
 
@@ -1297,10 +1324,14 @@ For a representative MoE configuration (M3: E=256, k=2, H_model=7168, EP=96 acro
   = ~76.5 KB per GPU pair. Of the 96 × 95 = 9,120 total ordered GPU pairs, only
   96 × 88 = 8,448 cross the fabric (the remaining 672 pairs are intra-node,
   within each of the 12 8-GPU nodes, and do not traverse the fabric).
-  Fabric-visible aggregate: ~76.5 KB × 8,448 ≈ 646 MB.
+  Fabric-Visible Data Volume (S_fabric), aggregate: ~76.5 KB × 8,448 ≈ 646 MB.
 * Low-Latency Dispatch (decode, batch=8): 8 × 2 × 7168 × 2 bytes / 96 GPUs
-  = ~2.4 KB per GPU pair; fabric-visible aggregate (8,448 pairs): ~2.4 KB × 8,448
+  = ~2.4 KB per GPU pair; S_fabric aggregate (8,448 pairs): ~2.4 KB × 8,448
   ≈ 20.2 MB.
+
+Both figures are derived from the expert placement rather than measured; a
+report using this derivation states it, per the Fabric-Visible Data Volume
+reporting element of {{reporting}}.
 
 With 61 MoE layers and a decode iteration time target of ~30 ms, the decode
 phase requires 61 AllToAll dispatches within 30 ms. This yields 61 dispatches
