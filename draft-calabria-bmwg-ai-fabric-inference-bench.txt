@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 29 January 2027                            Blue Fern Consulting
+Expires: 1 February 2027                            Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                            28 July 2026
+                                                            31 July 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -74,7 +74,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 29 January 2027.
+   This Internet-Draft will expire on 1 February 2027.
 
 Copyright Notice
 
@@ -1005,10 +1005,14 @@ Table of Contents
    T_egress = B × k × H_model × P_bytes × (N - 1) / N
 
    T_egress, not T_dispatch, characterizes the per-accelerator offered
-   load: it equals T_dispatch × (N - 1).  The fabric-visible portion of
-   T_egress counts only inter-node destination peers; see the MoE
-   AllToAll appendix for a worked example in which 88 of 95 destination
-   peers are inter-node.
+   load: it equals T_dispatch × (N - 1).  The portion of T_egress that
+   crosses the Fabric DUT Boundary counts only inter-node destination
+   peers; this quantity is the Fabric-Visible Data Volume (S_fabric)
+   defined in [TERMINOLOGY], and expert placement across nodes
+   determines it.  Two results obtained at equal B, k, and N but
+   different expert placement therefore represent different offered
+   fabric workloads.  See the MoE AllToAll appendix for a worked example
+   in which 88 of 95 destination peers are inter-node.
 
    *Canonical MoE Test Matrix*
 
@@ -1116,6 +1120,14 @@ Table of Contents
    node fraction).  Report the scaling efficiency: (EP=16 latency) /
    (EP=N latency), using EP=16 as the wide-EP baseline (the first
    configuration requiring inter-node fabric communication).
+
+   Because S_fabric varies with EP group size and expert placement, the
+   EP=8 configuration presents no dispatch traffic to the fabric and is
+   reported as a placement reference point rather than as a fabric
+   result.  Report S_fabric at each EP size per Section 14; the scaling
+   curve is interpreted against that series, since a change in dispatch
+   latency across EP sizes reflects both the change in offered fabric
+   work and the fabric's response to it.
 
 7.4.  Expert Parallelism and KV Cache Transfer Contention
 
@@ -1578,38 +1590,58 @@ Table of Contents
       tested, the number of trials, all measured KPI values with
       confidence intervals, and any anomalies observed.
 
-     +===============+==================+============================+
-     | Report        | Format           | Required?                  |
-     | Element       |                  |                            |
-     +===============+==================+============================+
-     | System        | Structured table | Yes (required)             |
-     | Configuration | per above        |                            |
-     +---------------+------------------+----------------------------+
-     | Workload      | Structured table | Yes (required)             |
-     | Parameters    | per above        |                            |
-     +---------------+------------------+----------------------------+
-     | KPI Summary   | Table with all   | Yes (required)             |
-     | Table         | measured KPIs    |                            |
-     +---------------+------------------+----------------------------+
-     | Latency       | CDF or histogram | Recommended                |
-     | Distribution  | per test section |                            |
-     | Plots         |                  |                            |
-     +---------------+------------------+----------------------------+
-     | Throughput    | Line chart per   | Recommended                |
-     | vs. Scale     | test section     |                            |
-     | Graphs        |                  |                            |
-     +---------------+------------------+----------------------------+
-     | Fabric Health | Table per        | Yes (values reported; the  |
-     | Indicators    | Table 6          | Typical Healthy Range      |
-     |               |                  | column is informative, not |
-     |               |                  | a pass/fail requirement)   |
-     +---------------+------------------+----------------------------+
-     | Raw Data      | Machine-readable | Optional                   |
-     | Appendix      | format (CSV,     |                            |
-     |               | JSON)            |                            |
-     +---------------+------------------+----------------------------+
+   *  *Fabric-Visible Data Volume Report:* for every MoE AllToAll result
+      reported under Section 7, the report states: the application-level
+      dispatch volume per participant (T_egress); the Fabric-Visible
+      Data Volume (S_fabric) defined in [TERMINOLOGY], together with the
+      method used to obtain it (measurement from NIC Ethernet port
+      counters is preferred; derivation from the routing function and
+      the expert placement is acceptable when the derivation is stated);
+      and the expert placement across nodes, including EP group size and
+      accelerators per node.  Intra-node transfer contributions are
+      reported as a separately labelled component per Section 1.2 and
+      are never added to, subtracted from, or folded into a fabric KPI.
+      Comparisons between fabrics use the same expert placement on both
+      sides; where placement cannot be matched, the report gives
+      S_fabric for each result so that the difference in offered fabric
+      work is visible, and the results are not presented as an equal-
+      workload comparison.
 
-                  Table 10: Reporting Format Requirements
+    +================+==================+============================+
+    | Report Element | Format           | Required?                  |
+    +================+==================+============================+
+    | System         | Structured table | Yes (required)             |
+    | Configuration  | per above        |                            |
+    +----------------+------------------+----------------------------+
+    | Workload       | Structured table | Yes (required)             |
+    | Parameters     | per above        |                            |
+    +----------------+------------------+----------------------------+
+    | KPI Summary    | Table with all   | Yes (required)             |
+    | Table          | measured KPIs    |                            |
+    +----------------+------------------+----------------------------+
+    | Latency        | CDF or histogram | Recommended                |
+    | Distribution   | per test section |                            |
+    | Plots          |                  |                            |
+    +----------------+------------------+----------------------------+
+    | Throughput vs. | Line chart per   | Recommended                |
+    | Scale Graphs   | test section     |                            |
+    +----------------+------------------+----------------------------+
+    | Fabric Health  | Table per        | Yes (values reported; the  |
+    | Indicators     | Table 6          | Typical Healthy Range      |
+    |                |                  | column is informative, not |
+    |                |                  | a pass/fail requirement)   |
+    +----------------+------------------+----------------------------+
+    | Fabric-Visible | S_fabric with    | Yes (required) for         |
+    | Data Volume    | derivation       | Section 7 results          |
+    |                | method and       |                            |
+    |                | expert placement |                            |
+    +----------------+------------------+----------------------------+
+    | Raw Data       | Machine-readable | Optional                   |
+    | Appendix       | format (CSV,     |                            |
+    |                | JSON)            |                            |
+    +----------------+------------------+----------------------------+
+
+                 Table 10: Reporting Format Requirements
 
 15.  Security Considerations
 
@@ -2094,12 +2126,16 @@ Appendix E.  MoE AllToAll Communication Pattern
       96 GPUs = ~76.5 KB per GPU pair.  Of the 96 × 95 = 9,120 total
       ordered GPU pairs, only 96 × 88 = 8,448 cross the fabric (the
       remaining 672 pairs are intra-node, within each of the 12 8-GPU
-      nodes, and do not traverse the fabric).  Fabric-visible aggregate:
-      ~76.5 KB × 8,448 ≈ 646 MB.
+      nodes, and do not traverse the fabric).  Fabric-Visible Data
+      Volume (S_fabric), aggregate: ~76.5 KB × 8,448 ≈ 646 MB.
 
    *  Low-Latency Dispatch (decode, batch=8): 8 × 2 × 7168 × 2 bytes /
-      96 GPUs = ~2.4 KB per GPU pair; fabric-visible aggregate (8,448
-      pairs): ~2.4 KB × 8,448 ≈ 20.2 MB.
+      96 GPUs = ~2.4 KB per GPU pair; S_fabric aggregate (8,448 pairs):
+      ~2.4 KB × 8,448 ≈ 20.2 MB.
+
+   Both figures are derived from the expert placement rather than
+   measured; a report using this derivation states it, per the Fabric-
+   Visible Data Volume reporting element of Section 14.
 
    With 61 MoE layers and a decode iteration time target of ~30 ms, the
    decode phase requires 61 AllToAll dispatches within 30 ms.  This
