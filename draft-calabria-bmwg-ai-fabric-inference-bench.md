@@ -900,7 +900,7 @@ is provided.
 | CFG-B          | Mid: L=80, H_kv=8 (GQA), D=128, BF16 (~70B-parameter dense class)         | 1.3 GB            | 10.7 GB            | 43.0 GB             |
 | CFG-C          | Large: L=96, H_kv=64 (Multi-Head Attention, MHA), D=128, BF16 | 12.9 GB       | 103 GB             | 412 GB              |
 | CFG-D          | Mid INT8: L=80, H_kv=8 (GQA), D=128, INT8 (quantized)     | 0.67 GB           | 5.4 GB             | 21.5 GB             |
-| CFG-E (custom) | Implementer-defined: L=[value], H_kv=[value], D=[value], P=[value] | Computed          | Computed           | Computed            |
+| CFG-E (custom) | Implementer-defined: L=\[value\], H_kv=\[value\], D=\[value\], P=\[value\] | Computed          | Computed           | Computed            |
 {: #tab-conf-matrix title="Reference Configuration Matrix"}
 
 NOTE: S_KV values are computed per the S_KV formula in {{TERMINOLOGY}}
@@ -1148,17 +1148,27 @@ inference-specific reporting elements apply:
 * **Fabric-Visible Data Volume Report:** for every MoE AllToAll result reported
   under {{test-cat3}}, the report states: the application-level dispatch volume
   per participant (T_egress); the Fabric-Visible Data Volume (S_fabric) defined
-  in {{TERMINOLOGY}}, together with the method used to obtain it (measurement
+  in {{TERMINOLOGY}}, counted in application payload bytes with each byte
+  counted once per the Fabric_Goodput byte-counting rule of that document,
+  together with the method used to obtain it (measurement
   from NIC Ethernet port counters is preferred; derivation from the routing
   function and the expert placement is acceptable when the derivation is
-  stated); and the expert placement across nodes, including EP group size and
-  accelerators per node. Intra-node transfer contributions are reported as a
+  stated). Retransmitted and duplicate bytes MUST NOT be included in S_fabric;
+  under this rule the two methods return the same value, and where both are
+  available and they disagree the report gives both values and the difference.
+  The report also states the expert placement across nodes, including EP group
+  size and accelerators per node. Intra-node transfer contributions are reported as a
   separately labelled component per {{scope-and-applicability}} and are never
   added to, subtracted from, or folded into a fabric KPI. Comparisons between
   fabrics use the same expert placement on both sides; where placement cannot be
   matched, the report gives S_fabric for each result so that the difference in
   offered fabric work is visible, and the results are not presented as an
-  equal-workload comparison.
+  equal-workload comparison. Where a report needs to account for forwarding work
+  inside the Fabric DUT when explaining a difference between MoE AllToAll
+  results that match on S_fabric and expert placement, the optional diagnostic
+  profile defined in the companion training methodology document
+  ({{TRAINING-BENCH}}) may be applied; it does not alter S_fabric or any KPI
+  defined here.
 
 | Report Element | Format | Required? |
 |----------------|--------|-----------|
@@ -1373,4 +1383,4 @@ Step 5:  671,088,640 × 2   = 1,342,177,280 bytes
 # Acknowledgments
 {:numbered="false"}
 
-This work has benefited from the discussions that occurred during the joint IPPM and BMWG meeting and on the BMWG mailing list. Thanks to Carsten Rossenhoevel and Mohamed Boucadair for valuable review and comments. Thanks to Andrew Yourtchenko for a thorough review of the document set.
+This work has benefited from the discussions that occurred during the joint IPPM and BMWG meeting and on the BMWG mailing list. Thanks to Carsten Rossenhoevel and Mohamed Boucadair for valuable review and comments. Thanks to Andrew Yourtchenko for a thorough review of the document set. Thanks to Niangen Ye for the review comments on Fabric-Visible Data Volume provenance and on forwarding-work accounting, which prompted the byte-counting rule stated in this document.
