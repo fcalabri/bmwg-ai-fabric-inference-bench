@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-07-30T01:17:21.587025+00:00",
+  "timestamp": "2026-08-02T01:30:07.983300+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -535,6 +535,22 @@
       "createdAt": "2026-07-23T22:16:55Z",
       "updatedAt": "2026-07-28T19:50:22Z",
       "closedAt": "2026-07-28T19:50:22Z",
+      "comments": []
+    },
+    {
+      "number": 46,
+      "id": "I_kwDORX8k_s8AAAABLDobDA",
+      "title": "ML-02 (Niangen Ye, BMWG list \u2014 s_fabric provenance; companion accounting profile",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/46",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2026-08-01T12:20:43Z",
+      "updatedAt": "2026-08-01T12:20:43Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -1833,6 +1849,88 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 45,
+      "id": "PR_kwDORX8k_s74mXXF",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/45",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "normalization aigment",
+      "createdAt": "2026-07-30T15:37:18Z",
+      "updatedAt": "2026-07-31T20:04:34Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "639f817837eb1886ad75ef52a61bf6303eee732e",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "Normalization",
+      "headRefOid": "ccacc9412583b4d2acc4f8d23372ff08d1e86054",
+      "closedAt": "2026-07-31T20:04:34Z",
+      "mergedAt": "2026-07-31T20:04:34Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "1115f990e7fc6d7280aee9aac11da126969443dc"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s8AAAABH_IibQ",
+          "commit": {
+            "abbreviatedOid": "ccacc94"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-07-31T17:49:46Z",
+          "updatedAt": "2026-07-31T17:49:46Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 47,
+      "id": "PR_kwDORX8k_s75YU84",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/47",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "04 - Ye, N. email exchange on list ",
+      "createdAt": "2026-08-01T12:45:56Z",
+      "updatedAt": "2026-08-01T12:54:50Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "1115f990e7fc6d7280aee9aac11da126969443dc",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "04/sfabric-provenance",
+      "headRefOid": "857114cc34e19f74f35306629b1a21075f2fce60",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s8AAAABICuGgg",
+          "commit": {
+            "abbreviatedOid": "857114c"
+          },
+          "author": "cpignata",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2026-08-01T12:54:50Z",
+          "updatedAt": "2026-08-01T12:54:50Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
