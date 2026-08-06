@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-02T01:30:07.983300+00:00",
+  "timestamp": "2026-08-06T01:22:24.850526+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -542,15 +542,15 @@
       "id": "I_kwDORX8k_s8AAAABLDobDA",
       "title": "ML-02 (Niangen Ye, BMWG list \u2014 s_fabric provenance; companion accounting profile",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/46",
-      "state": "OPEN",
+      "state": "CLOSED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2026-08-01T12:20:43Z",
-      "updatedAt": "2026-08-01T12:20:43Z",
-      "closedAt": null,
+      "updatedAt": "2026-08-05T15:24:46Z",
+      "closedAt": "2026-08-05T15:24:46Z",
       "comments": []
     }
   ],
@@ -1897,24 +1897,26 @@
       "id": "PR_kwDORX8k_s75YU84",
       "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
       "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/47",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "fcalabri",
       "authorAssociation": "OWNER",
       "assignees": [],
       "labels": [],
       "body": "04 - Ye, N. email exchange on list ",
       "createdAt": "2026-08-01T12:45:56Z",
-      "updatedAt": "2026-08-01T12:54:50Z",
+      "updatedAt": "2026-08-05T15:24:31Z",
       "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "baseRefName": "main",
       "baseRefOid": "1115f990e7fc6d7280aee9aac11da126969443dc",
       "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
       "headRefName": "04/sfabric-provenance",
       "headRefOid": "857114cc34e19f74f35306629b1a21075f2fce60",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2026-08-05T15:24:30Z",
+      "mergedAt": "2026-08-05T15:24:30Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "aa54d527d502be3e631bf31e3209d1d93be2dacc"
+      },
       "comments": [],
       "reviews": [
         {
