@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-08-06T01:22:24.850526+00:00",
+  "timestamp": "2026-09-27T02:17:17.151616+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -551,6 +551,22 @@
       "createdAt": "2026-08-01T12:20:43Z",
       "updatedAt": "2026-08-05T15:24:46Z",
       "closedAt": "2026-08-05T15:24:46Z",
+      "comments": []
+    },
+    {
+      "number": 48,
+      "id": "I_kwDORX8k_s8AAAABS_ZntA",
+      "title": "Saumya Comments (list)",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/issues/48",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "Hello Authors, Group members,\n\nIt will be great to hear form anyone on the below email.\nAs an implementer of the solution, looking forward to the clarity,\n\nThanks,\nSaumya.\nFrom: Dikshit, Saumya <[saumya.dikshit@hpe.com](mailto:saumya.dikshit@hpe.com)>\nDate: Monday, 21 September 2026 at 5:11\u202fPM\nTo: [bmwg@ietf.org](mailto:bmwg@ietf.org) <[bmwg@ietf.org](mailto:bmwg@ietf.org)>\nCc: [draft-calabria-bmwg-ai-fabric-terminology@ietf.org](mailto:draft-calabria-bmwg-ai-fabric-terminology@ietf.org) <[draft-calabria-bmwg-ai-fabric-terminology@ietf.org](mailto:draft-calabria-bmwg-ai-fabric-terminology@ietf.org)>; [draft-calabria-bmwg-ai-fabric-training-bench@ietf.org](mailto:draft-calabria-bmwg-ai-fabric-training-bench@ietf.org) <[draft-calabria-bmwg-ai-fabric-training-bench@ietf.org](mailto:draft-calabria-bmwg-ai-fabric-training-bench@ietf.org)>; [draft-calabria-bmwg-ai-fabric-inference-bench@ietf.org](mailto:draft-calabria-bmwg-ai-fabric-inference-bench@ietf.org) <[draft-calabria-bmwg-ai-fabric-inference-bench@ietf.org](mailto:draft-calabria-bmwg-ai-fabric-inference-bench@ietf.org)>\nSubject: [bmwg] Comment on adoption of the AI network fabric benchmarking document set\n\nHello Authors of  draft-calabria-bmwg-ai-fabric-terminology, draft-calabria-bmwg-ai-fabric-training-bench, draft-calabria-bmwg-ai-fabric-inference-bench\n  and BMWG participants,\n\nI support discussion of the three companion documents on benchmarking Ethernet based AI network fabrics. \n\nBefore adoption, I suggest adding a common reproducibility and observation model across the three documents. \nThe current procedures may not cover this important bullet from implementation point of view\n, results from two fabrics may  be incomparable if the packetization, queue, observation point, or congestion control conditions differ.\n\nI would love to see the common methodology states in detail or at least draw attention to following:\n The MTU, packetization, segmentation, and encapsulation configuration used for each test.\nThe observation point for latency, queue depth, ECN marking, PFC events, and throughput.\nIngress, egress, and in fabric observations should not be treated as interchangeable.\nThe offered load, flow and microflow concurrency, message size distribution, burst pattern, and warm up period.\nThe ECN and PFC thresholds, congestion control algorithm and parameters, pause behavior, and any vendor specific defaults.\nThe separation between initialization, warm up, steady state, transient congestion, and recovery measurements.\nThe treatment of loss, counter resets, incomplete trials, retransmissions, and test runs that do not reach the required steady state.\nThe minimum metadata needed to reproduce a result, including topology, link speed, queue configuration, traffic class, endpoint and NIC configuration, software versions, and benchmark revision.\n\nThis is particularly important for the inference document. \nIts KV transfer, prefill and decode, expert parallelism, and congestion tests can produce different conclusions depending on whether the reported latency is measured at the application boundary, the RDMA operation boundary, the completion queue, or the fabric observation point.\nThe result should identify the boundary and provide enough timestamps to separate endpoint processing, queueing, and fabric delay.\n\nThe same  applies to the training document when ECN or PFC behavior is compared across fabrics. \nA marking rate or pause count without the corresponding offered load, packetization, queue threshold, and observation scope is difficult to interpret as a fabric property.\n\nI suggest adding a shared result metadata section or a common terminology and methodology table to the document set. \nThe goal is to  make the measurements comparable and the reported results reproducible.\n\nThe document set is also relevant to related IPPM and telemetry work because the benchmark output needs explicit scope and comparability rules when values are collected from multiple observation points or traffic classes.\n\nPlease let know your inputs on above and specially the last line before this one. \n\nBest Regards,\nSaumya Dikshit",
+      "createdAt": "2026-09-24T13:54:42Z",
+      "updatedAt": "2026-09-24T13:54:42Z",
+      "closedAt": null,
       "comments": []
     }
   ],
@@ -1933,6 +1949,34 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 49,
+      "id": "PR_kwDORX8k_s8AAAABE8j8Fg",
+      "title": "Update draft-calabria-bmwg-ai-fabric-inference-bench.md",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/49",
+      "state": "OPEN",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "Saumya email to the list",
+      "createdAt": "2026-09-24T14:08:01Z",
+      "updatedAt": "2026-09-24T14:08:01Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "aa54d527d502be3e631bf31e3209d1d93be2dacc",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "05/observation-point",
+      "headRefOid": "d8aeb8ecbcfb2d8d930d216d5a93d013de88c030",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
     }
   ]
 }
