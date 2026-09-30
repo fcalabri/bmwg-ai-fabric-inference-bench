@@ -1125,8 +1125,11 @@ perturbation.
 All test results are reported following the conventions established in
 {{RFC2544}} Section 26. Where BusBW is reported (e.g., in the MoE expert
 parallelism tests), results MUST follow the reporting requirements
-stated in the BusBW definition of {{TERMINOLOGY}}. In addition, the following
-inference-specific reporting elements apply:
+stated in the BusBW definition of {{TERMINOLOGY}}. The report identifies this
+document and {{TERMINOLOGY}} by name and revision. The Test Configuration,
+Observation Points, and Trial Accounting elements of the Reporting Format of
+{{TRAINING-BENCH}} apply to this document without change. In addition, the
+following inference-specific reporting elements apply:
 
 * **System Configuration Report:** the report includes: model name and
   parameter count, parallelism strategy (TP, DP, EP, PP configuration for both
@@ -1143,7 +1146,15 @@ inference-specific reporting elements apply:
 * **Results Reporting:** for each test, results include: the specific test
   identifier (e.g., Test 5.1), the DUT/SUT configuration tested, the number of
   trials, all measured KPI values with confidence intervals, and any anomalies
-  observed.
+  observed. The DUT/SUT configuration fixes the measurement boundary of the
+  result ({{tab-dut}}). Results obtained at different boundaries are not
+  compared with each other or combined; for example, a KV_xfer_latency
+  measured from PUT posting to remote completion (DUT-N or DUT-PD) is not
+  compared with a NIC-to-NIC latency measured at DUT-F. When a latency is
+  measured at a boundary wider than DUT-F, the report states the timestamps
+  used and, where the test equipment observes the NIC Ethernet ports, reports
+  the fabric-segment component separately, as in the TTFT decomposition of
+  {{end-to-end-disaggregated-ttft}}.
 
 * **Fabric-Visible Data Volume Report:** for every MoE AllToAll result reported
   under {{test-cat3}}, the report states: the application-level dispatch volume
