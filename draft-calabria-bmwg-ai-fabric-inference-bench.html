@@ -3080,8 +3080,11 @@ perturbation.<a href="#section-13.3-3" class="pilcrow">¶</a></p>
 <p id="section-14-1">All test results are reported following the conventions established in
 <span>[<a href="#RFC2544" class="cite xref">RFC2544</a>]</span> Section 26. Where BusBW is reported (e.g., in the MoE expert
 parallelism tests), results <span class="bcp14">MUST</span> follow the reporting requirements
-stated in the BusBW definition of <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>. In addition, the following
-inference-specific reporting elements apply:<a href="#section-14-1" class="pilcrow">¶</a></p>
+stated in the BusBW definition of <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span>. The report identifies this
+document and <span>[<a href="#TERMINOLOGY" class="cite xref">TERMINOLOGY</a>]</span> by name and revision. The Test Configuration,
+Observation Points, and Trial Accounting elements of the Reporting Format of
+<span>[<a href="#TRAINING-BENCH" class="cite xref">TRAINING-BENCH</a>]</span> apply to this document without change. In addition, the
+following inference-specific reporting elements apply:<a href="#section-14-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-14-2.1">
           <p id="section-14-2.1.1"><strong>System Configuration Report:</strong> the report includes: model name and
@@ -3101,7 +3104,15 @@ prefix sharing percentage.<a href="#section-14-2.2.1" class="pilcrow">¶</a></p>
           <p id="section-14-2.3.1"><strong>Results Reporting:</strong> for each test, results include: the specific test
 identifier (e.g., Test 5.1), the DUT/SUT configuration tested, the number of
 trials, all measured KPI values with confidence intervals, and any anomalies
-observed.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
+observed. The DUT/SUT configuration fixes the measurement boundary of the
+result (<a href="#tab-dut" class="auto internal xref">Table 2</a>). Results obtained at different boundaries are not
+compared with each other or combined; for example, a KV_xfer_latency
+measured from PUT posting to remote completion (DUT-N or DUT-PD) is not
+compared with a NIC-to-NIC latency measured at DUT-F. When a latency is
+measured at a boundary wider than DUT-F, the report states the timestamps
+used and, where the test equipment observes the NIC Ethernet ports, reports
+the fabric-segment component separately, as in the TTFT decomposition of
+<a href="#end-to-end-disaggregated-ttft" class="auto internal xref">Section 6.1</a>.<a href="#section-14-2.3.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-14-2.4">
           <p id="section-14-2.4.1"><strong>Fabric-Visible Data Volume Report:</strong> for every MoE AllToAll result reported
