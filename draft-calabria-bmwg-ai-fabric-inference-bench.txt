@@ -5,13 +5,13 @@
 BMWG                                                         F. Calabria
 Internet-Draft                                                     Cisco
 Intended status: Informational                              C. Pignataro
-Expires: 6 February 2027                            Blue Fern Consulting
+Expires: 3 April 2027                               Blue Fern Consulting
                                                                    Q. Wu
                                                              G. Fioccola
                                                                   Huawei
                                                                 S. Reddy
                                                                    Apple
-                                                           5 August 2026
+                                                       30 September 2026
 
 
    Benchmarking Methodology for AI Inference Serving Network Fabrics
@@ -74,7 +74,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 6 February 2027.
+   This Internet-Draft will expire on 3 April 2027.
 
 Copyright Notice
 
@@ -1681,7 +1681,11 @@ Table of Contents
 
    Benchmarking is performed on a "black-box" basis, relying solely on
    measurements observable external to the DUT as defined in
-   [TERMINOLOGY].
+   [TERMINOLOGY].  Counters or telemetry read from the DUT itself (e.g.,
+   switch queue occupancy, ECN-marked packet counts, PFC PAUSE counts)
+   are a bounded exception to this principle per the black-box carve-out
+   in [TERMINOLOGY], reported as DUT-reported rather than independently
+   observed.
 
    Special capabilities SHOULD NOT exist in the DUT specifically for
    benchmarking purposes.  Any implications for network security arising
@@ -1775,17 +1779,17 @@ Table of Contents
               Calabria, F., Pignataro, C., Wu, Q., Fioccola, G., and S.
               Reddy, "Benchmarking Terminology for AI Network Fabrics",
               Work in Progress, Internet-Draft, draft-calabria-bmwg-ai-
-              fabric-terminology-03, 6 July 2026,
+              fabric-terminology-04, 12 August 2026,
               <https://datatracker.ietf.org/doc/html/draft-calabria-
-              bmwg-ai-fabric-terminology-03>.
+              bmwg-ai-fabric-terminology-04>.
 
    [TRAINING-BENCH]
               Calabria, F., Pignataro, C., Wu, Q., Fioccola, G., and S.
               Reddy, "Benchmarking Methodology for AI Training Network
               Fabrics", Work in Progress, Internet-Draft, draft-
-              calabria-bmwg-ai-fabric-training-bench-03, 6 July 2026,
+              calabria-bmwg-ai-fabric-training-bench-04, 12 August 2026,
               <https://datatracker.ietf.org/doc/html/draft-calabria-
-              bmwg-ai-fabric-training-bench-03>.
+              bmwg-ai-fabric-training-bench-04>.
 
    [UEC-1.0]  Ultra Ethernet Consortium, "Ultra Ethernet Transport (UET)
               Specification 1.0", June 2025,
