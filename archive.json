@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-01T02:53:23.209032+00:00",
+  "timestamp": "2026-10-04T03:13:33.113844+00:00",
   "repo": "fcalabri/bmwg-ai-fabric-inference-bench",
   "labels": [
     {
@@ -2007,6 +2007,50 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 51,
+      "id": "PR_kwDORX8k_s8AAAABGFLOmQ",
+      "title": "Point DUT-reported telemetry at TERMINOLOGY Security Considerations",
+      "url": "https://github.com/fcalabri/bmwg-ai-fabric-inference-bench/pull/51",
+      "state": "MERGED",
+      "author": "fcalabri",
+      "authorAssociation": "OWNER",
+      "assignees": [
+        "fcalabri"
+      ],
+      "labels": [],
+      "body": "Replace the restated black-box carve-out with a reference to the conditions now stated in the Security Considerations of TERMINOLOGY, and drop \"solely\" to match.",
+      "createdAt": "2026-10-01T11:31:07Z",
+      "updatedAt": "2026-10-01T11:49:13Z",
+      "baseRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "baseRefName": "main",
+      "baseRefOid": "ca9aed4c476c53660d315508eebb0619775e68bb",
+      "headRepository": "fcalabri/bmwg-ai-fabric-inference-bench",
+      "headRefName": "06/blackbox-wording",
+      "headRefOid": "ac29f49e1f8231f4faef114d98ec905fe5208e21",
+      "closedAt": "2026-10-01T11:49:13Z",
+      "mergedAt": "2026-10-01T11:49:13Z",
+      "mergedBy": "fcalabri",
+      "mergeCommit": {
+        "oid": "246a101a4b70029a95c8e10aa6637d261050b890"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDORX8k_s8AAAABQJf-mg",
+          "commit": {
+            "abbreviatedOid": "ac29f49"
+          },
+          "author": "billwuqin",
+          "authorAssociation": "COLLABORATOR",
+          "state": "APPROVED",
+          "body": "We are good now. thanks!",
+          "createdAt": "2026-10-01T11:33:07Z",
+          "updatedAt": "2026-10-01T11:33:07Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
