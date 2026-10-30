@@ -3,14 +3,14 @@ title: "Benchmarking Methodology for AI Inference Serving Network Fabrics"
 abbrev: "AI Inference Fabric Benchmarking"
 category: info
 
-docname: draft-calabria-bmwg-ai-fabric-inference-bench-latest
+docname: draft-calabria-bpm-ai-fabric-inference-bench-latest
 submissiontype: IETF
 ipr: trust200902
 number:
 consensus: true
 v: 3
 area: "Operations and Management"
-workgroup: "BMWG"
+workgroup: "BPM"
 keyword:
  - benchmarking
  - AI
@@ -28,7 +28,7 @@ venue:
   mail: "bmwg@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/bmwg/"
   github: "fcalabri/bmwg-ai-fabric-inference-bench"
-  latest: "https://fcalabri.github.io/bmwg-ai-fabric-inference-bench/draft-calabria-bmwg-ai-fabric-inference-bench.html"
+  latest: "https://fcalabri.github.io/bmwg-ai-fabric-inference-bench/draft-calabria-bpm-ai-fabric-inference-bench.html"
 
 author:
   - name: Fernando Calabria
@@ -63,8 +63,8 @@ normative:
   RFC6815:
   RFC8238:
   RFC8239:
-  TERMINOLOGY: I-D.calabria-bmwg-ai-fabric-terminology
-  TRAINING-BENCH: I-D.calabria-bmwg-ai-fabric-training-bench
+  TERMINOLOGY: I-D.calabria-bpm-ai-fabric-terminology
+  TRAINING-BENCH: I-D.calabria-bpm-ai-fabric-training-bench
   UEC-1.0:
     title: "Ultra Ethernet Transport (UET) Specification 1.0"
     author:
